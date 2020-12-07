@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# results folder
+results/**
+
+#other files
+.DS_Store
+.idea/
+
