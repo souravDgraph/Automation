@@ -131,6 +131,10 @@ dmypy.json
 results/*
 !results/report.html
 
+# backup folder
+backup/*
+!backup/.gitkeep
+
 #other files
 .DS_Store
 .idea/
