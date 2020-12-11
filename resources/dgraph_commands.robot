@@ -55,7 +55,7 @@ Create NFS Backup
     [Documentation]    Accepts three params: "{URL}","{appenders}" and "{backup_path}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
     ${P1}=    normalize path    ${CURDIR}/..
-    ${backup_path}=     ${P1}/backup
+    ${backup_path}=     Join Path	${P1}	backup
     clear all the folder in a directory    ${backup_path}
     connect server    ${URL}
     ${res}=    post nfs command    ${appenders}    ${backup_path}
@@ -66,14 +66,14 @@ Create NFS Backup
 Perform a restore on backup
     [Documentation]     Performs an restore operation on the default location of backup created.
     ${P1}=    normalize path    ${CURDIR}/..
-    ${path}=     ${P1}/backup
-    ${result_restore}=    Start Process    dgraph    restore    -p    ${path}    -l    ${path}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
+    ${path}=     Join Path	${P1}	backup
+    ${result_restore}=    Start Process    dgraph    restore    -p    ${path}/dgraph.202*    -l    ${path}/dgraph.202*    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
     Process Should Be Running    zero
     Process Should Be Running    alpha
     Process Should Be Running    restore
     Should Be Equal As Integers    ${result_restore}    3
     ${wait}=    Wait For Process    restore
-    Process Should Be Stopped
+    Process Should Be Stopped	restore
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
     ${Live_Text_File_Content}    Get File    ${P1}/results/restorebackup.txt
@@ -90,7 +90,7 @@ Perform a restore on backup present at other location
     Process Should Be Running    restore
     Should Be Equal As Integers    ${result_restore}    3
     ${wait}=    Wait For Process    restore
-    Process Should Be Stopped
+    Process Should Be Stopped	restore
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
     ${Live_Text_File_Content}    Get File    ${P1}/results/restorebackup.txt
@@ -118,7 +118,7 @@ Verify file exists in a directory with parent folder name
     [Arguments]    ${path}
     [Documentation]    Keyword to verify if a file exists in a directory
     ...    Accepts one argument "{path}" <- which indicates the path of the direcory
-    ${rest}    ${folder_name}=    Split String From Right    ${backup_path}    /    1
+    ${rest}    ${folder_name}=    Split String From Right    ${path}    /    1
     @{dirs}=    List Directories In Directory    ${path}
     FOR    ${dir}    IN    @{dirs}
         directory should exist    ${folder_name.strip()}/${dir}
