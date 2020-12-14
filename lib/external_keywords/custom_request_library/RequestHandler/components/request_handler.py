@@ -9,18 +9,20 @@ __email__ = "tkrishnakaushik96@gmail.com"
 __status__ = "Stagging"
 
 
-# api = TestRailAPI("https://dgraph.testrail.io/", "tester@dgraph.io", "dgraph")
-
-# api = TestRailAPI("https://dgraph.testrail.io/", "vivetha@dgraph.io", "Vera@5464")
-
 class RequestHandler:
 
     def __init__(self, url):
         self.url = url
-
         self.headers = {}
 
     def post_request(self, appender, body):
+        """
+        def to request a post call for the provided appender and body.
+        :param appender: /admin || /admin/backup
+        :param body: params
+        :return: response
+        """
+
         logger.info("Hitting post request at: "+self.url+appender)
         if appender == "/admin":
             self.headers = {
@@ -32,11 +34,20 @@ class RequestHandler:
         return response
 
     def get_request(self):
+        """
+        def to perform a get request.
+        :return: response
+        """
         response = requests.get(self.url)
         print(response.text)
         return response
 
     def get_request(self, appender):
+        """
+        def to perform the get request for a provided appender
+        :param appender: /*
+        :return: response
+        """
         print("Hitting get request at: " + self.url+appender)
         response = requests.get(self.url+appender)
         print(response.text)

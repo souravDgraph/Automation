@@ -18,7 +18,7 @@ TC_01 Perform liveload backup restore data.
      [Documentation]    Perform live load data.
      ...    *Author*: Krishna, Sourav and Sankalan
      [Tags]    regression   C698
-     Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
+     Execute Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}     live
 
 
 TC_02 Perform NFS backup and restore data

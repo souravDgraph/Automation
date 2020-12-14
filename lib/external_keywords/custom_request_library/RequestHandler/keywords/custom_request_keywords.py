@@ -12,6 +12,10 @@ import json
 
 
 class CustomRequestKeywords:
+    """
+    Custom Request Keywords Class.
+    """
+
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
     ROBOT_LIBRARY_VERSION = __version__
 
@@ -21,9 +25,20 @@ class CustomRequestKeywords:
     OS = None
 
     def connect_server(self, url):
+        """
+        def to conect to the url.
+        :param url:
+        :return: the instance of RequestHandler object
+        """
         self.req_handler = RequestHandler(url)
 
     def post_nfs_command(self, appender, path):
+        """
+        def to post dgraph nfs request and validate the output
+        :param appender: /admin || /admin/backup
+        :param path: path to the backup folder in the local.
+        :return:
+        """
 
         logger.info("backup path: " + path)
         logger.info("POST command has been requested for: " + appender)
@@ -49,11 +64,20 @@ class CustomRequestKeywords:
         return post_res
 
     def get_command(self):
+        """
+        def to perform a get request for the dgraph.
+        :return: response
+        """
         logger.info("Hitting the get method.")
         get_res = self.req_handler.get_request()
         return get_res
 
     def get_command(self, appender):
+        """
+        def to perform a get request for any appender provided.
+        :param appender: /*
+        :return: response
+        """
         logger.info("Hitting the get method with appender")
         logger.info("appending: " + appender + " to url")
         get_res = self.req_handler.get_request(appender)

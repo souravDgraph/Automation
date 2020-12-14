@@ -6,9 +6,9 @@ Library           JSONLibrary
 Library           String
 
 *** Keywords ***
-# Dgraph alpha and zero command
 Start Dgraph
-    [Documentation]    Start Dgraph alpha and Zero process
+    [Documentation]    Start Dgraph alpha and Zero process with cwd poiting to results folder.
+    # Dgraph alpha and zero command
     ${result_z}=    Process.start Process    dgraph    zero    2>&1    alias=zero    cwd=results    shell=yes    stdout=zero.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
@@ -17,6 +17,22 @@ Start Dgraph
     Process Should Be Running    alpha
     Should Be Equal As Integers    ${result_a}    2
     Wait For Process    timeout=10 s    on_timeout=continue
+
+Start Dgraph Zero
+    [Documentation]    Start Dgraph Zero process
+    ${result_z}=    Process.start Process    dgraph    zero    2>&1    alias=zero    cwd=results    shell=yes    stdout=zero.txt    stderr=zeroerr.txt
+    Process Should Be Running    zero
+    Wait For Process    timeout=10 s    on_timeout=continue
+    Should Be Equal As Integers    ${result_z}    1
+
+Start Dgraph Alpha for bulk loader
+    [Arguments]    ${path}    ${process_id}
+    [Documentation]    Start Dgraph Alpha with bulk loader data
+    ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
+    ${result_a}=    Process.start Process    dgraph    alpha    -p    ${path}    alias=alpha    stdout=alpha.txt    stderr=alphaerr.txt    shell=True    cwd=results
+    Process Should Be Running    alpha
+    Wait For Process    timeout=10 s    on_timeout=continue
+    Should Be Equal As Integers    ${result_a}    ${process_id}
     # End dgraph and zero process and clear the folders created in results
 
 End All Process
@@ -24,83 +40,128 @@ End All Process
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Terminate All Processes
-    ${P1}=    normalize path    ${CURDIR}/..
     Sleep    5s
-    ${Alpha_Text_Context}    Get File    ${P1}/results/alpha.txt
-    Should Contain    ${Alpha_Text_Context}    Buffer flushed successfully.
-    ${Zero_Text_Context}    Get File    ${P1}/results/zero.txt
-    Should Contain    ${Zero_Text_Context}    All done. Goodbye!
+    Verify file Content in results folder   zero    All done. Goodbye!
+    Verify file Content in results folder   alpha    Buffer flushed successfully.
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
-Execute Live Loader with rdf and schema parameters
-    [Arguments]    ${rdf_filename}    ${schema_filename}
-    [Documentation]    Keyword to accept two params "rdf_filename","schema_filename" and perform live loader.
-    ${P1}=    normalize path    ${CURDIR}/..
-    ${result_live_loader}=    Process.start Process    dgraph    live    -f    ${P1}/test_data/datasets/${rdf_filename}    -s    ${P1}/test_data/datasets/${schema_filename}    2>&1    alias=live    stdout=liveloader.txt    shell=yes    cwd=results
+End Zero Process
+    [Arguments]    ${is_clear_folder}
+    [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
+    ...    Accepts argument "is_clear_folder" as a check to clear the folder
+    Terminate All Processes
+    Sleep    5s
+    Verify file Content in results folder   zero    All done. Goodbye!
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+
+End Aplha Process
+    [Arguments]    ${is_clear_folder}
+    [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
+    ...    Accepts argument "is_clear_folder" as a check to clear the folder
+    Terminate All Processes
+    Sleep    5s
+    Verify file Content in results folder    alpha    Buffer flushed successfully.
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+
+# Bulk/Live Loader
+Execute Loader with rdf and schema parameters
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${loader_type}
+    [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
+    ...     rdf_filename, schema_filename ,loader_type- "live"/"bulk"
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${result_loader}=    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
     Process Should Be Running    zero
-    Process Should Be Running    alpha
-    Process Should Be Running    live
-    Should Be Equal As Integers    ${result_live_loader}    3
-    ${wait}=    Wait For Process    live
+    Run Keyword If    '${loader_type}' == 'live'    Process Should Be Running    alpha
+    ${process_id}    Set Variable    ${2}
+    ${process_id}=    Run Keyword If    '${loader_type}' == 'live'    Set Variable    ${3}
+    ...    ELSE    Set Variable    ${2}
+    Process Should Be Running    ${loader_type}
+    Should Be Equal    ${result_loader}    ${process_id}
+    ${wait}=    Wait For Process    ${loader_type}
     Process Should Be Stopped
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
-    Log To Console    ${result_live_loader}
-    ${Live_Text_File_Content}    Get File    ${P1}/results/liveloader.txt
-    Should Contain    ${Live_Text_File_Content}    Finished writing xid map to DB
+    ${process_id}    Evaluate    ${process_id}+1
+    ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
+    Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    Finished writing xid map to DB
+    ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
+    ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
+    ...    AND    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p    ${process_id}
+    ...    AND    End Aplha Process    true
+
 
 # Backup Keywords
 Create NFS Backup
-    [Arguments]    ${URL}    ${appenders}
-    [Documentation]    Accepts three params: "{URL}","{appenders}" and "{backup_path}"
+    [Arguments]    ${url}    ${appenders}
+    [Documentation]    Accepts two params: "{URL}","{appenders}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
-    ${P1}=    normalize path    ${CURDIR}/..
-    ${backup_path}=     Join Path	${P1}	backup
+    ${root_path}=    normalize path    ${CURDIR}/..
+    ${backup_path}=    Join Path    ${root_path}/backup
     clear all the folder in a directory    ${backup_path}
-    connect server    ${URL}
+    connect server    ${url}
     ${res}=    post nfs command    ${appenders}    ${backup_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${backup_path}
 
 # Restore Keywords
 Perform a restore on backup
-    [Documentation]     Performs an restore operation on the default location of backup created.
-    ${P1}=    normalize path    ${CURDIR}/..
-    ${path}=     Join Path	${P1}	backup
-    ${result_restore}=    Start Process    dgraph    restore    -p    ${path}/dgraph.202*    -l    ${path}/dgraph.202*    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
+    [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
+    ${root_dir}=    normalize path    ${CURDIR}/..
+    ${path}=    Join Path    ${root_dir}/backup
+    @{dirs_backup}=    List Directories In Directory    ${path}
+    ${restore_dir}=    Set Variable    ${dirs_backup}[0]
+    ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
+    ${result_restore}=    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
     Process Should Be Running    zero
     Process Should Be Running    alpha
     Process Should Be Running    restore
     Should Be Equal As Integers    ${result_restore}    3
     ${wait}=    Wait For Process    restore
-    Process Should Be Stopped	restore
+    Process Should Be Stopped
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
-    ${Live_Text_File_Content}    Get File    ${P1}/results/restorebackup.txt
-    Should Contain    ${Live_Text_File_Content}    Updating Zero timestamp at
+    Verify retore file Content in results folder    restorebackup    ${restore_dir}
 
 Perform a restore on backup present at other location
-    [Documentation]     Performs an restore operation on the backup created.
-    ...     Accepts one paramter "{path}" <- path of the backup file.
     [Arguments]    ${path}
-    ${P1}=    normalize path    ${CURDIR}/..
+    [Documentation]    Performs an restore operation on the backup created.
+    ...    Accepts one paramter "{path}" <- complete path including name of the folder of the backup file.
     ${result_restore}=    Start Process    dgraph    restore    -p    ${path}    -l    ${path}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
     Process Should Be Running    zero
     Process Should Be Running    alpha
     Process Should Be Running    restore
     Should Be Equal As Integers    ${result_restore}    3
     ${wait}=    Wait For Process    restore
-    Process Should Be Stopped	restore
+    Process Should Be Stopped
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
-    ${Live_Text_File_Content}    Get File    ${P1}/results/restorebackup.txt
-    Should Contain    ${Live_Text_File_Content}    Updating Zero timestamp at
+    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+
+
+# Validations:
+Verify retore file Content in results folder
+    [Arguments]    ${file_name}    ${path}
+    [Documentation]    Keyword for validating content in restore.txt files generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${file_context}=    Get File    ${dir_path}/results/${file_name}.txt
+    @{compare_context}=    Create List    Restoring backups from: ${path}    Writing postings to: ${path}    Updating Zero timestamp at: localhost:5080
+    FOR    ${context}    IN    @{compare_context}
+        Should Contain    ${file_context}    ${context}
+    END
+
+Verify Bulk Loader output generated
+    [Documentation]     Keyword to verify bulk loader files output
+    [Arguments]    ${path}
+    @{count}=    List Files In Directory    ${path}
+    ${list_size}    Get Length    ${count}
+    Run Keyword If    ${list_size}<0    FAIL    “Files were not generated.”
 
 # File operations keywords
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    p    t    w    zw
+    @{dir}    Create List    p    t    w    zw    out
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
@@ -123,3 +184,11 @@ Verify file exists in a directory with parent folder name
     FOR    ${dir}    IN    @{dirs}
         directory should exist    ${folder_name.strip()}/${dir}
     END
+
+Verify file Content in results folder
+    [Arguments]    ${file_name}    ${context}
+    [Documentation]    Keyword for checking content in .txt files generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${file_context}=    Get File    ${dir_path}/results/${file_name}.txt
+    Should Contain    ${file_context}    ${context}

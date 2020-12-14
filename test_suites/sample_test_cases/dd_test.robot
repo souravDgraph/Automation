@@ -5,11 +5,10 @@ Library     OperatingSystem
 Library     String
 Library     Process
 Library     DataDriver      ../../../test_data/liveloading_datasets/liveload.csv
-Resource    ../../../resources/dgraph_commands.robot
-Resource    ../../../resources/dgraph_initiation.robot
+Resource    ../../resources/dgraph_commands.robot
 
 Suite Setup     Start Dgraph
-Suite Teardown  End All Process
+Suite Teardown  End All Process     true
 Test Template   Template for live loader execution
 
 *** Variables ***
