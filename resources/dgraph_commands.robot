@@ -83,7 +83,7 @@ Execute Loader with rdf and schema parameters
     Sleep    5s
     ${process_id}    Evaluate    ${process_id}+1
     ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
-    Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    Finished writing xid map to DB
+    Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:
     ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
     ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     ...    AND    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p    ${process_id}
