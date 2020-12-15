@@ -6,7 +6,9 @@ Author: vivetha@dgraph.io
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.keywords.login.login_keywords import LoginKeywords
 from Slash.keywords.dashboard.dashboard_keywords import DashboardKeywords
+from Slash.keywords.lambdas.lambdas_keywords import LambdaKeywords
 from Slash.keywords.settings.settings_keywords import SettingsKeywords
+from Slash.keywords.organization.organization_keywords import OrganizationKeywords
 from robot.api import logger
 
 
@@ -25,6 +27,8 @@ __status__ = "Production"
 class Slash(BrowserKeywords,
             LoginKeywords,
             DashboardKeywords,
+            OrganizationKeywords,
+            LambdaKeywords,
             SettingsKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
 

@@ -10,7 +10,6 @@ from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.dashboard.dashboard import DashboardLocators
 from time import sleep
 
-# pylint: disable=too-many-arguments
 
 
 __all__ = ['DashboardKeywords']
@@ -86,6 +85,13 @@ class DashboardKeywords(object):
     def click_schema_in_menu(browser_alias):
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.schema,
+                              timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    @keyword
+    def click_lambdas_in_menu(browser_alias):
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.lambdas,
                               timeout=DashboardKeywords.timeout)
 
     @staticmethod

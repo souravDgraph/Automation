@@ -31,12 +31,16 @@ class SettingsLocators:
     destroy_button = "xpath = //button[text()='Destroy']"
     update_button = "xpath = //button[text()='Update']"
     info_tab = "xpath = //button[text()='Info']"
-    secutity_tab = "xpath = //button[text()='Info']"
-    cors_tab = "xpath = //button[text()='Info']"
-    advanced_tab = "xpath = //button[text()='Info']"
-    info_tab = "xpath = //button[text()='Info']"
-    info_tab = "xpath = //button[text()='Info']"
-    info_tab = "xpath = //button[text()='Info']"
+    security_tab = "xpath = //button[text()='Security']"
+    cors_tab = "xpath = //button[text()='CORS']"
+    advanced_tab = "xpath = //button[text()='Advanced']"
+    backup_tab = "xpath = //button[text()='Backups']"
+
+    backend_mode = "xpath = //h3[normalize-space(text())='Backend Mode']/parent::div"
+    select_backend_mode = "xpath = //h3[normalize-space(text())='Backend Mode']//following::div[text()='%s']"
+
+
+
 
 
 

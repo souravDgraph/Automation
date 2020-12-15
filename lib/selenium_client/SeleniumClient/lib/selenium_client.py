@@ -12,16 +12,16 @@ except ImportError:
     log = logging.getLogger(__name__)
 
 
-__all__ = ['SlashSeleniumClient']
+__all__ = ['SeleniumClient']
 
 
-class SlashSeleniumClient(SeleniumLibrary):
+class SeleniumClient(SeleniumLibrary):
     """
 
     """
 
     def __init__(self, *args, **kwargs):
-        super(SlashSeleniumClient, self).__init__(**kwargs)
+        super(SeleniumClient, self).__init__(**kwargs)
         self.wait_keyword_object = WaitingKeywords(self)
         self.element_keyword_object = ElementKeywords(self)
         self.form_element_keyword_object = FormElementKeywords(self)

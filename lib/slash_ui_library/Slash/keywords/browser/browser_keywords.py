@@ -5,9 +5,8 @@ Author: vivetha@dgraph.io
 """
 
 from robot.api import logger
-from SlashSeleniumClient import SlashSeleniumClient
-import time
-# pylint: disable=too-many-arguments
+from SeleniumClient import SeleniumClient
+
 
 
 __all__ = ['BrowserKeywords']
@@ -47,7 +46,7 @@ class BrowserKeywords(object):
         Return:
             None
         """
-        _browser = SlashSeleniumClient()
+        _browser = SeleniumClient()
         if browser_name == 'ie' :
             desired_capabilities = {'ie.ensureCleanSession':True, 'ACCEPT_SSL_CERTS':True}
             

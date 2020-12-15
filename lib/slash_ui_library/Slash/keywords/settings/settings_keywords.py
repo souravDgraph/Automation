@@ -9,8 +9,6 @@ from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.settings.settings import SettingsLocators
 from Slash.keywords.settings.constants import clone_text, delete_text
 import time
-# pylint: disable=too-many-arguments
-
 
 __all__ = ['SettingsKeywords']
 __author__ = "Vivetha Madesh"

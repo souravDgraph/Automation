@@ -36,6 +36,11 @@ class DashboardLocators:
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"
     settings = "xpath = //a[@href='/_/settings']"
+    lambdas = "xpath = //a[@href='/_/lambdas']"
+    api_explorer = "xpath = //a[@href='/_/explorer']"
+
+
+
 
 
 

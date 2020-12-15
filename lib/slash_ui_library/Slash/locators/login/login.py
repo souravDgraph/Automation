@@ -25,3 +25,10 @@ class LoginLocators:
     password = "password"
     #continue button
     continue_button = "action"
+    logout = "xpath = //div[text()='Log out']"
+    profile = "xpath = //div/img[@alt='avatar']"
+    ok_button = "xpath = //button[text()='Okay']"
+    save_button = "xpath = //button[text()='Save']"
+    delete_button = "xpath = //button[text()='Delete']"
+    organization = "xpath = //div[text()='Organizations']"
+    creation_button = "xpath = //button[text()='Create']"
