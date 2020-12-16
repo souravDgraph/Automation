@@ -15,7 +15,9 @@ This is a Automation Repo for Dgraph including Slash.
   * [test_suites](#test_suites)
   * [utilities](#utilities)
   * [backup](#backup)
-*  [Common Problems](#common-Problems)
+* [Docs generation](#docs-generation)
+* [Common Problems](#common-Problems)
+
 
 # Framework Setup
 * Goto utils-> run `python env_setup.py` in the terminal to install all the dependencies related to the framework.
@@ -25,7 +27,7 @@ This is a Automation Repo for Dgraph including Slash.
 * To pass arguments from terminal `robot -d results -v rdf_file:2million.rdf.gz -v schema_file:testschema.schema test_suites/dgraph/Linux/dgraph_suite.robot`
 
 - [x] results are stored under results
-- [x]   backup and restore are defaulted to "backup/" directory
+- [x] backup and restore are defaulted to "backup/" directory
 - [x] test data is present under test_data/datasets
 
 # Framework Structure:
@@ -61,7 +63,7 @@ This is a Automation Repo for Dgraph including Slash.
     * test_suites/dgraph/Linux/ contains the main execution test suite
         * draph_suite.robot
     * test_suites/sample_test_cases holds the code creation data.
-        * backup_suite.robot - for all the back realted operations
+        * backup_suite.robot - for all the backup realted operations
         * liveloader_suite.robot - for all the live loader realted operations.
         * dd_test.robot - for any new implementations of robot-framework.
         * bulkloader.robot - for all the test cases related to bulk
@@ -71,7 +73,8 @@ This is a Automation Repo for Dgraph including Slash.
 *   ## backup:
     * dir to store the backup files created from live and bulk loading.
 
-
+#### Docs generation:
+* run the command `python3 -m robot.libdoc Dgraph doc/Dgraph.html`.
 
 #### Common Problems:
 * While creating External Library.

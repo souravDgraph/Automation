@@ -37,7 +37,11 @@ class CustomRequestKeywords:
         method to post dgraph nfs request and validate the output
         :param appender: /admin || /admin/backup
         :param path: path to the backup folder in the local.
-        :return:
+        :return: response
+
+        Example:
+        | Post Nfs Command | /admin | /path/backup
+        | Post Nfs Command | /admin/backup | /path/backup
         """
 
         logger.info("backup path: " + path)
