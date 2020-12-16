@@ -5,7 +5,7 @@ __maintainer__ = "Krishna Kaushik"
 __email__ = "tkrishnakaushik96@gmail.com"
 __status__ = "Stagging"
 
-from RequestHandler.components.request_handler import RequestHandler
+from Dgraph.components.request_handler import RequestHandler
 from robot.api import ResultWriter
 from robot.api import logger
 import json
@@ -26,7 +26,7 @@ class CustomRequestKeywords:
 
     def connect_server(self, url):
         """
-        def to conect to the url.
+        method to conect to the url.
         :param url:
         :return: the instance of RequestHandler object
         """
@@ -34,7 +34,7 @@ class CustomRequestKeywords:
 
     def post_nfs_command(self, appender, path):
         """
-        def to post dgraph nfs request and validate the output
+        method to post dgraph nfs request and validate the output
         :param appender: /admin || /admin/backup
         :param path: path to the backup folder in the local.
         :return:
@@ -65,7 +65,7 @@ class CustomRequestKeywords:
 
     def get_command(self):
         """
-        def to perform a get request for the dgraph.
+        method to perform a get request for the dgraph.
         :return: response
         """
         logger.info("Hitting the get method.")
@@ -74,7 +74,7 @@ class CustomRequestKeywords:
 
     def get_command(self, appender):
         """
-        def to perform a get request for any appender provided.
+        meethod to perform a get request for any appender provided.
         :param appender: /*
         :return: response
         """

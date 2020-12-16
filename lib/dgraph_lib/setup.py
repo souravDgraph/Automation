@@ -3,9 +3,9 @@ from setuptools import setup, find_packages
 from version import __VERSION__
 
 setup(
-    name='request_handler_library',
+    name='dgraph_library',
     version=__VERSION__,  # resolved with execfile
-    description='Request Handler Library',
+    description='Dgraph Library',
     classifiers=[
         'Programming Language :: Python :: 2.x',
         'Programming Language :: Python :: 3.x',
@@ -17,5 +17,5 @@ setup(
     keywords='robotframework dgraph testing',
     platforms='any',
     packages=find_packages(),
-    install_requires=['robotframework','requests'],
+    install_requires=['robotframework', 'requests'],
 )

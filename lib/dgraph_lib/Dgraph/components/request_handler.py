@@ -1,5 +1,6 @@
 import requests
 from robot.api import logger
+import logging
 
 __all__ = ['RequestHandler']
 __author__ = "Krishna Kaushik"
@@ -17,7 +18,7 @@ class RequestHandler:
 
     def post_request(self, appender, body):
         """
-        def to request a post call for the provided appender and body.
+        method to request a post call for the provided appender and body.
         :param appender: /admin || /admin/backup
         :param body: params
         :return: response
@@ -35,7 +36,7 @@ class RequestHandler:
 
     def get_request(self):
         """
-        def to perform a get request.
+        method yet to implement..
         :return: response
         """
         response = requests.get(self.url)
@@ -44,7 +45,7 @@ class RequestHandler:
 
     def get_request(self, appender):
         """
-        def to perform the get request for a provided appender
+        method to perform the get request for a provided appender
         :param appender: /*
         :return: response
         """

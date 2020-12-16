@@ -3,8 +3,7 @@ Documentation     Dgraph Live Loading Test Suite
 Test Setup        Start Dgraph
 Test Teardown     End All Process    true
 Resource          ../../resources/dgraph_commands.robot
-Library           RequestsLibrary
-Library           RequestHandler.CustomRequestKeywords
+Library           Dgraph
 Library           String
 
 *** Variables ***
@@ -23,12 +22,12 @@ TC_01 Restore the empty backup previously taken
     perform a restore on backup
 
 
-TC_02 Perform liveload backup restore data.
-     [Documentation]    Perform live load, backup and restore data.
-     ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   C702    C698    C700
-     Execute Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}     live
-     Create NFS Backup  ${URL}    ${appenders}
-     perform a restore on backup
+#TC_02 Perform liveload backup restore data.main
+#     [Documentation]    Perform live load, backup and restore data.
+#     ...    *Author*: Krishna, Sourav and Sankalan
+#     [Tags]    regression   C702    C698    C700
+#     Execute Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}     live
+#     Create NFS Backup  ${URL}    ${appenders}
+#     perform a restore on backup
 
 

@@ -1,7 +1,7 @@
 *** Settings ***
 Library           OperatingSystem
 Library           Process
-Library           RequestsLibrary
+Library           Dgraph
 Library           JSONLibrary
 Library           String
 

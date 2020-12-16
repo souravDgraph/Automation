@@ -3,8 +3,7 @@ Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph
 Suite Teardown     End All Process    true
 Resource          ../../../resources/dgraph_commands.robot
-Library           RequestsLibrary
-Library           RequestHandler.CustomRequestKeywords
+Library           Dgraph
 Library           String
 
 *** Variables ***
