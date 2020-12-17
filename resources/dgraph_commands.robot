@@ -12,10 +12,8 @@ Start Dgraph
     ${result_z}=    Process.start Process    dgraph    zero    2>&1    alias=zero    cwd=results    shell=yes    stdout=zero.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
-    Should Be Equal As Integers    ${result_z}    1
     ${result_a}=    Process.start Process    dgraph    alpha    2>&1    alias=alpha    stdout=alpha.txt    cwd=results    shell=yes
     Process Should Be Running    alpha
-    Should Be Equal As Integers    ${result_a}    2
     Wait For Process    timeout=10 s    on_timeout=continue
 
 Start Dgraph Zero
@@ -23,16 +21,14 @@ Start Dgraph Zero
     ${result_z}=    Process.start Process    dgraph    zero    2>&1    alias=zero    cwd=results    shell=yes    stdout=zero.txt    stderr=zeroerr.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
-    Should Be Equal As Integers    ${result_z}    1
 
 Start Dgraph Alpha for bulk loader
-    [Arguments]    ${path}    ${process_id}
+    [Arguments]    ${path}
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
     ${result_a}=    Process.start Process    dgraph    alpha    -p    ${path}    alias=alpha    stdout=alpha.txt    stderr=alphaerr.txt    shell=True    cwd=results
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
-    Should Be Equal As Integers    ${result_a}    ${process_id}
     # End dgraph and zero process and clear the folders created in results
 
 End All Process
@@ -72,21 +68,16 @@ Execute Loader with rdf and schema parameters
     ${result_loader}=    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
     Process Should Be Running    zero
     Run Keyword If    '${loader_type}' == 'live'    Process Should Be Running    alpha
-    ${process_id}    Set Variable    ${2}
-    ${process_id}=    Run Keyword If    '${loader_type}' == 'live'    Set Variable    ${3}
-    ...    ELSE    Set Variable    ${2}
     Process Should Be Running    ${loader_type}
-    Should Be Equal    ${result_loader}    ${process_id}
     ${wait}=    Wait For Process    ${loader_type}
-    Process Should Be Stopped
+    Process Should Be Stopped       ${loader_type}
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
-    ${process_id}    Evaluate    ${process_id}+1
     ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
     Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:
     ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
     ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
-    ...    AND    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p    ${process_id}
+    ...    AND    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     ...    AND    End Aplha Process    true
 
 
@@ -115,9 +106,8 @@ Perform a restore on backup
     Process Should Be Running    zero
     Process Should Be Running    alpha
     Process Should Be Running    restore
-    Should Be Equal As Integers    ${result_restore}    3
     ${wait}=    Wait For Process    restore
-    Process Should Be Stopped
+    Process Should Be Stopped       restore
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
     Verify retore file Content in results folder    restorebackup    ${restore_dir}
@@ -130,9 +120,8 @@ Perform a restore on backup present at other location
     Process Should Be Running    zero
     Process Should Be Running    alpha
     Process Should Be Running    restore
-    Should Be Equal As Integers    ${result_restore}    3
     ${wait}=    Wait For Process    restore
-    Process Should Be Stopped
+    Process Should Be Stopped       restore
     Should Be Equal As Integers    ${wait.rc}    0
     Sleep    5s
     Verify retore file Content in results folder    restorebackup    ${restore_dir}
