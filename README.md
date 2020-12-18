@@ -35,7 +35,7 @@ This is a Automation Repo for Dgraph including Slash.
     * Contains the configurations requuired in the test suite or test cases.
     * Test Case arguments are declared over here.
 *   ## doc:
-    * Contains documents for generated lib keywords.
+    * Contains all the  documents for generated lib keywords.
 
 *   ## lib:
     * Contains the custom keywords defined for the Dgraph and Slash.
