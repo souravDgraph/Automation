@@ -20,7 +20,7 @@ This is a Automation Repo for Dgraph including Slash.
 
 
 # Framework Setup
-* Goto utils-> run `python env_setup.py` in the terminal to install all the dependencies related to the framework.
+* Goto utils-> run `python env_setup.py -l Dgraph` || `python env_setup.py -l Slash` in the terminal to install all the dependencies related to the perticular library.
 
 ## Execution Commands:
 * To run the suite `robot -d results test_suites/dgraph/Linux/dgraph_suite.robot`
