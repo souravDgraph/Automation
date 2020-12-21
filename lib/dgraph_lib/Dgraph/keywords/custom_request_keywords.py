@@ -6,7 +6,6 @@ __email__ = "tkrishnakaushik96@gmail.com"
 __status__ = "Stagging"
 
 from Dgraph.components.request_handler import RequestHandler
-from robot.api import ResultWriter
 from robot.api import logger
 import json
 
@@ -26,7 +25,7 @@ class CustomRequestKeywords:
 
     def connect_server(self, url):
         """
-        method to conect to the url.
+        method to connect to url to perform backup.
         :param url:
         :return: the instance of RequestHandler object
         """

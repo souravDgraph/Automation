@@ -11,3 +11,4 @@ robotframework-ride==2.0b1
 robotframework-seleniumlibrary==5.0.0b1
 selenium==4.0.0a7
 wxPython==4.1.1
+testrail_api==1.9.0

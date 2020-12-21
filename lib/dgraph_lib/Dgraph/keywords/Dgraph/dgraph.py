@@ -12,9 +12,10 @@ __email__ = "tkrishnakaushik96@gmail.com"
 __status__ = "Stagging"
 
 from Dgraph.keywords.custom_request_keywords import CustomRequestKeywords
+from Dgraph.keywords.test_rails_keywords import TestRailsKeywords
 
 
-class Dgraph(CustomRequestKeywords):
+class Dgraph(CustomRequestKeywords, TestRailsKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
     All the keywords pertaining to Networker are
     exposed to the user through this library.
