@@ -18,7 +18,7 @@ Start Dgraph
 
 Start Dgraph Zero
     [Documentation]    Start Dgraph Zero process
-    ${result_z}=    Process.start Process    dgraph    zero    2>&1    alias=zero    cwd=results    shell=yes    stdout=zero.txt    stderr=zeroerr.txt
+    ${result_z}=    Process.start Process    dgraph    zero    2>&1    alias=zero    cwd=results    shell=yes    stdout=zero.txt    stderr=zero_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
 
@@ -26,7 +26,7 @@ Start Dgraph Alpha for bulk loader
     [Arguments]    ${path}
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
-    ${result_a}=    Process.start Process    dgraph    alpha    -p    ${path}    alias=alpha    stdout=alpha.txt    stderr=alphaerr.txt    shell=True    cwd=results
+    ${result_a}=    Process.start Process    dgraph    alpha    -p    ${path}    alias=alpha    stdout=alpha.txt    stderr=alpha_err.txt    shell=True    cwd=results
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
     # End dgraph and zero process and clear the folders created in results
