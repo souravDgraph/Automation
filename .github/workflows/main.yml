@@ -35,17 +35,20 @@ jobs:
           # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
           token: ${{ github.token }} # optional, default is ${{ github.token }}
           
+      # Navigating to the directory and installing the requiremenets file
       - name: Install requirements for Dgraph
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}
-          python3 env_setup -l Dgraph 
+          ls -alh
+          python3 setup.py install
         
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}
-          python3 env_setup -l Slash 
+          ls -alh
+          python3 setup.py install 
         
       # Linting the Python code whenever there is a push in main branch
       - name: Python Linting
