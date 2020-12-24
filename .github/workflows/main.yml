@@ -36,15 +36,15 @@ jobs:
           token: ${{ github.token }} # optional, default is ${{ github.token }}
           
       - name: Install requirements for Dgraph
-        run: 
-          echo ${{ env.GITHUB_WORKSPACE }}
-          cd ${{ env.GITHUB_WORKSPACE }}
+        run: |
+          echo ${{ github.workspace }}
+          cd ${{ github.workspace }}
           python3 env_setup -l Dgraph 
         
       - name: Install requirements for Slash
-        run: 
-          echo ${{ env.GITHUB_WORKSPACE }}
-          cd ${{ env.GITHUB_WORKSPACE }}
+        run: |
+          echo ${{ github.workspace }}
+          cd ${{ github.workspace }}
           python3 env_setup -l Slash 
         
       # Linting the Python code whenever there is a push in main branch
