@@ -1,5 +1,7 @@
 import requests
+from requests import RequestException
 from robot.api import logger
+import json
 import logging
 
 __all__ = ['RequestHandler']
@@ -16,27 +18,53 @@ class RequestHandler:
         self.url = url
         self.headers = {}
 
-    def post_request(self, appender, body):
+    def post_request(self, appender, headers, body, cert):
         """
-        method to request a post call for the provided appender and body.
+        Method to perform a basic POST call and return the response
+
+        :param appender: url appender's
+        :param headers: any headers {}
+        :param body: post body
+        :param cert: certificates
+        :return:<response>
+        """
+        logger.debug("inside post_request --> ")
+        response = ""
+        try:
+            response = requests.post(self.url + appender, headers=headers, data=body,  verify=cert)
+            if "errors" in response.json():
+                raise Exception("Post Request failed:\n" + json.dumps(response.json()))
+        except RequestException as e:
+            logger.warn(e)
+            logger.warn(response.text)
+            logger.warn(response.status_code)
+        logger.debug(response.json())
+        return response
+
+    def post_backup_request(self, appender, headers, body):
+        """
+        Method to request a post call for the provided appender and body.
         :param appender: /admin || /admin/backup
+        :param headers: any headers {}
         :param body: params
         :return: response
         """
 
-        logger.info("Hitting post request at: "+self.url+appender)
-        if appender == "/admin":
-            self.headers = {
-                'Content-Type': 'application/json'
-            }
-            response = requests.request("POST", self.url+appender, headers=self.headers, data=body)
-        elif appender == "/admin/backup":
-            response = requests.request("POST", self.url + appender, headers=self.headers, data=body)
+        logger.info("Hitting post request at: "+self.url + appender)
+        self.headers = headers
+        try:
+            response = requests.request("POST", self.url + appender, headers=headers, data=body)
+            if "errors" in response.json():
+                raise Exception("Post Request failed:\n" + json.dumps(response.json()))
+        except RequestException as e:
+            logger.warn(e)
+            logger.warn(response.text)
+            logger.warn(response.status_code)
         return response
 
     def get_request(self):
         """
-        method yet to implement..
+        Method yet to implement..
         :return: response
         """
         response = requests.get(self.url)
@@ -45,7 +73,7 @@ class RequestHandler:
 
     def get_request(self, appender):
         """
-        method to perform the get request for a provided appender
+        Method to perform the get request for a provided appender
         :param appender: /*
         :return: response
         """

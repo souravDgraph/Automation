@@ -13,9 +13,10 @@ __status__ = "Stagging"
 
 from Dgraph.keywords.custom_request_keywords import CustomRequestKeywords
 from Dgraph.keywords.test_rails_keywords import TestRailsKeywords
+from Dgraph.keywords.setup_dgraph_keywords import SetupDgraphKeywords
 
 
-class Dgraph(CustomRequestKeywords, TestRailsKeywords):
+class Dgraph(CustomRequestKeywords, TestRailsKeywords, SetupDgraphKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
     All the keywords pertaining to Networker are
     exposed to the user through this library.
@@ -33,11 +34,11 @@ class Dgraph(CustomRequestKeywords, TestRailsKeywords):
         Framework init
         Initializes framework properties such as absolute code path
         """
-        print('lib Keyword Library')
+        print('Dgraph Library')
 
     def about(self):
-        """ Just a placeholder function printing the library description
         """
-        print('Robot Networker Core Keyword Library derrived from all '
-              ' component level keyword libraries, serves as single access'
-              ' for all networker keywords')
+        Dgraph Library consists of Test Rails- for adding-updating-deleting, Custom Requests- for the  and Setup for
+        the cli commands.
+        """
+        print("Dgraph Lib keywords: CustomRequestKeywords, TestRailsKeywords, SetupDgraphKeywords")
