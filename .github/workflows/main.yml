@@ -46,7 +46,7 @@ jobs:
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/ utilities
+          cd ${{ github.workspace }}/utilities
           ls -alh
           python3 env_setup.py 
         
