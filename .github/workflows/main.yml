@@ -39,16 +39,16 @@ jobs:
       - name: Install requirements for Dgraph
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}
+          cd ${{ github.workspace }}/utilities
           ls -alh
-          python3 setup.py install
+          python3 env_setup.py -l Dgraph
         
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}
+          cd ${{ github.workspace }}/ utilities
           ls -alh
-          python3 setup.py install 
+          python3 env_setup.py 
         
       # Linting the Python code whenever there is a push in main branch
       - name: Python Linting
