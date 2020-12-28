@@ -48,7 +48,7 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/utilities
           ls -alh
-          python3 env_setup.py 
+          python3 env_setup.py -l Slash
         
       # Linting the Python code whenever there is a push in main branch
       - name: Python Linting
