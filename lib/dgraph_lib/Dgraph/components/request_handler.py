@@ -1,8 +1,10 @@
-import requests
-from requests import RequestException
-from robot.api import logger
+"""
+ Custom request class for Request Calls
+"""
 import json
-import logging
+import requests
+from requests import RequestException, Response
+from robot.api import logger
 
 __all__ = ['RequestHandler']
 __author__ = "Krishna Kaushik"
@@ -13,6 +15,9 @@ __status__ = "Stagging"
 
 
 class RequestHandler:
+    """
+    Handles all the request calls customized as per Dgraph
+    """
 
     def __init__(self, url):
         self.url = url
@@ -29,13 +34,13 @@ class RequestHandler:
         :return:<response>
         """
         logger.debug("inside post_request --> ")
-        response = ""
+        response = Response()
         try:
             response = requests.post(self.url + appender, headers=headers, data=body,  verify=cert)
             if "errors" in response.json():
                 raise Exception("Post Request failed:\n" + json.dumps(response.json()))
-        except RequestException as e:
-            logger.warn(e)
+        except RequestException as req_error:
+            logger.warn(req_error)
             logger.warn(response.text)
             logger.warn(response.status_code)
         logger.debug(response.json())
@@ -52,12 +57,13 @@ class RequestHandler:
 
         logger.info("Hitting post request at: "+self.url + appender)
         self.headers = headers
+        response = Response()
         try:
             response = requests.request("POST", self.url + appender, headers=headers, data=body)
             if "errors" in response.json():
                 raise Exception("Post Request failed:\n" + json.dumps(response.json()))
-        except RequestException as e:
-            logger.warn(e)
+        except RequestException as res_error:
+            logger.warn(res_error)
             logger.warn(response.text)
             logger.warn(response.status_code)
         return response
@@ -71,7 +77,7 @@ class RequestHandler:
         print(response.text)
         return response
 
-    def get_request(self, appender):
+    def get_request_appender(self, appender):
         """
         Method to perform the get request for a provided appender
         :param appender: /*

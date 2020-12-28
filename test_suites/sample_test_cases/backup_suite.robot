@@ -7,7 +7,7 @@ Library           Dgraph
 Library           String
 
 *** Variables ***
-${URL}            https://localhost:8080
+${URL}            http://localhost:8080
 ${backup_path}    /Users/apple/Desktop/Dgraph_workspace/robot_framework/Automation/backup
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema

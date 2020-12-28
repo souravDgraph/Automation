@@ -1,3 +1,6 @@
+"""
+ Test Rails lib implementation
+"""
 from testrail_api import TestRailAPI
 
 __all__ = ['TestRailsRequest']
@@ -9,6 +12,9 @@ __status__ = "Stagging"
 
 
 class TestRailsRequest:
+    """
+    Test Rails request handler class.
+    """
 
     def __init__(self, url, user_name, password):
         """

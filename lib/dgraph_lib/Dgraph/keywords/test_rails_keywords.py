@@ -1,3 +1,6 @@
+"""
+Test Rails Request Lib
+"""
 from Dgraph.components.testrails_request import TestRailsRequest
 from robot.api import logger
 
@@ -10,6 +13,12 @@ __status__ = "Stagging"
 
 
 class TestRailsKeywords:
+    """
+    Test Rails request keywords
+    """
+
+    def __init__(self):
+        self.test_rails_request = TestRailsRequest
 
     def test_rails_setup(self, url, user_name, password):
         """

@@ -1,3 +1,6 @@
+"""
+Setup Library
+"""
 __all__ = ['SetupDgraphKeywords']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
@@ -6,10 +9,15 @@ __email__ = "tkrishnakaushik96@gmail.com"
 __status__ = "Stagging"
 
 from Dgraph.components.setup_configurations import DgraphCLI
-from robot.api import logger
 
 
 class SetupDgraphKeywords:
+    """
+    Setup Library Keywords
+    """
+
+    def __init__(self):
+        self.dgraph_cli = DgraphCLI
 
     def get_dgraph_cli_command(self, cli_name):
         """
@@ -28,12 +36,13 @@ class SetupDgraphKeywords:
         cli_command = self.dgraph_cli.build_zero_alpha_cli(cli_name)
         return cli_command
 
-    def get_dgraph_live_loader_command(self, rdf_file, schema_file):
+    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type):
         """
-        Method to build CLI command for live loading
+        Method to build CLI command for live | bulk loading
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
         \n:param rdf_file: <path to rdf file>
         \n:param schema_file: <path to schema file>
+        \n:param loader_type: <live | bulk>
         \n:return: live_loader_command <returns live loader command>
 
         Example:
@@ -42,7 +51,7 @@ class SetupDgraphKeywords:
         """
 
         self.dgraph_cli = DgraphCLI()
-        live_loader_command = self.dgraph_cli.build_live_loader_command(rdf_file, schema_file)
+        live_loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type)
         return live_loader_command
 
     def get_acl_value(self):
@@ -54,7 +63,7 @@ class SetupDgraphKeywords:
         | Get acl value |
         """
         self.dgraph_cli = DgraphCLI()
-        return self.dgraph_cli.get_acl();
+        return self.dgraph_cli.get_acl()
 
     def get_tls_value(self):
         """

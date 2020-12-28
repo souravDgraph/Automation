@@ -1,3 +1,6 @@
+"""
+Custom Request Library for Dgraph
+"""
 __all__ = ['CustomRequestKeywords']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
@@ -5,11 +8,10 @@ __maintainer__ = "Krishna Kaushik"
 __email__ = "tkrishnakaushik96@gmail.com"
 __status__ = "Stagging"
 
+import json
+from robot.api import logger
 from Dgraph.components.request_handler import RequestHandler
 from Dgraph.components.setup_configurations import DgraphCLI
-from robot.api import logger
-import json
-import sys
 
 
 class CustomRequestKeywords:
@@ -25,7 +27,11 @@ class CustomRequestKeywords:
     ROBOT_CODE_UTILS_FOLDER_PATH = None
     OS = None
 
-    def connect_server(self, url):
+    def __init__(self):
+        self.req_handler: RequestHandler = RequestHandler("")
+        self.dgraph_cli: DgraphCLI = DgraphCLI()
+
+    def connect_request_server(self, url):
         """
         Method to connect to url to perform backup.
         :param url:
@@ -35,12 +41,12 @@ class CustomRequestKeywords:
         self.dgraph_cli = DgraphCLI()
         logger.info("Requested URL:" + url)
 
-    def post_nfs_backup_restore_command(self, appender, path, type:str):
+    def post_nfs_backup_restore_command(self, appender, path, req_type: str):
         """
         Method to post dgraph backup | restore  nfs request and validate the response.
         \n:param appender: /admin || /admin/backup
         \n:param path: path to the backup folder in the local.
-        \n:param type: <post type> | backup || restore
+        \n:param req_type: <post type> | backup || restore
         \n:return: <response>
 
         Example:
@@ -56,12 +62,17 @@ class CustomRequestKeywords:
 
         # Check the configurations
         if self.dgraph_cli.get_acl() and "https" in self.req_handler.url and appender == "/admin":
-            login_body = "{\"query\":\"mutation {\\n    login(userId: \\\"groot\\\", password: \\\"password\\\") {\\n   " \
-                         "         response {\\n                        accessJWT\\n                        " \
-                         "refreshJWT\\n                    }\\n    }\\n}\",\"variables\":{}} "
+            login_body = "{\"query\":\"mutation {\\n    " \
+                         "login(userId: \\\"groot\\\", " \
+                         "password: \\\"password\\\") {\\n   " \
+                         "         response {\\n                        " \
+                         "accessJWT\\n                        " \
+                         "refreshJWT\\n                   " \
+                         " }\\n    }\\n}\",\"variables\":{}} "
             cert = ""
             if self.dgraph_cli.get_tls():
-                tls_cert = self.dgraph_cli.curr_path + self.dgraph_cli.cfg['tls']['location'] + "/ca.crt"
+                tls_cert = self.dgraph_cli.curr_path + \
+                           self.dgraph_cli.cfg['tls']['location'] + "/ca.crt"
                 cert = tls_cert
             headers = {
                 'Content-Type': 'application/json'
@@ -69,24 +80,26 @@ class CustomRequestKeywords:
             # Generating awt_token
             login_response = self.req_handler.post_request(appender, headers, login_body, cert)
             awt_token = login_response.json()['data']['login']['response']['accessJWT']
-        else:
-            if self.dgraph_cli.get_acl():
-                raise Exception("Use https request to proceed with the post call "
+        elif self.dgraph_cli.get_acl():
+            raise Exception("Use https request to proceed with the post call "
                             "since ACL is enabled or check if it's requested only "
-                            "for /admin call .\n url requested: " + self.req_handler.url + " appender's used: " + appender)
+                            "for /admin call .\n url requested: "
+                            + self.req_handler.url + " appender's used: " + appender)
 
         # Post call for /admin request
         if appender == "/admin":
             payload = ""
-            if type.lower() == "backup":
+            if req_type.lower() == "backup":
                 payload = "{\"query\":\"mutation {\\n  backup(input: {destination: " \
-                      "\\\"" + path + "\\\"}) {\\n    " \
-                                      "response {\\n      message\\n      code\\n    }\\n  }\\n}\\n\",\"variables\":{" \
-                                      "}} "
-            elif type.lower() == "restore":
+                          "\\\"" + path + "\\\"}) {\\n    " \
+                                          "response {\\n      message\\n     " \
+                                          " code\\n    }\\n  }\\n}\\n\",\"variables\":{" \
+                                          "}} "
+            elif req_type.lower() == "restore":
                 payload = "{\"query\":\"mutation {\\n  restore(input: {location: " \
                           "\\\"" + path + "\\\"}) " \
-                                          " {\\n      message\\n      code\\n    }\\n}\\n\",\"variables\":{" \
+                                          " {\\n      message\\n      code\\n    }" \
+                                          "\\n}\\n\",\"variables\":{" \
                                           "}} "
 
             post_res = ""
@@ -110,9 +123,9 @@ class CustomRequestKeywords:
             payload = ""
             post_res = ""
             headers = {}
-            if type.lower() == "backup":
+            if req_type.lower() == "backup":
                 payload = {'destination': path}
-            elif type.lower() == "restore":
+            elif req_type.lower() == "restore":
                 payload = {'location': path}
             if self.dgraph_cli.get_acl():
                 logger.info(awt_token)
@@ -124,16 +137,19 @@ class CustomRequestKeywords:
 
         # Validations for the output generated for backup | restore
         try:
-            if type.lower() == "backup":
+            if req_type.lower() == "backup":
                 if post_res.json()['data']['backup']['response']['code'] == 'Success' and \
-                        post_res.json()['data']['backup']['response']['message'] == 'Backup completed.':
+                        post_res.json()['data']['backup']['response']['message'] \
+                        == 'Backup completed.':
                     logger.info('Backup successfully completed')
-            elif type.lower() == "restore":
+            elif req_type.lower() == "restore":
                 if post_res.json()['data']['restore']['code'] == 'Success' and \
-                        post_res.json()['data']['restore']['message'] == 'Restore operation started.':
+                        post_res.json()['data']['restore']['message'] == \
+                        'Restore operation started.':
                     logger.info('Restore successfully completed')
         except Exception as err:
-            raise Exception("Something went wrong with the data params.." + json.dumps(post_res.json()))
+            raise Exception("Something went wrong with the data params.."
+                            + json.dumps(post_res.json())) from err
 
         return post_res
 
@@ -146,7 +162,7 @@ class CustomRequestKeywords:
         get_res = self.req_handler.get_request()
         return get_res
 
-    def get_command(self, appender):
+    def get_command_with_appender(self, appender):
         """
         Method to perform a get request for any appender provided.
         \n:param appender: /*
@@ -154,5 +170,5 @@ class CustomRequestKeywords:
         """
         logger.info("Hitting the get method with appender")
         logger.info("appending: " + appender + " to url")
-        get_res = self.req_handler.get_request(appender)
+        get_res = self.req_handler.get_request_appender(appender)
         return get_res

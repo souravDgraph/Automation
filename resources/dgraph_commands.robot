@@ -73,7 +73,7 @@ Execute Loader with rdf and schema parameters
     ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${value}=       Get Tls Value
-    ${conf_live_command}=        Get Dgraph Live Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}
+    ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
     ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
     ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
     Process Should Be Running    zero
@@ -81,6 +81,7 @@ Execute Loader with rdf and schema parameters
     Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    handle=${loader_type}
     Process Should Be Stopped       handle=${loader_type}
+    Should Be Equal As Integers     ${wait.rc}     0
     Sleep    5s
     ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
     Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:
@@ -103,7 +104,7 @@ Create NFS Backup
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
     clear all the folder in a directory    ${backup_path}
-    connect server    ${url}
+    connect request server    ${url}
     ${res}=    Post Nfs Backup Restore Command    ${appenders}    ${backup_path}    backup
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${backup_path}
