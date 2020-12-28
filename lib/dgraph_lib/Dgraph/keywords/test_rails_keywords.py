@@ -8,8 +8,8 @@ __all__ = ['TestRailsKeywords']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
 __maintainer__ = "Krishna Kaushik"
-__email__ = "tkrishnakaushik96@gmail.com"
-__status__ = "Stagging"
+__email__ = "krishna@dgraph.io"
+__status__ = "Staging"
 
 
 class TestRailsKeywords:

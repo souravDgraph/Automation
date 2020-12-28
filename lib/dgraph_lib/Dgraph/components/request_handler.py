@@ -5,13 +5,14 @@ import json
 import requests
 from requests import RequestException, Response
 from robot.api import logger
+# pylint: disable=E1121
 
 __all__ = ['RequestHandler']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
 __maintainer__ = "Krishna Kaushik"
-__email__ = "tkrishnakaushik96@gmail.com"
-__status__ = "Stagging"
+__email__ = "krishna@dgraph.io"
+__status__ = "Staging"
 
 
 class RequestHandler:
@@ -39,10 +40,8 @@ class RequestHandler:
             response = requests.post(self.url + appender, headers=headers, data=body,  verify=cert)
             if "errors" in response.json():
                 raise Exception("Post Request failed:\n" + json.dumps(response.json()))
-        except RequestException as req_error:
-            logger.warn(req_error)
-            logger.warn(response.text)
-            logger.warn(response.status_code)
+        except RequestException as res_error:
+            logger.warn(res_error, response.text, response.status_code)
         logger.debug(response.json())
         return response
 
@@ -63,9 +62,7 @@ class RequestHandler:
             if "errors" in response.json():
                 raise Exception("Post Request failed:\n" + json.dumps(response.json()))
         except RequestException as res_error:
-            logger.warn(res_error)
-            logger.warn(response.text)
-            logger.warn(response.status_code)
+            logger.warn(res_error, response.text, response.status_code)
         return response
 
     def get_request(self):
@@ -74,7 +71,7 @@ class RequestHandler:
         :return: response
         """
         response = requests.get(self.url)
-        print(response.text)
+        logger.info(response.text)
         return response
 
     def get_request_appender(self, appender):
@@ -83,7 +80,7 @@ class RequestHandler:
         :param appender: /*
         :return: response
         """
-        print("Hitting get request at: " + self.url+appender)
+        logger.info("Hitting get request at: " + self.url+appender)
         response = requests.get(self.url+appender)
-        print(response.text)
+        logger.info(response.text)
         return response

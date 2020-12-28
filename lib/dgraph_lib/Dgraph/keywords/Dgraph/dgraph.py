@@ -1,5 +1,5 @@
 """
-Author: tkrishnakaushik96@gmail.com
+Author: krishna@dgraph.io
 """
 # pylint: disable=too-many-ancestors
 
@@ -8,7 +8,7 @@ __all__ = ['Dgraph']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
 __maintainer__ = "Krishna Kaushik"
-__email__ = "tkrishnakaushik96@gmail.com"
+__email__ = "krishna@dgraph.io"
 __status__ = "Stagging"
 
 from Dgraph.keywords.custom_request_keywords import CustomRequestKeywords

@@ -5,13 +5,17 @@ __all__ = ['CustomRequestKeywords']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
 __maintainer__ = "Krishna Kaushik"
-__email__ = "tkrishnakaushik96@gmail.com"
-__status__ = "Stagging"
+__email__ = "krishna@dgraph.io"
+__status__ = "Staging"
 
 import json
 from robot.api import logger
 from Dgraph.components.request_handler import RequestHandler
 from Dgraph.components.setup_configurations import DgraphCLI
+
+# pylint: disable=R0912
+# pylint: disable=R0915
+
 
 
 class CustomRequestKeywords:

@@ -4,8 +4,6 @@ Test Setup        Setup
 Test Teardown     Close Browser    ${Browser_Alias}
 Library           Slash
 Variables         ../../conf/slash/variables.py
-Library           AWSLibrary
-Library           OperatingSystem
 
 *** Variables ***
 ${Browser_Alias}    Browser1

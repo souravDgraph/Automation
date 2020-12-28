@@ -127,6 +127,7 @@ def setup_lib(proj_name):
         python_name = 'python3'
 
     subprocess.check_call([pip_name, 'install', '-r', '../requirements.txt'])
+    proj_lib_paths = []
     if proj_name == "Dgraph":
         proj_lib_paths = ['./lib/dgraph_lib/']
     elif proj_name == "Slash":

@@ -2,9 +2,6 @@
 Documentation     Dgraph Live Loading Test Suite
 Suite Setup       Start Dgraph Zero
 Suite Teardown    End Zero Process   true
-Library           OperatingSystem
-Library           String
-Library           Process
 Resource          ../../resources/dgraph_commands.robot
 
 *** Variables ***

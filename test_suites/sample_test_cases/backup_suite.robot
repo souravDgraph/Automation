@@ -4,10 +4,9 @@ Test Setup        Start Dgraph
 Test Teardown     End All Process    true
 Resource          ../../resources/dgraph_commands.robot
 Library           Dgraph
-Library           String
 
 *** Variables ***
-${URL}            http://localhost:8080
+${URL}            https://localhost:8080
 ${backup_path}    /Users/apple/Desktop/Dgraph_workspace/robot_framework/Automation/backup
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema
