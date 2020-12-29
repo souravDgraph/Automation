@@ -41,14 +41,14 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/utilities
           ls -alh
-          python3 env_setup.py -l Dgraph
+          python3 env_setup.py -l Dgraph -c enabled
         
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/utilities
           ls -alh
-          python3 env_setup.py -l Slash
+          python3 env_setup.py -l Slash -c enabled
         
       # Linting the Python code whenever there is a push in main branch
       - name: Python Linting
