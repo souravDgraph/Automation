@@ -1,5 +1,5 @@
 import logging
-
+# pylint: disable=C0301
 from SeleniumLibrary import SeleniumLibrary
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from SeleniumLibrary.keywords.element import ElementKeywords

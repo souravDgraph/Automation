@@ -1,0 +1,22 @@
+{
+    "acl": {
+        "is_enabled": false,
+        "location": "conf/dgraph/acl/hmac_secret_file"
+    },
+    "enc": {
+        "is_enabled": false,
+        "location": "conf/dgraph/encryption/enc_key_file"
+    },
+    "tls": {
+        "is_enabled": false,
+        "mutual_tls": {
+            "is_enabled": false,
+            "REQUEST": false,
+            "REQUIREANY": false,
+            "VERIFYIFGIVEN": false,
+            "REQUIREANDVERIFY": false
+        },
+        "force_tls": false,
+        "location": "conf/dgraph/mTLS/tls"
+    }
+}
