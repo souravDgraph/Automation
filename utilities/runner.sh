@@ -10,10 +10,10 @@
 #   5. Deactivate the virtualenv.
 
 usage() {
-    echo "Usage: $0 [-l <Dgraph|Slash>] [-c <disabled|enabled>]"
+    echo "Usage: $0 [-l <Dgraph|Slash>] [-c <disabled|enabled>] [-t <absolute path of test suite>]"
 }
 
-while getopts ":l:c:" o; do
+while getopts ":l:c:t:" o; do
     case "${o}" in
         l)
             l=${OPTARG}
@@ -21,6 +21,7 @@ while getopts ":l:c:" o; do
             args="-l "${l} 
             else
                 usage
+                echo 1
                 exit 1
             fi
             ;;
@@ -30,8 +31,13 @@ while getopts ":l:c:" o; do
                 args+=" -c "${c} 
             else
                 usage
+                echo 11
                 exit 1
             fi
+            ;;
+        t)
+            t=${OPTARG}
+            args+=" -t "${t} 
             ;;
         *)
             usage
@@ -41,8 +47,9 @@ while getopts ":l:c:" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${l}" ] || [ -z "${c}" ]; then
+if [ -z "${l}" ] || [ -z "${c}" ] || [ -z "${t}" ]; then
     usage
+    echo 1111
     exit 1
 fi
 
@@ -54,8 +61,8 @@ pwd
 echo "Virtual environment used: $VIRTUAL_ENV" 
 echo "Args been set: ${args}"
 python3 env_setup.py -l ${l} -c ${c}
-echo "------------ Running Test --------------"
+echo "------------ Running Test ${t} --------------"
 cd ..
 echo "Current directory: " $PWD 
-robot test_suites/dgraph/Linux/dgraph_suite.robot
+robot ${t}
 deactivate
