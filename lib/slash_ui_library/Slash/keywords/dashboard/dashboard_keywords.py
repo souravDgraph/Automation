@@ -1,15 +1,13 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=too-many-arguments, missing-function-docstring
 """
 Author: vivetha@dgraph.io
 """
 
-from robot.api import logger
 from robot.api.deco import keyword
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.dashboard.dashboard import DashboardLocators
-from time import sleep
-
 
 
 __all__ = ['DashboardKeywords']
@@ -20,7 +18,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class DashboardKeywords(object):
+class DashboardKeywords():
     """Dashboard/Landing Page Keyword Library.
 
     Main operations:
@@ -28,7 +26,6 @@ class DashboardKeywords(object):
     - create Backend.
     """
     timeout = 10
-
     @staticmethod
     def click_launch_new_backend(browser_alias):
 
@@ -48,9 +45,12 @@ class DashboardKeywords(object):
                            backend_name,
                            timeout=DashboardKeywords.timeout)
         if subdomain:
-            browser.input_text(DashboardLocators.subdomain, subdomain, timeout=DashboardKeywords.timeout)
+            browser.input_text(DashboardLocators.subdomain,
+                               subdomain,
+                               timeout=DashboardKeywords.timeout)
         if organization:
-            browser.click_element(DashboardLocators.organization_select, timeout=DashboardKeywords.timeout)
+            browser.click_element(DashboardLocators.organization_select,
+                                  timeout=DashboardKeywords.timeout)
             browser.click_element(DashboardLocators.organization_name.replace("%s", organization),
                                   timeout=DashboardKeywords.timeout)
         if provider:
@@ -70,15 +70,14 @@ class DashboardKeywords(object):
     def monitor_backend_creation(browser_alias,
                                  timeout):
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(DashboardLocators.spinning_backend, 
+        browser.wait_until_page_contains_element(DashboardLocators.spinning_backend,
                                                  timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.spinning_backend, timeout=timeout)
+        browser.wait_until_page_does_not_contain_element(DashboardLocators.spinning_backend,
+                                                         timeout=timeout)
         browser.wait_until_page_contains_element(DashboardLocators.backend_live,
                                                  timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.create_schema_button,
                                                  timeout=DashboardKeywords.timeout)
-        #browser.click_element(DashboardLocators.create_schema_button,
-        #                      timeout=DashboardKeywords.timeout)
 
     @staticmethod
     @keyword
@@ -100,13 +99,3 @@ class DashboardKeywords(object):
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.settings,
                               timeout=DashboardKeywords.timeout)
-
-
-
-
-
-
-
-        
-        
-
