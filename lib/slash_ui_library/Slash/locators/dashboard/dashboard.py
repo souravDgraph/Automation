@@ -1,9 +1,9 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=R0903
 """
 Author: vivetha@dgraph.io
 """
-
 
 __all__ = ['DashboardLocators']
 __author__ = "Vivetha Madesh"
@@ -11,7 +11,6 @@ __version__ = "1.0"
 __maintainer__ = "Vivetha Madesh"
 __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
-
 
 
 class DashboardLocators:
@@ -41,12 +40,3 @@ class DashboardLocators:
 
     backends_list = "xpath = //button[@aria-haspopup='listbox']"
     backend_selection = "xpath = //li/div[text()='RC3']"
-
-
-
-
-
-
-
-
-

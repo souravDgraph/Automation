@@ -5,11 +5,9 @@
 Author: vivetha@dgraph.io
 """
 
-from robot.api import logger
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.organization.organization import OrganizationLocators
-
-
+from robot.api import logger
 
 __all__ = ['OrganizationKeywords']
 __author__ = "Vivetha Madesh"

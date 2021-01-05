@@ -6,8 +6,9 @@ import json
 import pathlib
 import platform
 import subprocess
-import sys
 import logging
+import sys
+
 
 
 def main(argv):

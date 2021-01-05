@@ -1,3 +1,7 @@
+"""
+Constants file used for assertions
+"""
+
 CLONE_TEXT = """Clone Backend
 All the information associated to the backend will be duplicated."""
 DELETE_TEXT = """Delete Backend
