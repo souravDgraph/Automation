@@ -39,6 +39,11 @@ class DashboardLocators:
     lambdas = "xpath = //a[@href='/_/lambdas']"
     api_explorer = "xpath = //a[@href='/_/explorer']"
 
+    backends_list = "xpath = //button[@aria-haspopup='listbox']"
+    backend_selection = "xpath = //li/div[text()='RC3']"
+
+
+
 
 
 

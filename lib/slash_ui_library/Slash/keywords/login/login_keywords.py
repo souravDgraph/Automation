@@ -4,7 +4,7 @@
 Author: vivetha@dgraph.io
 """
 
-from robot.api import logger
+
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.login.login import LoginLocators
 
@@ -18,7 +18,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class LoginKeywords(object):
+class LoginKeywords():
     """Login Page Keyword Library.
 
     Main operations:
@@ -29,6 +29,16 @@ class LoginKeywords(object):
 
     @staticmethod
     def login(browser_alias, username, password):
+        """
+        Log into Slash with the username and password provided
+
+        | browser_alias | Alias of the browser on which webdriver should do actions |
+        | username | Username for slash |
+        | password | Password for slash |
+
+        Example:
+            Login    Browser1    user    password
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.input_text(LoginLocators.username, username)
         browser.input_text(LoginLocators.password, password)
@@ -36,21 +46,41 @@ class LoginKeywords(object):
 
     @staticmethod
     def click_organizations_in_profile(browser_alias):
+        """
+        Click Organizations in the profile drop down menu
+
+        | browser_alias | Alias of the browser on which webdriver should do actions |
+
+        Example:
+            Click Organizations In Profile    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(LoginLocators.profile)
         browser.click_element(LoginLocators.organization)
 
     @staticmethod
     def logout(browser_alias):
+        """
+        Log out of Slash
+
+        | browser_alias | Alias of the browser on which webdriver should do actions |
+
+        Example:
+            Logout    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(LoginLocators.profile)
         browser.click_element(LoginLocators.logout)
 
     @staticmethod
     def click_ok_button(browser_alias):
+        """
+        Click Ok Button
+
+        | browser_alias | Alias of the browser on which webdriver should do actions |
+
+        Example:
+            Click Ok Button    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(LoginLocators.ok_button)
-
-
-
-

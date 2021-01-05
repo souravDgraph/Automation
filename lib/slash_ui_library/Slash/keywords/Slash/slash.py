@@ -1,15 +1,16 @@
 #!/usr/bin/env python
+# pylint: disable=no-self-use
 """
 Author: vivetha@dgraph.io
 """
 
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
-from Slash.keywords.login.login_keywords import LoginKeywords
 from Slash.keywords.dashboard.dashboard_keywords import DashboardKeywords
 from Slash.keywords.lambdas.lambdas_keywords import LambdaKeywords
+from Slash.keywords.login.login_keywords import LoginKeywords
 from Slash.keywords.settings.settings_keywords import SettingsKeywords
 from Slash.keywords.organization.organization_keywords import OrganizationKeywords
-from robot.api import logger
+
 
 
 # pylint: disable=too-many-ancestors
@@ -58,5 +59,3 @@ class Slash(BrowserKeywords,
         print('Robot Networker Core Keyword Library derrived from all '
               ' component level keyword libraries, serves as single access'
               ' for all networker keywords')
-
-

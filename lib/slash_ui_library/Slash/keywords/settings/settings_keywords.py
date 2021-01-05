@@ -1,14 +1,16 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=missing-function-docstring
 """
 Author: vivetha@dgraph.io
 """
 
+import time
 from robot.api import logger
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.settings.settings import SettingsLocators
-from Slash.keywords.settings.constants import clone_text, delete_text
-import time
+from Slash.keywords.settings.constants import CLONE_TEXT, DELETE_TEXT
+
 
 __all__ = ['SettingsKeywords']
 __author__ = "Vivetha Madesh"
@@ -18,7 +20,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class SettingsKeywords(object):
+class SettingsKeywords():
     """Login Page Keyword Library.
 
     Main operations:
@@ -45,16 +47,16 @@ class SettingsKeywords(object):
             raise Exception("Expected Organization Name Not found")
         browser.page_should_contain_element(SettingsLocators.clone_backend)
         browser.page_should_contain_element(SettingsLocators.delete_backend)
-        ui_clone_text = browser.get_text(SettingsLocators.clone_text)
+        ui_clone_text = browser.get_text(SettingsLocators.CLONE_TEXT)
         logger.info(ui_clone_text)
-        logger.info(clone_text)
-        if clone_text not in ui_clone_text:
+        logger.info(CLONE_TEXT)
+        if CLONE_TEXT not in ui_clone_text:
             raise Exception("Expected clone text Not found")
 
-        ui_delete_text = browser.get_text(SettingsLocators.delete_text)
+        ui_delete_text= browser.get_text(SettingsLocators.DELETE_TEXT)
         logger.info(ui_delete_text)
-        logger.info(delete_text)
-        if delete_text not in ui_delete_text:
+        logger.info(DELETE_TEXT)
+        if DELETE_TEXT not in ui_delete_text:
             raise Exception("Expected Delete text Not found")
 
     @staticmethod
@@ -85,23 +87,3 @@ class SettingsKeywords(object):
                                   timeout=SettingsKeywords.timeout)
             browser.click_element(SettingsLocators.update_button,
                                   timeout=SettingsKeywords.timeout)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
