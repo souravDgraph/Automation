@@ -51,8 +51,7 @@ jobs:
           python3 env_setup.py -l Slash -c enabled
         
       # Linting the Python code whenever there is a push in main branch
-      - name: Python Linting
-        # You may pin to the exact commit or the version.
-        # uses: WhyNotHugo/python-linting@17bef49b0602da95c0cefea5b2d28f758f5fc2b9
-        uses: WhyNotHugo/python-linting@v1.0.0
+      - name: Python Pylint Github Action
+        uses: fylein/python-pylint-github-action@v4
+
         
