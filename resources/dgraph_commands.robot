@@ -7,8 +7,11 @@ Library           String
 
 *** Keywords ***
 Start Dgraph
-    [Documentation]    Start Dgraph alpha and Zero process with cwd poiting to results folder.
+    [Arguments]    ${platform}
+    [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
+    Run Keyword If    '${platform}' == 'docker'    Start Dgraph In Docker
+    ...    AND    Return From Keyword
     ${zero_command}    Get Dgraph Cli Command    zero
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=yes    stdout=zero.txt
     Process Should Be Running    zero
@@ -16,6 +19,21 @@ Start Dgraph
     ${alpha_command}    Get Dgraph Cli Command    alpha
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=yes
     Process Should Be Running    alpha
+    Wait For Process    timeout=10 s    on_timeout=continue
+
+Start Dgraph In Docker
+    [Documentation]    Start Dgraph alpha and Zero process in Helm with cwd pointing to results folder.
+    # Dgraph alpha and zero command
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    log    ${dir_path}
+    ${result_docker}=    Process.run Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=yes
+    log    ${result_docker.stdout}
+    Should Be Equal As Integers    ${result_docker.rc}    0
+    ${result_docker_compose}=    Process.run Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt    cwd=results    shell=yes
+    Should Be Equal As Integers    ${result_docker_compose.rc}    0
+    OperatingSystem.Create Directory    ${dir_path}/data
+    Process.start Process    docker-compose    -f    ${dir_path}/conf/docker-compose.yml    up    alias=dc_up    cwd=results    shell=yes    stdout=docker_compose_up.txt
+    Process Should Be Running    dc_up
     Wait For Process    timeout=10 s    on_timeout=continue
 
 Start Dgraph Zero
@@ -75,13 +93,9 @@ Execute Loader with rdf and schema parameters
     ${value}=       Get Tls Value
     ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
     ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
-    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
-    Process Should Be Running    zero
-    Run Keyword If    '${loader_type}' == 'live'    Process Should Be Running    alpha
-    Process Should Be Running    ${loader_type}
+    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results    Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    handle=${loader_type}
-    Process Should Be Stopped       handle=${loader_type}
-    Should Be Equal As Integers     ${wait.rc}     0
+    Process Should Be Stopped    handle=${loader_type}
     Sleep    5s
     ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
     Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:

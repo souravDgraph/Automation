@@ -13,6 +13,7 @@ usage() {
     echo "Usage: $0 [-l <Dgraph|Slash>] [-c <disabled|enabled>] [-t <absolute path of test suite>]"
 }
 
+# Getting all the required options
 while getopts ":l:c:t:" o; do
     case "${o}" in
         l)
@@ -53,6 +54,7 @@ if [ -z "${l}" ] || [ -z "${c}" ] || [ -z "${t}" ]; then
     exit 1
 fi
 
+# Activating the virtualenv and running automation
 epoch=`date +%s`
 pip3 install virtualenv==20.2.2
 python3 -m venv env_${epoch}
