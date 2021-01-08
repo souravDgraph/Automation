@@ -4,13 +4,15 @@
 Author: vivetha@dgraph.io
 """
 
-
 __all__ = ['LambdaLocators']
 __author__ = "Vivetha Madesh"
 __version__ = "1.0"
 __maintainer__ = "Vivetha Madesh"
 __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
+
+# pylint: disable=R0903
+
 
 class LambdaLocators:
     """
@@ -24,14 +26,3 @@ class LambdaLocators:
     refresh_tab = "xpath = //button[text()='Refresh']"
     download_tab = "xpath = //button[text()='Download']"
     lambda_info_tab = "xpath = //h3[text()='Learn more']/following-sibling::a"
-
-
-
-
-
-
-
-
-
-
-

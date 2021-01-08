@@ -1,9 +1,7 @@
-# !/usr/bin/env python
-# coding=utf-8
 """
 Author: vivetha@dgraph.io
 """
-
+# pylint: disable=C0301, R0903, line-too-long
 
 __all__ = ['SettingsLocators']
 __author__ = "Vivetha Madesh"
@@ -11,6 +9,7 @@ __version__ = "1.0"
 __maintainer__ = "Vivetha Madesh"
 __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
+
 
 class SettingsLocators:
     """
@@ -38,9 +37,3 @@ class SettingsLocators:
 
     backend_mode = "xpath = //h3[normalize-space(text())='Backend Mode']/parent::div"
     select_backend_mode = "xpath = //h3[normalize-space(text())='Backend Mode']//following::div[text()='%s']"
-
-
-
-
-
-

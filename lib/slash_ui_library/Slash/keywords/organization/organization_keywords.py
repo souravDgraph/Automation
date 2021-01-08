@@ -1,14 +1,13 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=missing-function-docstring
 """
 Author: vivetha@dgraph.io
 """
 
-from robot.api import logger
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.organization.organization import OrganizationLocators
-
-
+from robot.api import logger
 
 __all__ = ['OrganizationKeywords']
 __author__ = "Vivetha Madesh"
@@ -18,7 +17,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class OrganizationKeywords(object):
+class OrganizationKeywords():
     """Dashboard/Landing Page Keyword Library.
 
     Main operations:
@@ -29,16 +28,7 @@ class OrganizationKeywords(object):
 
     @staticmethod
     def get_organization_list(browser_alias):
-        """
-        Gets the list og Orgs fro the Organizationtable
 
-        ::
-
-        return
-        Expamples :
-
-
-        """
         headers = ["NAME", "OWNER"]
         browser = BrowserKeywords.switch_browser(browser_alias)
         org_header = browser.get_text(OrganizationLocators.org_list_headers)
@@ -93,23 +83,3 @@ class OrganizationKeywords(object):
         logger.info("Actual Alert : %s" % alert_text)
         if expected_data not in alert_text:
             raise Exception("Expected alert is not found")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        
-

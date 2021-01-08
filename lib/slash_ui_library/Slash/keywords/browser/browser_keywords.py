@@ -1,13 +1,12 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=too-many-arguments
 """
 Author: vivetha@dgraph.io
 """
 
-from robot.api import logger
 from SeleniumClient import SeleniumClient
-
-
+from robot.api import logger
 
 __all__ = ['BrowserKeywords']
 __author__ = "Vivetha Madesh"
@@ -17,7 +16,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class BrowserKeywords(object):
+class BrowserKeywords():
     """Browser related Keyword Library.
 
     Main operations:
@@ -26,7 +25,7 @@ class BrowserKeywords(object):
     """
 
     browsers = dict()
-    
+
     @staticmethod
     def open_browser(browser_alias, url, browser_name='firefox', remote_url=False,
                      desired_capabilities=None, ff_profile_dir=None,
@@ -47,9 +46,8 @@ class BrowserKeywords(object):
             None
         """
         _browser = SeleniumClient()
-        if browser_name == 'ie' :
-            desired_capabilities = {'ie.ensureCleanSession':True, 'ACCEPT_SSL_CERTS':True}
-            
+        if browser_name == 'ie':
+            desired_capabilities = {'ie.ensureCleanSession': True, 'ACCEPT_SSL_CERTS': True}
         _browser.open_browser(url, browser=browser_name,
                               remote_url=remote_url,
                               desired_capabilities=desired_capabilities,
@@ -59,10 +57,9 @@ class BrowserKeywords(object):
         _browser.maximize_browser_window()
         logger.info("Successfully Opened Browser Connection")
         if browser_name == 'ie':
-            #value = "document.getElementById('overridelink').click()"
-            #_browser.execute_javascript(value)
+            # value = "document.getElementById('overridelink').click()"
+            # _browser.execute_javascript(value)
             _browser.click_element('overridelink')
-            time.sleep(20)
 
         BrowserKeywords.browsers[browser_alias] = _browser
         _browser.maximize_browser_window()

@@ -23,7 +23,8 @@ This is a Automation Repo for Dgraph including Slash.
 * Goto utilities dir-> run `python env_setup.py -l Dgraph -c disabled` || `python env_setup.py -l Slash` in the terminal to install all the dependencies related to the particular library.
 
 ## Execution Commands:
-* To run the suite `robot -d results test_suites/dgraph/Linux/dgraph_suite.robot`
+* To run the suite with virtualenv enabled `cd utilities &&  runner.sh -l Dgraph -c disabled -t /Users/souravmukherjee/Desktop/Sourav/office/repos/Automation/test_suites/dgraph/Linux/dgraph_suite.robot`. This is a prefered way to execute.
+* To run individual suite without virtualenv setup `robot -d results test_suites/dgraph/Linux/dgraph_suite.robot`
 * To pass arguments from terminal `robot -d results -v rdf_file:2million.rdf.gz -v schema_file:testschema.schema test_suites/dgraph/Linux/dgraph_suite.robot`
 
 - [x] results are stored under results
