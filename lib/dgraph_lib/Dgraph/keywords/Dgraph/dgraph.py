@@ -14,9 +14,10 @@ __status__ = "Stagging"
 from Dgraph.keywords.custom_request_keywords import CustomRequestKeywords
 from Dgraph.keywords.test_rails_keywords import TestRailsKeywords
 from Dgraph.keywords.setup_dgraph_keywords import SetupDgraphKeywords
+from Dgraph.keywords.pydgraph_keywords import PydgraphKeywords
 
 
-class Dgraph(CustomRequestKeywords, TestRailsKeywords, SetupDgraphKeywords):
+class Dgraph(CustomRequestKeywords, TestRailsKeywords, SetupDgraphKeywords, PydgraphKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
     All the keywords pertaining to Networker are
     exposed to the user through this library.

@@ -50,6 +50,13 @@ class DgraphCLI:
         """
         return self.tls_mutual
 
+    def get_tls_location(self):
+        """
+        Method to get the tls location
+        :return: <path_tls_location>
+        """
+        return  self.curr_path + self.cfg['tls']['location']
+
     def read_config(self):
         """
         Method to set the configurations based on conf/dgraph/conf_dgraph.json
