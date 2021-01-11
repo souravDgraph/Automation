@@ -24,6 +24,14 @@ TC_02 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna, Sourav and Sankalan
      [Tags]    regression   C702    C700
-     Create NFS Backup  ${URL}    ${appenders}
+     Create NFS Backup  ${URL}    ${appenders}    full
+     perform a restore on backup
+
+TC_03 Perform Increment backup and restore data
+     [Documentation]    Perform NFS backup and restore data.
+     ...    *Author*: Krishna, Sourav and Sankalan
+     [Tags]    regression   C702    C700
+     Create NFS Backup  ${URL}    ${appenders}    full
+     Create NFS Backup  ${URL}    ${appenders}    increment
      perform a restore on backup
 
