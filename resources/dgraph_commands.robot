@@ -112,7 +112,7 @@ Execute Loader with rdf and schema parameters with configurations
     # Backup Keywords
 
 Create NFS Backup
-    [Arguments]    ${url}    ${appenders}   ${type}
+    [Arguments]    ${url}    ${appenders}    ${type}    ${is_clear_folder}
     [Documentation]    Accepts two params: "{URL}","{appenders}" & "{type}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
     ${root_path}=    normalize path    ${CURDIR}/..
