@@ -108,16 +108,16 @@ class PydgraphKeywords:
             res_client = self.py_client.custom_client_connect(address, acl=True, mtls=True)
         return res_client
 
-    def pyd_set_schema(self, user_schema):
+    def pyd_set_schema(self, schema_file_name):
         """
         Method to set schema for the client connection created.
-        \n:param user_schema: <schema>
+        \n:param schema_file_name: <schema_file_name>
         \n:return: <client_obj>
 
         Example:
         | Pyd set schema | user_schema
         """
-        return self.py_client.set_schema(user_schema)
+        return self.py_client.set_schema(schema_file_name)
 
     def pyd_get_data(self, query):
         """

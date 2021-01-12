@@ -35,21 +35,21 @@ class PydgraphOperations:
         logger.info("Dgraph client connection is established using gRPC.")
         return self.client
 
-    def custom_client_connect(self, address, acl=False, mtls=False, loc=None, username=None, password=None):
+    def custom_client_connect(self, address, acl=False, mtls=False, cust_cert_loc=None, username=None, password=None):
         """
-        Mehtod to create gRPC client connection for mtls and acl.
+        Method to create gRPC client connection for mtls and acl.
         :param address:
         :param acl:
         :param mtls:
-        :param loc:
+        :param cust_cert_loc:
         :param username:
         :param password:
         :return:
         """
         logger.info("Creating client...")
         if mtls:
-            if loc and username:
-                creds = PydgraphOperations.create_mtls_connect(self, address, loc, username)
+            if cust_cert_loc and username:
+                creds = PydgraphOperations.create_mtls_connect(self, address, cust_cert_loc, username)
             else:
                 creds = PydgraphOperations.create_mtls_connect(self, address)
 
