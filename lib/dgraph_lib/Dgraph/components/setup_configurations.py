@@ -17,16 +17,26 @@ class DgraphCLI:
         self.enc = False
         self.tls = False
         self.tls_mutual = False
+        self.tls_mutual_flags = []
         self.curr_path = str(pathlib.PurePath(pathlib.Path().absolute()))
         curr_dir = str(pathlib.Path.cwd())
         self.curr_path = curr_dir + "/"
         DgraphCLI.read_config(self)
+        logger.info("Dgraph Configurations are ready to load.")
+
+    def get_test_data_location(self):
+        """
+        Method to get test-data location for Dgraph
+        :return:
+        """
+        return self.curr_path + "test_data/datasets/"
 
     def get_acl(self):
         """
         Method to get the ACL flag value
         :return: acl_flag
         """
+        logger.debug(self.acl)
         return self.acl
 
     def get_enc(self):
@@ -34,6 +44,7 @@ class DgraphCLI:
         Mehtod to get the ENC flag value
         :return: enc_flag
         """
+        logger.debug(self.enc)
         return self.enc
 
     def get_tls(self):
@@ -41,6 +52,7 @@ class DgraphCLI:
         Method to get TLS flag value
         :return: tls_flag
         """
+        logger.debug(self.tls)
         return self.tls
 
     def get_tls_mutual(self):
@@ -48,6 +60,7 @@ class DgraphCLI:
         Method to get mTLS flag value.
         :return: mTLS_flag
         """
+        logger.debug(self.tls_mutual)
         return self.tls_mutual
 
     def get_tls_location(self):
@@ -55,7 +68,20 @@ class DgraphCLI:
         Method to get the tls location
         :return: <path_tls_location>
         """
-        return  self.curr_path + self.cfg['tls']['location']
+        tls_loc = self.cfg['tls']['location']
+        logger.debug(self.curr_path + tls_loc)
+        return self.curr_path + tls_loc
+
+    def get_mtls_verification_type(self):
+        """
+        Method to get the verification type specified in conf file.
+        :return:
+        """
+        verification_type = None
+        for key in self.cfg['tls']['mutual_tls']:
+            if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
+                verification_type = key
+        return verification_type
 
     def read_config(self):
         """
