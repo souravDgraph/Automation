@@ -17,10 +17,12 @@ This is a Automation Repo for Dgraph including Slash.
   * [backup](#backup)
 * [Docs generation](#docs-generation)
 * [Common Problems](#common-Problems)
+* [Useful Commands](#useful-commands)
 
 
 # Framework Setup
 * Goto utilities dir-> run `python env_setup.py -l Dgraph -c disabled` || `python env_setup.py -l Slash` in the terminal to install all the dependencies related to the particular library.
+* Added Common Library for TestRails and Pydgraph `python env_setup.py -l Common`
 
 ## Execution Commands:
 * To run the suite with virtualenv enabled `cd utilities &&  runner.sh -l Dgraph -c disabled -t /Users/souravmukherjee/Desktop/Sourav/office/repos/Automation/test_suites/dgraph/Linux/dgraph_suite.robot`. This is a prefered way to execute.
@@ -87,4 +89,9 @@ This is a Automation Repo for Dgraph including Slash.
     * make sure the file name and python class name are same. for reference check the file at `lib/external_keywords/Dgraph_Lib/Dgraph/keywords/Dgraph/dgraph.py`
 * Incase of any error while executing backup
     * make sure backup folder is present in the root folder.
+
+#### Useful Commands
+* For setting custom log and report title use `--logtitle and --reporttitle`.
+* To specify time stamps use ` --timestampoutputs`.
+* To specify log-level  use `--loglevel DEBUG:INFO` 
 

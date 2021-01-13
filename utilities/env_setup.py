@@ -10,7 +10,6 @@ import logging
 import sys
 
 
-
 def main(argv):
     """
     Method to install all the package dependencies and lib based on the req
@@ -24,10 +23,10 @@ def main(argv):
         logging.debug(args)
         if not opts:
             print('Usage: python/python3 env_setup.py -l <proj_name>'
-                  + '\n proj_name = Dgraph, Slash')
+                  + '\n proj_name = Dgraph, Slash, Common')
             sys.exit(2)
     except getopt.GetoptError:
-        print('Usage: python/python3 env_setup.py -l <proj_name>' + '\n proj_name = Dgraph, Slash')
+        print('Usage: python/python3 env_setup.py -l <proj_name>' + '\n proj_name = Dgraph, Slash, Common')
         sys.exit(2)
 
     dgraph_check = False
@@ -58,7 +57,7 @@ def usage():
     """
     print("Usage:\n")
     print('python/python3 env_setup.py -l <proj_name> -c <configuration>'
-          + '\n proj_name = Dgraph| Slash, configuration = enabled | disabled')
+          + '\n proj_name = Dgraph | Slash | Common, configuration = enabled | disabled')
     print('')
     print('Ex: python/python3 env_setup.py -l Dgraph -c enabled'
           + '\n proj_name = Dgraph, config = enabled|disabled.')
@@ -66,6 +65,8 @@ def usage():
     print('Ex: python/python3 env_setup.py -l Slash'
           + '\n proj_name = Slash')
     print('')
+    print('Ex: python/python3 env_setup.py -l Common'
+          + '\n proj_name = Common')
 
 
 def generate_config(arg_value):
@@ -134,6 +135,9 @@ def setup_lib(proj_name):
     elif proj_name == "Slash":
         proj_lib_paths = ['./lib/selenium_client/',
                           './lib/slash_ui_library/']
+    elif proj_name == "Common":
+        proj_lib_paths = ['./lib/common_lib/']
+
     print("\n\n\n*********Installing Lib for: " + proj_name + " *****************\n\n\n")
     cwd_path = pathlib.PurePath(pathlib.Path().absolute(), '../')
 
