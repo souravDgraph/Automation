@@ -159,7 +159,7 @@ Perform a restore on backup present at other location
     ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
     # Validations:
 
-Verify retore file Content in results folder
+Verify restore file Content in results folder
     [Arguments]    ${file_name}    ${path}
     [Documentation]    Keyword for validating content in restore.txt files generated in results folder
     ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
