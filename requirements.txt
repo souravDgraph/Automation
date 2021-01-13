@@ -6,3 +6,5 @@ robotframework-requests==0.7.2
 robotframework-seleniumlibrary==5.0.0b1
 testrail_api==1.9.0
 selenium==4.0.0a7
+grpcio
+pydgraph==20.7.0

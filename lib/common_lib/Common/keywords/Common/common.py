@@ -4,18 +4,18 @@ Author: krishna@dgraph.io
 # pylint: disable=too-many-ancestors
 
 __version__ = "1.0.0"
-__all__ = ['Dgraph']
+__all__ = ['Common']
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
 __maintainer__ = "Krishna Kaushik"
 __email__ = "krishna@dgraph.io"
 __status__ = "Stagging"
 
-from Dgraph.keywords.custom_request_keywords import CustomRequestKeywords
-from Dgraph.keywords.setup_dgraph_keywords import SetupDgraphKeywords
+from Common.keywords.test_rails_keywords import TestRailsKeywords
+from Common.keywords.pydgraph_keywords import PydgraphKeywords
 
 
-class Dgraph(CustomRequestKeywords, SetupDgraphKeywords):
+class Common(TestRailsKeywords, PydgraphKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
     All the keywords pertaining to Networker are
     exposed to the user through this library.
@@ -37,7 +37,6 @@ class Dgraph(CustomRequestKeywords, SetupDgraphKeywords):
 
     def about(self):
         """
-        Dgraph Library consists of Test Rails- for adding-updating-deleting, Custom Requests- for the  and Setup for
-        the cli commands.
+        Common Library consists of Keywords related to both Slash and Dgraph
         """
-        print("Dgraph Lib keywords: CustomRequestKeywords, TestRailsKeywords, SetupDgraphKeywords")
+        print("Common Lib keywords: TestRailsKeywords, PydgraphKeywords")
