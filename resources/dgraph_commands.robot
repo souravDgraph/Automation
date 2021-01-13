@@ -133,6 +133,30 @@ Execute Parallel Loader with rdf and schema parameters
         ...    AND    End Aplha Process    true
     END
 
+Execute Multiple Parallel Live Loader with rdf and schema parameters
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${num_threads}
+    [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "num_threads" perform multiple parallel live loading.
+    ...    rdf_filename, schema_filename , num_threads
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${value}=       Get Tls Value
+    FOR    ${i}    IN RANGE   ${num_threads}
+        Log    Running thread -- ${i}
+        ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
+        ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       live
+        ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        Process Should Be Running    ${loader_alias}
+        Sleep    15s
+    END
+    FOR    ${i}    IN RANGE   ${num_threads}
+        ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
+        ${wait}=    Wait For Process    handle=${loader_alias}
+        Process Should Be Stopped    handle=${loader_alias}
+        Sleep    5s
+        ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
+        Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
+    END
+
 Execute Loader with rdf and schema parameters with configurations
 [Arguments]    ${rdf_filename}    ${schema_filename}    ${loader_type}
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
