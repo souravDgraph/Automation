@@ -98,7 +98,7 @@ Execute Loader with rdf and schema parameters
     Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    handle=${loader_type}
     Process Should Be Stopped    handle=${loader_type}
-    Sleep    5s
+    Sleep    60s
     ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
     Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:
     ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
@@ -124,7 +124,7 @@ Execute Parallel Loader with rdf and schema parameters
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
         ${wait}=    Wait For Process    handle=${loader_alias}
         Process Should Be Stopped    handle=${loader_alias}
-        Sleep    5s
+        Sleep    60s
         ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_alias}.txt
         Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:
         ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
@@ -146,13 +146,13 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
         ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
         Process Should Be Running    ${loader_alias}
-        Sleep    15s
+        Sleep    50s
     END
     FOR    ${i}    IN RANGE   ${num_threads}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
         ${wait}=    Wait For Process    handle=${loader_alias}
         Process Should Be Stopped    handle=${loader_alias}
-        Sleep    5s
+        Sleep    60s
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
         Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
     END
