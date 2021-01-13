@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
-Suite Setup        Start Dgraph    docker
+Suite Setup        Start Dgraph    local
 Suite Teardown     End All Process    true
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
