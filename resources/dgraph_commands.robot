@@ -4,6 +4,7 @@ Library           Process
 Library           Dgraph
 Library           JSONLibrary
 Library           String
+Library           Collections
 
 *** Keywords ***
 Start Dgraph
@@ -11,7 +12,7 @@ Start Dgraph
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
     Run Keyword If    '${platform}' == 'docker'    Start Dgraph In Docker
-    ...    AND    Return From Keyword
+    Run Keyword If    '${platform}' == 'docker'    Return From Keyword
     ${zero_command}    Get Dgraph Cli Command    zero
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=yes    stdout=zero.txt
     Process Should Be Running    zero
@@ -93,7 +94,8 @@ Execute Loader with rdf and schema parameters
     ${value}=       Get Tls Value
     ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
     ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
-    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results    Process Should Be Running    ${loader_type}
+    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
+    Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    handle=${loader_type}
     Process Should Be Stopped    handle=${loader_type}
     Sleep    5s
@@ -103,6 +105,57 @@ Execute Loader with rdf and schema parameters
     ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     ...    AND    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     ...    AND    End Aplha Process    true
+
+Execute Parallel Loader with rdf and schema parameters
+    [Arguments]    ${rdf_filename}    ${schema_filename}
+    [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
+    ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${value}=       Get Tls Value
+    @{loader_type}=       Create List       live       bulk
+    FOR    ${i}    IN    @{loader_type}
+        ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
+        ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${i}
+        ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        ...     ELSE    Process.start Process    dgraph    ${i}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        Process Should Be Running    ${loader_alias}
+    END
+    FOR    ${i}    IN    @{loader_type}
+        ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
+        ${wait}=    Wait For Process    handle=${loader_alias}
+        Process Should Be Stopped    handle=${loader_alias}
+        Sleep    5s
+        ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_alias}.txt
+        Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    N-Quads:
+        ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
+        ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
+        ...    AND    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
+        ...    AND    End Aplha Process    true
+    END
+
+Execute Multiple Parallel Live Loader with rdf and schema parameters
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${num_threads}
+    [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "num_threads" perform multiple parallel live loading.
+    ...    rdf_filename, schema_filename , num_threads
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${value}=       Get Tls Value
+    FOR    ${i}    IN RANGE   ${num_threads}
+        Log    Running thread -- ${i}
+        ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
+        ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       live
+        ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        Process Should Be Running    ${loader_alias}
+        Sleep    15s
+    END
+    FOR    ${i}    IN RANGE   ${num_threads}
+        ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
+        ${wait}=    Wait For Process    handle=${loader_alias}
+        Process Should Be Stopped    handle=${loader_alias}
+        Sleep    5s
+        ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
+        Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
+    END
 
 Execute Loader with rdf and schema parameters with configurations
 [Arguments]    ${rdf_filename}    ${schema_filename}    ${loader_type}

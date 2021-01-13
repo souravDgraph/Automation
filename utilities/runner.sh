@@ -22,7 +22,6 @@ while getopts ":l:c:t:" o; do
             args="-l "${l} 
             else
                 usage
-                echo 1
                 exit 1
             fi
             ;;
@@ -32,7 +31,6 @@ while getopts ":l:c:t:" o; do
                 args+=" -c "${c} 
             else
                 usage
-                echo 11
                 exit 1
             fi
             ;;
@@ -50,7 +48,6 @@ shift $((OPTIND-1))
 
 if [ -z "${l}" ] || [ -z "${c}" ] || [ -z "${t}" ]; then
     usage
-    echo 1111
     exit 1
 fi
 
