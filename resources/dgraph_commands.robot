@@ -97,7 +97,7 @@ Execute Loader with rdf and schema parameters
     ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    cwd=results
     Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    ${loader_type}    timeout=90min 30s    on_timeout=terminate
-    Should Be Equal As Integers    ${wait.rc}    0
+    Should Be Equal As Integers    ${wait.rc}    1
     Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
     Sleep    60s
     ${loader_Text_File_Content}    Get File    ${dir_path}/results/${loader_type}.txt
