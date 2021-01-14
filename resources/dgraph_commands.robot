@@ -94,7 +94,7 @@ Execute Loader with rdf and schema parameters
     ${value}=       Get Tls Value
     ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
     ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
-    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
+    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    cwd=results
     Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    ${loader_type}    timeout=90min 30s    on_timeout=terminate
     Should Be Equal As Integers    ${wait.rc}    0
@@ -118,7 +118,7 @@ Execute Parallel Loader with rdf and schema parameters
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
         ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${i}
         ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
-        ...     ELSE    Process.start Process    dgraph    ${i}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        ...     ELSE    Process.start Process    dgraph    ${i}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
         Process Should Be Running    ${loader_alias}
     END
     FOR    ${i}    IN    @{loader_type}
@@ -145,7 +145,7 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
         ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       live
         ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
-        ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
+        ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
         Process Should Be Running    ${loader_alias}
         Sleep    10s
     END
@@ -187,7 +187,7 @@ Perform a restore on backup
     ${restore_dir}=    Set Variable    ${dirs_backup}[0]
     ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
     ${result_restore}=    Run Keyword If    "https" in "${url}"    Post Nfs Backup Restore Command    /admin    ${restore_dir}    restore
-    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
+    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt   cwd=results
     ...    AND    Process Should Be Running    zero
     ...    AND    Process Should Be Running    alpha
     ...    AND    Process Should Be Running    restore
@@ -203,7 +203,7 @@ Perform a restore on backup present at other location
     ${restore_dir}=    Set Variable    ${dirs_backup}[0]
     ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
     ${result_restore}=    Run Keyword If    "https" in "${url}"    Post Nfs Backup Restore Command    /admin    ${restore_dir}    restore
-    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    shell=yes    cwd=results
+    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
     ...    AND    Process Should Be Running    zero
     ...    AND    Process Should Be Running    alpha
     ...    AND    Process Should Be Running    restore
