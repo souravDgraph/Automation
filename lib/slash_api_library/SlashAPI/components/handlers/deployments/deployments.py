@@ -20,8 +20,8 @@ __status__ = "Production"
 
 class Deployments():
 
-    CREATE_DEPLOYMENT_TEMPLATE = "/home/vivetha/workspace/git/Automation/lib/slash_api_library/SlashAPI/components/models/deployment/create_deployment.txt"
-    DEPLOYMENT_DETAILS_TEMPLATE = "/home/vivetha/workspace/git/Automation/lib/slash_api_library/SlashAPI/components/models/deployment/deployment_attributes.txt"
+    deployment_details_template_file = "deployment_attributes.txt"
+    create_deployment_template_file = "create_deployment.txt"
 
     @staticmethod
     def create_deployment(session_alias, url, auth,
@@ -36,7 +36,7 @@ class Deployments():
         if organization:
             properties["organization"] = organization
 
-        data = Utills.render_data_from_template(Deployments.CREATE_DEPLOYMENT_TEMPLATE,
+        data = Utills.render_data_from_template(Utills.render_template_path(Deployments.create_deployment_template_file),
                                                 properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
@@ -70,7 +70,7 @@ class Deployments():
                                     size='small'):
         properties = locals()
         del properties["response_data"]
-        data = Utills.render_data_from_template(Deployments.DEPLOYMENT_DETAILS_TEMPLATE,
+        data = Utills.render_data_from_template(Utills.render_template_path(Deployments.deployment_details_template_file),
                                                 properties)
         Utills.compare_dict_based_on_primary_dict_keys(data, response_data)
 
