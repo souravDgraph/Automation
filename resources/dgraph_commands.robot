@@ -95,7 +95,7 @@ Execute Loader with rdf and schema parameters
     ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
     ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
     ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    cwd=results
-    Sleep    5s
+    Sleep    60s
     Log    ${loader_type}.txt is log file name for this process.
     Switch Process    ${loader_type}
     Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_type}
@@ -123,7 +123,7 @@ Execute Parallel Loader with rdf and schema parameters
         ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${i}
         ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
         ...     ELSE    Process.start Process    dgraph    ${i}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
-        Sleep    5s
+        Sleep    60s
         Log    ${loader_alias}.txt is log file name for this process.
         Switch Process    ${loader_alias}
         Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
@@ -156,7 +156,7 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
         ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
         Switch Process    ${loader_alias}
-        Sleep    5s
+        Sleep    60s
         Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
     END
     FOR    ${i}    IN RANGE   ${num_threads}
