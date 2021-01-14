@@ -136,7 +136,7 @@ def setup_lib(proj_name):
         proj_lib_paths = ['./lib/selenium_client/',
                           './lib/slash_ui_library/',
                          './lib/slash_api_library/',
-                         './lib/requests_client]
+                         './lib/requests_client']
     elif proj_name == "Common":
         proj_lib_paths = ['./lib/common_lib/']
 
