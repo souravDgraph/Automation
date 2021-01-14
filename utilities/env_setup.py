@@ -142,12 +142,16 @@ def setup_lib(proj_name):
 
     print("\n\n\n*********Installing Lib for: " + proj_name + " *****************\n\n\n")
     cwd_path = pathlib.PurePath(pathlib.Path().absolute(), '../')
-    print(cwd_path)
+     print("cwd -- " + cwd_path)
     # installing all the custom libraries...
     for lib_path in proj_lib_paths:
         cur_lib_path = cwd_path.joinpath(lib_path)
-        print(cur_lib_path)
-        subprocess.check_call([python_name, 'setup.py', 'install'], cwd=cur_lib_path)
+        print("Installing -- " + cur_lib_path)
+        try:
+            subprocess.check_call([python_name, 'setup.py', 'install'], cwd=cur_lib_path)
+        expect:
+            print("Skipping " + cur_lib_path)
+            pass
 
 
 if __name__ == "__main__":
