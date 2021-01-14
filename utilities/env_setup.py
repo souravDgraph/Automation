@@ -146,6 +146,7 @@ def setup_lib(proj_name):
     # installing all the custom libraries...
     for lib_path in proj_lib_paths:
         cur_lib_path = cwd_path.joinpath(lib_path)
+        print(cur_lib_path)
         subprocess.check_call([python_name, 'setup.py', 'install'], cwd=cur_lib_path)
 
 
