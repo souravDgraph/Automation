@@ -98,7 +98,7 @@ Execute Loader with rdf and schema parameters
     Sleep    5s
     Log    ${loader_type}.txt is log file name for this process.
     Switch Process    ${loader_type}
-    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_type}
+    Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_type}
     ${wait}=    Wait For Process    ${loader_type}    timeout=90min 30s
     Should Be Equal As Integers    ${wait.rc}    0
     Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
@@ -126,7 +126,7 @@ Execute Parallel Loader with rdf and schema parameters
         Sleep    5s
         Log    ${loader_alias}.txt is log file name for this process.
         Switch Process    ${loader_alias}
-        Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
+        Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
     END
     FOR    ${i}    IN    @{loader_type}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
@@ -157,7 +157,7 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         ...     ELSE    Process.start Process    dgraph    live    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
         Switch Process    ${loader_alias}
         Sleep    5s
-        Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
+        Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
     END
     FOR    ${i}    IN RANGE   ${num_threads}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
