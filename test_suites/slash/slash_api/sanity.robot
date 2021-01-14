@@ -21,11 +21,4 @@ Create Deployment
     Get Deployment Health    ${Session_alias}    https://${deployment_url}    ${HEADERS}
     Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
 
-Delete deployment
-    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-
-Get deployments
-    Get Deployments    ${Session_alias}    ${URL}    ${HEADERS}
-    Get Deployment Health    ${Session_alias}    https://glad-knot.us-east-1.aws.thegaas.com    ${HEADERS}
-
 *** Keywords ***
