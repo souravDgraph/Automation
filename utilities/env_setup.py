@@ -149,7 +149,7 @@ def setup_lib(proj_name):
         print("Installing -- " + cur_lib_path)
         try:
             subprocess.check_call([python_name, 'setup.py', 'install'], cwd=cur_lib_path)
-        expect:
+        except:
             print("Skipping " + cur_lib_path)
             pass
 
