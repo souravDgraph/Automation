@@ -102,7 +102,8 @@ Execute Loader with rdf and schema parameters
     Wait For Process    ${loader_type}    timeout=90min 30s
     Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
     Sleep    60s
-    ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_type}.txt    Number of N-Quads processed
+    Wait Until Keyword Succeeds    120x    10minute    Run Keyword If    '${loader_type}' == 'live'    ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_type}.txt    Number of N-Quads processed
+    ...    ELSE    Run Keywords    ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_type}.txt    100.00%
     Log    ${loader_Text_File_Content}
     Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
     ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
