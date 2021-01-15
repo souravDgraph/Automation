@@ -73,7 +73,26 @@ class Deployments():
         data = Utills.render_data_from_template(Utills.render_template_path(Deployments.deployment_details_template_file),
                                                 properties)
         Utills.compare_dict_based_on_primary_dict_keys(data, response_data)
+        
+    @staticmethod
+    def get_deployments(session_alias,
+                        url,
+                        auth,
+                        expected_response=200):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.get_on_session(session_alias, '', headers=auth,
+                                            expected_status=str(expected_response))
+        logger.info(response.json)
 
+    @staticmethod
+    def get_deployment_health(session_alias,
+                        url,
+                        auth):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.get_on_session(session_alias, '', headers=auth)
+        logger.info(response.json)
 
 
 
