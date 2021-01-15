@@ -134,7 +134,6 @@ Execute Parallel Loader with rdf and schema parameters
         Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
         Sleep    60s
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
-        Log    ${loader_Text_File_Content}
         Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
         ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
         ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
