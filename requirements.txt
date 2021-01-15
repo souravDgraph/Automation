@@ -2,7 +2,7 @@ requests==2.25.0
 robotframework==3.2.2
 robotframework-datadriver==1.0.0
 robotframework-jsonlibrary==0.3.1
-robotframework-requests==0.7.2
+robotframework-requests
 robotframework-seleniumlibrary==5.0.0b1
 testrail_api==1.9.0
 selenium==4.0.0a7
