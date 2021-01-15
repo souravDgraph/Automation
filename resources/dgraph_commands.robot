@@ -99,8 +99,7 @@ Execute Loader with rdf and schema parameters
     Log    ${loader_type}.txt is log file name for this process.
     Switch Process    ${loader_type}
     Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_type}
-    ${wait}=    Wait For Process    ${loader_type}    timeout=90min 30s
-    Should Be Equal As Integers    ${wait.rc}    0
+    Wait For Process    ${loader_type}    timeout=90min 30s
     Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
     Sleep    60s
     ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_type}.txt    Number of N-Quads processed
