@@ -164,7 +164,6 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
         Sleep    60s
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
-        Log ${loader_Text_File_Content}
         Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
     END
 
