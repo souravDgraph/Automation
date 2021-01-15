@@ -91,19 +91,21 @@ Execute Loader with rdf and schema parameters
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
     ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
+    ${pid}    Run    sudo lsof -t -i:8080
+    Log    ${pid}
+    Run    sudo kill -9 ${pid}
     ${value}=       Get Tls Value
     ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
-    ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results
-    ...     ELSE    Process.start Process    dgraph    ${loader_type}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_type}    stdout=${loader_type}.txt    cwd=results
-    Sleep    60s
+    ${result_loader}=      Run Keyword If      "${value}"=="True"       Run Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results    timeout=10s    on_timeout=continue
+    ...     ELSE    Run Process    dgraph    ${loader_type}     --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=${loader_type}    stdout=${loader_type}.txt    cwd=results    timeout=100s    on_timeout=continue    shell=True
     Log    ${loader_type}.txt is log file name for this process.
     Switch Process    ${loader_type}
     Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_type}
     Wait For Process    ${loader_type}    timeout=90min 30s
-    Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
-    Sleep    60s
-    Wait Until Keyword Succeeds    120x    10minute    Run Keyword If    '${loader_type}' == 'live'    ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_type}.txt    Number of N-Quads processed
-    ...    ELSE    Run Keywords    ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_type}.txt    100.00%
+    Wait Until Keyword Succeeds    3x    1minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
+    Sleep    1s
+    ${loader_Text_File_Content}=    Run Keyword If    '${loader_type}' == 'live'    Grep File    ${dir_path}/results/${loader_type}.txt    Number of N-Quads processed
+    ...    ELSE    Grep File   ${dir_path}/results/${loader_type}.txt    100.00%
     Log    ${loader_Text_File_Content}
     Run Keyword If    '${loader_type}' == 'live'    Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
     ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
