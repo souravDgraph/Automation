@@ -7,7 +7,7 @@ Author: vivetha@dgraph.io
 
 from robot.api import logger
 from jinja2 import Template
-import json
+import json, os
 
 
 __all__ = ['Utills']
@@ -47,6 +47,13 @@ class Utills():
         if not status:
             raise Exception("Expected data not found !!!")
 
-
+    @staticmethod
+    def render_template_path(template_file_name):
+        template = None
+        for root, dirs, files in os.walk("/"):
+            for name in files:
+                if name == template_file_name:
+                    template = os.path.abspath(os.path.join(root, name))
+        return template
 
 

@@ -1,0 +1,4 @@
+{
+    "query": "mutation { backup { response { code message }, location } }",
+    "variables": {}
+}
