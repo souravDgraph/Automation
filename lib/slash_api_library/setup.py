@@ -17,5 +17,5 @@ setup(
     keywords='robotframework slash api testing',
     platforms='any',
     packages=find_packages(),
-    install_requires=['robotframework', 'robotframework-requests'],
+    install_requires=['robotframework', 'robotframework-requests', 'Jinja2'],
 )

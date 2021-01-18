@@ -122,6 +122,27 @@ class DeploymentKeywords():
                                                  expected_response)
         return response
 
+    def get_deployments(session_alias,
+                        base_url,
+                        auth,
+                        expected_response=200):
+        logger.info("Get all deployments ")
+        url = base_url + "deployments"
+        Deployments.get_deployments(session_alias,
+                                      url,
+                                      auth,
+                                      expected_response)
+
+    @staticmethod
+    def get_deployment_health(session_alias,
+                        base_url,
+                        auth,
+                        expected_response=200):
+        logger.info("Get health of the deployment ")
+        url = base_url + "/health"
+        Deployments.get_deployment_health(session_alias,
+                                    url,
+                                    auth)
 
     @staticmethod
     def backup_ops(session_alias,

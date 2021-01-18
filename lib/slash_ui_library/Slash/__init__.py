@@ -1,1 +1,1 @@
-from Slash.keywords.Slash.slash import *
+from Slash.keywords.Slash.slash import Slash

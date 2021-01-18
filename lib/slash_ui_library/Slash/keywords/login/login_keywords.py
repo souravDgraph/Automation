@@ -4,11 +4,8 @@
 Author: vivetha@dgraph.io
 """
 
-
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.login.login import LoginLocators
-
-
 
 __all__ = ['LoginKeywords']
 __author__ = "Vivetha Madesh"

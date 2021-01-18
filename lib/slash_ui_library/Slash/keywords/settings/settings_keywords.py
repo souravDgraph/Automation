@@ -6,11 +6,10 @@ Author: vivetha@dgraph.io
 """
 
 import time
-from robot.api import logger
+from Slash.keywords.settings.constants import CLONE_TEXT, DELETE_TEXT
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.settings.settings import SettingsLocators
-from Slash.keywords.settings.constants import CLONE_TEXT, DELETE_TEXT
-
+from robot.api import logger
 
 __all__ = ['SettingsKeywords']
 __author__ = "Vivetha Madesh"
@@ -20,7 +19,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class SettingsKeywords():
+class SettingsKeywords:
     """Login Page Keyword Library.
 
     Main operations:
@@ -33,7 +32,7 @@ class SettingsKeywords():
     def validate_general_tab_data(browser_alias, backend_name, organization):
         browser = BrowserKeywords.switch_browser(browser_alias)
         ui_backend_name = browser.get_value(SettingsLocators.backend_name,
-                                           timeout=SettingsKeywords.timeout)
+                                            timeout=SettingsKeywords.timeout)
         logger.info(ui_backend_name)
         logger.info(backend_name)
         if ui_backend_name.strip() != backend_name.strip():
@@ -47,13 +46,13 @@ class SettingsKeywords():
             raise Exception("Expected Organization Name Not found")
         browser.page_should_contain_element(SettingsLocators.clone_backend)
         browser.page_should_contain_element(SettingsLocators.delete_backend)
-        ui_clone_text = browser.get_text(SettingsLocators.CLONE_TEXT)
+        ui_clone_text = browser.get_text(CLONE_TEXT)
         logger.info(ui_clone_text)
         logger.info(CLONE_TEXT)
         if CLONE_TEXT not in ui_clone_text:
             raise Exception("Expected clone text Not found")
 
-        ui_delete_text= browser.get_text(SettingsLocators.DELETE_TEXT)
+        ui_delete_text = browser.get_text(DELETE_TEXT)
         logger.info(ui_delete_text)
         logger.info(DELETE_TEXT)
         if DELETE_TEXT not in ui_delete_text:

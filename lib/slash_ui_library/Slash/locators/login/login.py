@@ -1,9 +1,9 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=R0903
 """
 Author: vivetha@dgraph.io
 """
-
 
 __all__ = ['LoginLocators']
 __author__ = "Vivetha Madesh"
@@ -13,17 +13,16 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-
 class LoginLocators:
     """
     Base Locators class for login page
     """
 
-    #User name text box
+    # User name text box
     username = "username"
-    #password text box
+    # password text box
     password = "password"
-    #continue button
+    # continue button
     continue_button = "action"
     logout = "xpath = //div[text()='Log out']"
     profile = "xpath = //div/img[@alt='avatar']"

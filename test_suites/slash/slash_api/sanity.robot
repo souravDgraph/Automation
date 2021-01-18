@@ -66,6 +66,11 @@ create , get and delete API key
 
 freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
+    ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
+    Set Suite Variable    ${deployment_id}
+    ${deployment_url}=    Collections.Get From Dictionary    ${data}    url
+    Get Deployment Health    ${Session_alias}    https://${deployment_url}    ${HEADERS}
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
 
 *** Keywords ***
 Create Backend

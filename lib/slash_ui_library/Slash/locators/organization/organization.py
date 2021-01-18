@@ -1,9 +1,9 @@
 # !/usr/bin/env python
 # coding=utf-8
+# pylint: disable=R0903
 """
 Author: vivetha@dgraph.io
 """
-
 
 __all__ = ['OrganizationLocators']
 __author__ = "Vivetha Madesh"
@@ -11,6 +11,7 @@ __version__ = "1.0"
 __maintainer__ = "Vivetha Madesh"
 __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
+
 
 class OrganizationLocators:
     """
@@ -28,22 +29,3 @@ class OrganizationLocators:
     remove_org = "xpath = //div[text()='%s']/following::button[text()='Remove']"
     org_email = "xpath = //input[@placeholder='Email ID used for slash account']"
     add_member_alert = "xpath = //h3[text()='Unable to add member']/following-sibling::div"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

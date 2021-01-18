@@ -21,21 +21,12 @@ __status__ = "Production"
 
 class Deployments():
 
-    #CREATE_DEPLOYMENT_TEMPLATE = "/home/vivetha/workspace/git/Automation/lib/slash_api_library/SlashAPI/components/models/deployment/create_deployment.txt"
-    # DEPLOYMENT_DETAILS_TEMPLATE = "/home/vivetha/workspace/git/Automation/lib/slash_api_library/SlashAPI/components/models/deployment/deployment_attributes.txt"
     deployment_details_template_file = "deployment_attributes.txt"
     create_deployment_template_file = "create_deployment.txt"
     list_backups_template_file = "list_backups.txt"
     create_backup_template_file = "create_backup.txt"
     freeze_template_file = "freeze_deployment.txt"
-    """
-    for root, dirs, files in os.walk("/"):
-        for name in files:
-            if name == deployment_details_template_file:
-                DEPLOYMENT_DETAILS_TEMPLATE = os.path.abspath(os.path.join(root, name))
-            elif name == create_deloyment_tempalte_file:
-                CREATE_DEPLOYMENT_TEMPLATE = os.path.abspath(os.path.join(root, name))
-    """
+
     @staticmethod
     def create_deployment(session_alias,
                           url,
@@ -157,7 +148,7 @@ class Deployments():
         data = Utills.render_data_from_template(Utills.render_template_path(Deployments.deployment_details_template_file),
                                                 properties)
         Utills.compare_dict_based_on_primary_dict_keys(data, response_data)
-
+        
     @staticmethod
     def get_deployments(session_alias,
                         url,
@@ -224,6 +215,7 @@ class Deployments():
         logger.info(response.text)
         if response.text != 'OK':
             raise Exception("Expected response body not found")
+        logger.info(response.json)
 
 
 
