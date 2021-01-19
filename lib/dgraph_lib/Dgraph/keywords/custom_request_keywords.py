@@ -142,9 +142,8 @@ class CustomRequestKeywords:
         # Validations for the output generated for backup | restore
         try:
             if req_type.lower() == "backup":
-                if post_res.json()['data']['backup']['response']['code'] == 'Success' and \
-                        post_res.json()['data']['backup']['response']['message'] \
-                        == 'Backup completed.':
+                if 'Success' in post_res.json() and \
+                   'Backup completed.' in  post_res.json():
                     logger.info('Backup successfully completed')
             elif req_type.lower() == "restore":
                 if post_res.json()['data']['restore']['code'] == 'Success' and \
