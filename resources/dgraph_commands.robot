@@ -93,7 +93,7 @@ Execute Loader with rdf and schema parameters
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${pid}    Run    sudo lsof -t -i:8080
     Log    ${pid}
-    Run    sudo kill -9 ${pid}
+    Run    sudo kill -9 ${pid}    
     ${value}=       Get Tls Value
     ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_type}
     ${result_loader}=      Run Keyword If      "${value}"=="True"       Run Process    ${conf_live_command}    alias=${loader_type}    stdout=${loader_type}.txt    shell=yes    cwd=results    timeout=10s    on_timeout=continue
@@ -102,8 +102,8 @@ Execute Loader with rdf and schema parameters
     Switch Process    ${loader_type}
     Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_type}
     Wait For Process    ${loader_type}    timeout=90min 30s
-    Wait Until Keyword Succeeds    3x    1minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
-    Sleep    1s
+    Wait Until Keyword Succeeds    300x    10minute    Process Should Be Stopped    ${loader_type}    error_message=${loader_type} process is running.
+    Sleep    100s
     ${loader_Text_File_Content}=    Run Keyword If    '${loader_type}' == 'live'    Grep File    ${dir_path}/results/${loader_type}.txt    Number of N-Quads processed
     ...    ELSE    Grep File   ${dir_path}/results/${loader_type}.txt    100.00%
     Log    ${loader_Text_File_Content}
@@ -121,6 +121,9 @@ Execute Parallel Loader with rdf and schema parameters
     ${value}=       Get Tls Value
     @{loader_type}=       Create List       live       bulk
     FOR    ${i}    IN    @{loader_type}
+        ${pid}    Run    sudo lsof -t -i:8080
+        Log    ${pid}
+        Run    sudo kill -9 ${pid}    
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
         ${conf_live_command}=        Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${i}
         ${result_loader}=      Run Keyword If      "${value}"=="True"       Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=yes    cwd=results
@@ -134,7 +137,7 @@ Execute Parallel Loader with rdf and schema parameters
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel  ${i}
         Switch Process    ${loader_alias}
         ${wait}=    Wait For Process    handle=${loader_alias}    timeout=90min 30s
-        Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
+        Wait Until Keyword Succeeds    300x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
         Sleep    60s
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
         Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
@@ -164,7 +167,7 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
         Switch Process    ${loader_alias}
         ${wait}=    Wait For Process    handle=${loader_alias}    timeout=90min 30s
-        Wait Until Keyword Succeeds    120x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
+        Wait Until Keyword Succeeds    300x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
         Sleep    60s
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
         Should Contain    ${loader_Text_File_Content}    Number of N-Quads processed
