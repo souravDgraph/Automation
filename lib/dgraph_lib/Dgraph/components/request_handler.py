@@ -5,6 +5,7 @@ import json
 import requests
 from requests import RequestException, Response
 from robot.api import logger
+
 # pylint: disable=E1121
 
 __all__ = ['RequestHandler']
@@ -57,7 +58,7 @@ class RequestHandler:
         :return: response
         """
 
-        logger.info("Hitting post request at: "+self.url + appender)
+        logger.info("Hitting post request at: " + self.url + appender)
         self.headers = headers
         response = Response()
         try:
@@ -83,13 +84,15 @@ class RequestHandler:
             variables = {}
         logger.debug("inside post_request --> ")
         response = Response()
+        payload = {'query': query, 'variables': variables}
+        logger.info(payload)
         try:
             if cert is None:
                 response = requests.post(self.url + appender, headers=headers,
-                                         json={'query': query, 'variables': variables})
+                                         json=payload)
             else:
                 response = requests.post(self.url + appender, headers=headers,
-                                         json={'query': query, 'variables': variables},  verify=cert)
+                                         json=payload, verify=cert)
             if "errors" in response.json():
                 raise Exception(f"POST Request failed:\n {json.dumps(response.json())}")
         except RequestException as res_error:

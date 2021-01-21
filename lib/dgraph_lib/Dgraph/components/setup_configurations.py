@@ -101,28 +101,69 @@ class DgraphCLI:
         if self.cfg['tls']['mutual_tls']['is_enabled']:
             self.tls_mutual = True
 
-    def build_zero_alpha_cli(self, cli_name):
+    def build_zero_cli(self):
         """
-        Method to generate zero and alpha commands based on conf.
-        :param cli_name:
+        Method to generate zero commands based on conf.
         :return:
         """
 
-        cli_name = cli_name.lower()
+        cli_name = "zero"
+        cli_command = "dgraph " + cli_name + " "
+        appender = ""
+
+        if self.tls_mutual:
+            for key in self.cfg['tls']['mutual_tls']:
+                if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
+                    appender = appender + " --tls_client_auth " + key
+            tls_location = self.curr_path + self.cfg['tls']['location']
+            tls = {
+                "--tls_cacert": tls_location + "/ca.crt",
+                "--tls_node_cert": tls_location + "/node.crt",
+                "--tls_node_key": tls_location + "/node.key",
+                "--tls_cert": tls_location + "/client.groot.crt",
+                "--tls_key": tls_location + "/client.groot.key"
+            }
+            tls_str = ""
+            for key in tls:
+                tls_str = tls_str + " " + key + " " + str(tls[key])
+            appender = appender + tls_str + " --tls_internal_port_enabled=true "
+        elif self.tls:
+            tls_location = self.curr_path + self.cfg['tls']['location']
+            tls = {
+                "--tls_cacert": tls_location + "/ca.crt",
+                "--tls_node_cert": tls_location + "/node.crt",
+                "--tls_node_key": tls_location + "/node.key",
+            }
+            tls_str = ""
+            for key in tls:
+                tls_str = tls_str + " " + key + " " + str(tls[key])
+            appender = appender + tls_str
+
+        cli_command = cli_command + appender + " 2>&1"
+        return cli_command
+
+    def build_alpha_cli(self, bulk_path=None):
+        """
+        Method to generate alpha commands based on conf.
+        \n accepts one param for bulk data initializing
+        :param bulk_path: <bulk loader data path>
+        :return:
+        """
+
+        cli_name = "alpha"
         cli_command = "dgraph " + cli_name + " "
         appender = ""
         cli_command = cli_command + "--cache_mb=6000 --badger.compression=zstd:3" \
-                                    " --logtostderr -v=2 --whitelist=0.0.0.0 " \
-                                    "--zero=localhost:5080" \
-            if cli_name.lower() == "alpha" else cli_command
-
-        if cli_name == "alpha":
-            if self.acl:
-                acl_path = self.curr_path + self.cfg['acl']['location']
-                appender = appender + " --acl_secret_file=" + acl_path
-            if self.enc:
-                enc_path = self.curr_path + self.cfg['enc']['location']
-                appender = appender + " --encryption_key_file " + enc_path
+                                    " -v=2 --whitelist=0.0.0.0 " \
+                                    "--zero=localhost:5080"
+        if bulk_path:
+            appender = appender + " -p " + bulk_path
+        if self.acl:
+            acl_path = self.curr_path + self.cfg['acl']['location']
+            appender = appender + " --acl_secret_file=" + acl_path
+        if self.enc:
+            enc_path = self.curr_path + self.cfg['enc']['location']
+            appender = appender + " --encryption_key_file " + enc_path
         if self.tls_mutual:
             for key in self.cfg['tls']['mutual_tls']:
                 if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
