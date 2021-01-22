@@ -1,8 +1,8 @@
---outputdir ./results/dgraph_results
+--outputdir ./results/slash_results
 #--timestampoutput
 --console verbose
 --consolemarkers on
-test_suites/dgraph/Linux/dgraph_live_suite.robot
+test_suites/slash/slash_api/org.robot
 
 #Additional arguments
 #--loglevel TRACE:INFO

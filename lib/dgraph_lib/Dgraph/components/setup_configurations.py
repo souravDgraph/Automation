@@ -211,8 +211,11 @@ class DgraphCLI:
             cli_command = "dgraph " + loader_type + " -s " + schema_file + " -f " + \
                           rdf_file + " --map_shards=2 --reduce_shards=1 --http " \
                                      "localhost:8000 --zero=localhost:5080 "
+            if self.enc:
+                enc_path = self.curr_path + self.cfg['enc']['location']
+                cli_command = cli_command + " --encryption_key_file " + enc_path
         if self.acl and loader_type != "bulk":
-            cli_command = cli_command + "-u groot -p password"
+            cli_command = cli_command + " -u groot -p password"
 
         tls_str = ""
         if self.tls_mutual:

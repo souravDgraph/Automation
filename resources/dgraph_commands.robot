@@ -26,10 +26,10 @@ Start Dgraph In Docker
     # Dgraph alpha and zero command
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
-    ${result_docker}=    Process.run Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=True
+    ${result_docker}=    Process.start Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=True
     log    ${result_docker.stdout}
     Should Be Equal As Integers    ${result_docker.rc}    0
-    ${result_docker_compose}=    Process.run Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt    cwd=results    shell=True
+    ${result_docker_compose}=    Process.start Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt    cwd=results    shell=True
     Should Be Equal As Integers    ${result_docker_compose.rc}    0
     OperatingSystem.Create Directory    ${dir_path}/data
     Process.start Process    docker-compose    -f    ${dir_path}/conf/docker-compose.yml    up    alias=dc_up    cwd=results    shell=True    stdout=docker_compose_up.txt
@@ -60,7 +60,7 @@ Start Dgraph Alpha for bulk loader
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
     ${alpha_command}    Generate Dgraph Alpha Cli Command    ${path}
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    stderr=alpha_err.txt    shell=True    cwd=results
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
     # End dgraph and zero process and clear the folders created in results
@@ -82,8 +82,8 @@ End Zero Process
     [Arguments]    ${is_clear_folder}
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    Switch Process      zero
-    Terminate Process   handle=zero
+    Switch Process    zero
+    Terminate Process    handle=zero
     Sleep    5s
     @{zero_context}    Create List    All done. Goodbye!
     Verify file Content in results folder    zero    @{zero_context}
@@ -93,8 +93,8 @@ End Aplha Process
     [Arguments]    ${is_clear_folder}
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    Switch Process      alpha
-    Terminate Process   handle=alpha
+    Switch Process    alpha
+    Terminate Process    handle=alpha
     Sleep    5s
     @{alpha_context}    Create List    Buffer flushed successfully.
     Verify file Content in results folder    alpha    @{alpha_context}
@@ -108,8 +108,8 @@ Execute Live Loader with rdf and schema parameters
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${value}=    Get Tls Value
     ${conf_live_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}    live
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Run Process    ${conf_live_command}    alias=live    stdout=live.txt    shell=True    cwd=results    timeout=10s    on_timeout=continue
-    ...    ELSE    Run Process    dgraph    live    --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=live    stdout=live.txt    cwd=results    timeout=100s    on_timeout=continue    shell=True
+    ${result_loader}=    Run Keyword If    "${value}"=="True"    Run Process    ${conf_live_command}    alias=live    stdout=live.txt    shell=True    cwd=results
+    ...    ELSE    Run Process    dgraph    live    --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=live    stdout=live.txt    cwd=results    shell=True
     Log    live.txt is log file name for this process.
     Switch Process    live
     Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    live
@@ -129,8 +129,8 @@ Execute Bulk Loader with rdf and schema parameters
     Run Keyword If    "${alpha_process_check}"=="True"    End Aplha Process    false
     ${value}=    Get Tls Value
     ${conf_bulk_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}    bulk
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Run Process    ${conf_bulk_command}    alias=bulk    stdout=bulk.txt    shell=True    cwd=results    timeout=10s    on_timeout=continue
-    ...    ELSE    Run Process    dgraph    bulk    --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=bulk    stdout=bulk.txt    cwd=results    timeout=100s    on_timeout=continue    shell=True
+    ${result_loader}=    Run Keyword If    "${value}"=="True"    Run Process    ${conf_bulk_command}    alias=bulk    stdout=bulk.txt    shell=True    cwd=results
+    ...    ELSE    Run Process    dgraph    bulk    --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=bulk    stdout=bulk.txt    cwd=results    shell=True
     Log    bulk.txt is log file name for this process.
     Wait For Process    bulk    timeout=90min 30s
     Wait Until Keyword Succeeds    300x    10minute    Process Should Be Stopped    handle=bulk    error_message=bulk process is running.
@@ -149,29 +149,31 @@ Execute Parallel Loader with rdf and schema parameters
     ...    rdf_filename, schema_filename
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${value}=    Get Tls Value
-    @{loader_type}=    Create List    live  bulk
+    @{loader_type}=    Create List    live    bulk
     FOR    ${i}    IN    @{loader_type}
         ${alpha_process_check}=    Is Process Running    alpha
-        Comment     Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Aplha Process    false
+        Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Aplha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         ${conf_live_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}    ${i}
         ${result_loader}=    Run Keyword If    "${value}"=="True"    Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=True    cwd=results
         ...    ELSE    Process.start Process    dgraph    ${i}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
         Sleep    60s
         Log    ${loader_alias}.txt is log file name for this process.
-        Comment     Switch Process    ${loader_alias}
-        Comment     Wait Until Keyword Succeeds    3x    10minute    Process Should Be Stopped    ${loader_alias}
+        Comment    Switch Process    ${loader_alias}
+        Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Stopped    ${loader_alias}
     END
     FOR    ${i}    IN    @{loader_type}
         ${alpha_process_check}=    Is Process Running    alpha
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Switch Process    ${loader_alias}
         ${wait}=    Wait For Process    handle=${loader_alias}    timeout=90min 30s
+        ${result_check}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    3x    5minute    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
+        Run Keyword And Return If    "${result_check}" == "PASS"    Fail    Error while processing schema file
         Wait Until Keyword Succeeds    300x    10minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
         Sleep    60s
         ${grep_context}=    Set Variable If    "${i}"=="bulk"    100.00%    Number of N-Quads processed
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    ${grep_context}
-        Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    ${grep_context}
+        Run Keyword If    '${i}' == 'live'    Wait Until Keyword Succeeds    900x    5minute    Should Contain    ${loader_Text_File_Content}    ${grep_context}
         ...    ELSE    Run Keywords    Should Contain    ${loader_Text_File_Content}    100.00%
         ...    AND    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
         ...    AND    End Aplha Process    true
@@ -201,6 +203,8 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
         Switch Process    ${loader_alias}
         ${wait}=    Wait For Process    handle=${loader_alias}    timeout=90min 30s
+        ${result_check}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    3x    5minute    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
+        Run Keyword And Return If    "${result_check}" == "PASS"    Fail    Error while processing schema file
         Wait Until Keyword Succeeds    900x    5minute    Process Should Be Stopped    ${loader_alias}    error_message=${loader_alias} process is running.
         Sleep    60s
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    Number of N-Quads processed
@@ -277,7 +281,7 @@ Verify Bulk Loader output generated
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    p    t    w    zw    out   alpha
+    @{dir}    Create List    p    t    w    zw    out    alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
@@ -314,11 +318,11 @@ Verify file Content in results folder
     ${file_context}=    Get File    ${dir_path}/results/${file_name}.txt
     Should Contain Any    ${file_context}    @{context}
 
-Grip and Verify file Content in results folder
+Grep and Verify file Content in results folder
     [Arguments]    ${file_name}    ${grep_text}
-    [Documentation]    Keyword for checking content in .txt files generated in results folder
+    [Documentation]    Keyword for grepping and checking content in .txt files generated in results folder
     ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
-    ${grep_file}    Grep File    ${dir_path}/results/${file_name}.txt    ${grep_text}
     ${dir_path}=    normalize path    ${CURDIR}/..
+    ${grep_file}    Grep File    ${dir_path}/results/${file_name}.txt    ${grep_text}
     ${file_context}=    Get File    ${grep_file}
     Should Contain    ${file_context}    ${grep_text}
