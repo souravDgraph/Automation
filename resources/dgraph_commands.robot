@@ -98,7 +98,8 @@ End Aplha Process
     Sleep    5s
     @{alpha_context}    Create List    Buffer flushed successfully.
     Verify file Content in results folder    alpha    @{alpha_context}
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+    @{dir}    Create List    p    t    w    out    alpha
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir     @{dir}
     # Bulk/Live Loader
 
 Execute Live Loader with rdf and schema parameters
@@ -286,6 +287,23 @@ clean up dgraph folders
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
     Log    "All the folders were deleted."
+
+clean up list of folders in results dir
+    [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
+    [Arguments]     @{dir}
+    ${curr_dir}=    Normalize Path    ${CURDIR}/..
+    FOR    ${foldername}    IN    @{dir}
+        Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
+    END
+    Log    "All the folders were deleted."
+
+clean up a perticular folders
+    [Documentation]    Keyword to clear up a perticular folder created.
+    [Arguments]     ${folder_name}
+    ${curr_dir}=    Normalize Path    ${CURDIR}/..
+    @{dir}    Create List    p    t    w    zw    out    alpha
+    Remove Directory    ${curr_dir}/results/${folder_name}    recursive=True
+    Log    " ${folder_name} folder is deleted."
 
 Clear all the folder in a directory
     [Arguments]    ${path}
