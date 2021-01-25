@@ -1,3 +1,0 @@
-{
-    "query": "mutation { freeze(deepFreeze: {{properties['deep_freeze']}}, backup: {{properties['backup']}}) }"
-}

@@ -21,8 +21,8 @@ ${api_key_uid}    ${EMPTY}
 Create Deployment
     [Documentation]    List of tests covered
     ...
-    ...    	- Create Deployment
-    ...     \ \ \ \ - Delete Deployment
+    ...    - Create Deployment
+    ...    \ \ \ \ - Delete Deployment
     [Tags]    C236    Sanity
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
@@ -32,8 +32,8 @@ Create Deployment
 Get deployments
     [Documentation]    List of tests covered
     ...
-    ...    	- Get Deployments
-    ...     \ \ \ \ - Deployments health API
+    ...    - Get Deployments
+    ...    \ \ \ \ - Deployments health API
     [Tags]    C224    Sanity
     ${deployments}=    Get Deployments    ${Session_alias}    ${URL}    ${HEADERS}
     log    ${deployments}
@@ -49,15 +49,16 @@ create manual backup
     sleep    60
 
 list backups
+    Comment    ${deployment_auth}=    Create Dictionary    x-auth-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzL3Byb3h5IiwiZHVpZCI6IjB4MTBhNDAxIiwiZXhwIjoxNjExNTYwMzg0LCJpc3MiOiJzL2FwaSJ9.NvLjMPzfdkaYO6puXErMIsJjr7x9FkvS7Px2BzfZ0ns
     ${backups} =    Backup Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    list
     log    ${backups}
 
 create , get and delete API key
     [Documentation]    List of tests covered
     ...
-    ...    	- Create API key
-    ...     \ \ \ \ - Delete API Key
-    ...    	- Get API key
+    ...    - Create API key
+    ...    \ \ \ \ - Delete API Key
+    ...    - Get API key
     ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test
     log    ${api_key_details}
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid

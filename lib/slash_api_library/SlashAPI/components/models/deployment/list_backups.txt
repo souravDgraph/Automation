@@ -1,1 +1,0 @@
-{"query": "{ listBackups{ response { type backupNum folder timestamp }, errors { message } } }" }

@@ -33,15 +33,15 @@ class DeploymentKeywords():
                           organization=None,
                           expected_response=200):
         logger.info("Creating a Deployment of Name : %s" % deployment_name)
-        url = base_url + "/deployments/create"
+        url = base_url + "deployments/create"
         response = Deployments.create_deployment(session_alias,
-                                      url,
-                                      auth,
-                                      deployment_name,
-                                      deployment_zone,
-                                      deployment_subdomain,
-                                      organization,
-                                      expected_response)
+                                                 url,
+                                                 auth,
+                                                 deployment_name,
+                                                 deployment_zone,
+                                                 deployment_subdomain,
+                                                 organization,
+                                                 expected_response)
         return response
 
     @staticmethod
@@ -51,11 +51,34 @@ class DeploymentKeywords():
                           deployment_uid,
                           expected_response=200):
         logger.info("Deleting a Deployment of Uid : %s" % deployment_uid)
-        url = base_url + "/deployment/" + str(deployment_uid)
+        url = base_url + "deployment/" + str(deployment_uid)
         Deployments.delete_deployment(session_alias,
                                       url,
                                       auth,
                                       expected_response)
+
+    @staticmethod
+    def delete_all_deployment(session_alias,
+                              base_url,
+                              auth,
+                              expected_response=200):
+        url = base_url + "deployments"
+        deployments = Deployments.get_deployments(session_alias,
+                                                  url,
+                                                  auth,
+                                                  expected_response)
+        logger.info(type(deployments))
+
+        for deployment in deployments:
+            deployment_id = deployment['uid']
+            logger.info(deployment_id)
+            logger.info("Deleting a Deployment of Uid : %s" % deployment_id)
+            url = base_url + "deployment/" + str(deployment_id)
+            Deployments.delete_deployment(session_alias,
+                                          url,
+                                          auth,
+                                          expected_response)
+
 
     @staticmethod
     def get_deployments(session_alias,
@@ -65,26 +88,26 @@ class DeploymentKeywords():
         logger.info("Get all deployments ")
         url = base_url + "deployments"
         deployments = Deployments.get_deployments(session_alias,
-                                      url,
-                                      auth,
-                                      expected_response)
+                                                  url,
+                                                  auth,
+                                                  expected_response)
         return deployments
 
     @staticmethod
     def get_deployment_health(session_alias,
-                        base_url,
-                        auth,
-                        expected_response=200):
+                              base_url,
+                              auth,
+                              expected_response=200):
         logger.info("Get health of the deployment ")
         url = base_url + "/health"
         Deployments.get_deployment_health(session_alias,
-                                    url,
-                                    auth)
+                                          url,
+                                          auth)
 
     @staticmethod
-    def validate_created_deployment( response,
-                                     deployment_name,
-                                     deployment_zone):
+    def validate_created_deployment(response,
+                                    deployment_name,
+                                    deployment_zone):
         logger.info("validating deployment")
         Deployments.validate_deployment_details(response, deployment_name, deployment_zone)
 
@@ -179,47 +202,47 @@ class DeploymentKeywords():
 
     @staticmethod
     def create_api_key(session_alias,
-                   base_url,
-                   auth,
-                   deployment_id,
-                   name,
-                   role='admin',
-                   expected_response=200):
+                       base_url,
+                       auth,
+                       deployment_id,
+                       name,
+                       role='admin',
+                       expected_response=200):
         logger.info("Create API key for deployment id : %s" % deployment_id)
-        url = base_url + "/deployments/" + deployment_id + "/api-keys"
+        url = base_url + "deployments/" + deployment_id + "/api-keys"
         response = Deployments.create_api_keys(session_alias,
-                                          url,
-                                          auth,
-                                          name,
-                                          role,
-                                          expected_response)
+                                               url,
+                                               auth,
+                                               name,
+                                               role,
+                                               expected_response)
         return response
 
     @staticmethod
     def get_api_key(session_alias,
-                       base_url,
-                       auth,
-                       deployment_id,
-                       expected_response=200):
+                    base_url,
+                    auth,
+                    deployment_id,
+                    expected_response=200):
         logger.info("Get API key for deployment id : %s " % deployment_id)
-        url = base_url + "/deployments/" + deployment_id + "/api-keys"
+        url = base_url + "deployments/" + deployment_id + "/api-keys"
         response = Deployments.get_api_keys(session_alias,
-                                          url,
-                                          auth,
-                                          expected_response)
+                                            url,
+                                            auth,
+                                            expected_response)
         return response
 
     @staticmethod
     def delete_api_key(session_alias,
-                    base_url,
-                    auth,
-                    deployment_id,
-                    api_key_uid,
-                    expected_response=200):
+                       base_url,
+                       auth,
+                       deployment_id,
+                       api_key_uid,
+                       expected_response=200):
         logger.info("Delete  API key of uid %s for deployment id : %s " % (api_key_uid, deployment_id))
         url = base_url + "deployments/" + deployment_id + "/api-keys/" + api_key_uid
         response = Deployments.delete_api_keys(session_alias,
-                                            url,
-                                            auth,
-                                            expected_response)
+                                               url,
+                                               auth,
+                                               expected_response)
         return response
