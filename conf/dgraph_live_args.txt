@@ -5,6 +5,6 @@
 test_suites/dgraph/Linux/dgraph_live_suite.robot
 
 #Additional arguments
---loglevel TRACE:INFO
+#--loglevel TRACE:INFO
 #--tagdoc *:See *README.md*
 #--tagstatcombine smokeANDregression
