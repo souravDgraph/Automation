@@ -2,6 +2,7 @@
 Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph    local
 Suite Teardown     End All Process    true
+Test Teardown   Monitor zero and alpha process
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
 Library           String

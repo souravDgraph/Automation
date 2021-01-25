@@ -344,3 +344,10 @@ Grep and Verify file Content in results folder
     ${grep_file}    Grep File    ${dir_path}/results/${file_name}.txt    ${grep_text}
     ${file_context}=    Get File    ${grep_file}
     Should Contain    ${file_context}    ${grep_text}
+
+Monitor zero and alpha process
+    [Documentation]  Keyword to monitor zero and alpha process to run
+    ${alpha_process_check}=    Is Process Running    alpha
+    ${zero_process_check}=    Is Process Running    zero
+    Run Keyword If    "${alpha_process_check}"=="False"    Start Dgraph Alpha    false
+    Run Keyword If    "${zero_process_check}"=="False"    Start Dgraph Zero    false
