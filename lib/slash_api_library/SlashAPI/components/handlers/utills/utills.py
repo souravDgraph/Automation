@@ -26,11 +26,10 @@ class Utills():
     @staticmethod
     def render_data_from_template(template_file,
                                   properties):
-        with open(template_file, 'r') as f1:
-            template = Template(f1.read())
-            value = template.render(properties=properties)
-            data = json.loads(value)
-            return data
+        template = Template(template_file)
+        value = template.render(properties=properties)
+        data = json.loads(value)
+        return data
 
     @staticmethod
     def compare_dict_based_on_primary_dict_keys(primary_dict, secondary_dict):
@@ -56,6 +55,13 @@ class Utills():
                     template = os.path.abspath(os.path.join(root, name))
         return template
 
-
+    @staticmethod
+    def render_template_path(template_file_name):
+        template = None
+        for root, dirs, files in os.walk("/"):
+            for name in files:
+                if name == template_file_name:
+                    template = os.path.abspath(os.path.join(root, name))
+        return template
 
 
