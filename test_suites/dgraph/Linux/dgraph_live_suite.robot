@@ -8,8 +8,8 @@ Library           Dgraph
 Library           String
 
 *** Variables ***
-${rdf_file}       1million.rdf.gz
-${schema_file}    1million.schema
+${rdf_file}       21million.json
+${schema_file}    21million.schema
 
 *** Test Cases ***
 TC_01 Perform live load data.
