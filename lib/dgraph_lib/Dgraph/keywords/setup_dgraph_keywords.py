@@ -20,7 +20,7 @@ class SetupDgraphKeywords:
     def __init__(self):
         self.dgraph_cli = DgraphCLI
 
-    def get_dgraph_cli_command(self, cli_name):
+    def generate_dgraph_zero_cli_command(self):
         """
         Method to build CLI command for zero and alpha.
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
@@ -34,7 +34,24 @@ class SetupDgraphKeywords:
         """
 
         self.dgraph_cli = DgraphCLI()
-        cli_command = self.dgraph_cli.build_zero_alpha_cli(cli_name)
+        cli_command = self.dgraph_cli.build_zero_cli()
+        return cli_command
+
+    def generate_dgraph_alpha_cli_command(self, bulk_path=None):
+        """
+        Method to build CLI command for zero and alpha.
+        \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
+        \n:param cli_name: <zero | alpha>
+        \n:return: cli_command <returns zero | alpha command>
+
+        Example:
+        | Get dgraph cli command | zero
+        | Get dgraph cli command | alpha
+
+        """
+
+        self.dgraph_cli = DgraphCLI()
+        cli_command = self.dgraph_cli.build_alpha_cli(bulk_path)
         return cli_command
 
     def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type):

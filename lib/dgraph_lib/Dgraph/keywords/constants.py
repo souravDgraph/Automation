@@ -7,7 +7,7 @@ LOGIN_BODY = """mutation {
     }
 }"""
 COMMON_HEADER = {'Content-Type': 'application/json'}
-BACKUP_QUERY = """mutation {
+BACKUP_QUERY = """mutation BackupReq ($path: String!) {
   backup(input: {destination: $path}) {
     response {
       message
@@ -15,7 +15,7 @@ BACKUP_QUERY = """mutation {
     }
   }
 }"""
-RESTORE_QUERY = """mutation{
+RESTORE_QUERY = """mutation RestoreReq($path: String!){
   restore(input: {location: $path}){
     message
     code 

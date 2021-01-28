@@ -17,5 +17,5 @@ setup(
     keywords='robotframework dgraph testing',
     platforms='any',
     packages=find_packages(),
-    install_requires=['robotframework', 'requests'],
+    install_requires=['robotframework', 'requests', 'grpcio', 'testrail_api'],
 )

@@ -16,8 +16,8 @@ from Dgraph.keywords.setup_dgraph_keywords import SetupDgraphKeywords
 
 
 class Dgraph(CustomRequestKeywords, SetupDgraphKeywords):
-    """Robot Framework Slash GraphQL Keyword Library.
-    All the keywords pertaining to Networker are
+    """Robot Framework Dgraph Keyword Library.
+    All the keywords pertaining to network are
     exposed to the user through this library.
     """
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
@@ -37,7 +37,7 @@ class Dgraph(CustomRequestKeywords, SetupDgraphKeywords):
 
     def about(self):
         """
-        Dgraph Library consists of Test Rails- for adding-updating-deleting, Custom Requests- for the  and Setup for
+        Dgraph Library consists of CustomRequestKeywords for handling request calls and SetupDgraphKeywords for
         the cli commands.
         """
-        print("Dgraph Lib keywords: CustomRequestKeywords, TestRailsKeywords, SetupDgraphKeywords")
+        print("Dgraph Lib keywords: CustomRequestKeywords, SetupDgraphKeywords")

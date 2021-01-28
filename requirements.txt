@@ -9,3 +9,4 @@ selenium==4.0.0a7
 grpcio
 pydgraph==20.7.0
 Jinja2
+robotframework-pabot

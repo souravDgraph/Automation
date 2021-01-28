@@ -4,7 +4,7 @@
         "location": "conf/dgraph/acl/hmac_secret_file"
     },
     "enc": {
-        "is_enabled": true,
+        "is_enabled": false,
         "location": "conf/dgraph/encryption/enc_key_file"
     },
     "tls": {
