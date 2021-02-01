@@ -5,7 +5,8 @@ Author: vivetha@dgraph.io
 """
 
 from SlashAPI.keywords.deployemnts.deployment_keywords import DeploymentKeywords
-from SlashAPI.keywords.organizations.organizations_keywords import OrganizationsKeywords
+
+
 
 # pylint: disable=too-many-ancestors
 
@@ -19,7 +20,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class SlashAPI(DeploymentKeywords, OrganizationsKeywords):
+class SlashAPI(DeploymentKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
 
     All the keywords pertaining to Networker are

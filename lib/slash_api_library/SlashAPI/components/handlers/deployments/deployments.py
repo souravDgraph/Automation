@@ -10,6 +10,7 @@ from SlashAPI.components.client.client import Connection
 from SlashAPI.components.handlers.utills.utills import Utills
 from SlashAPI.components.models.deployment.deployment import DeploymentModels
 
+
 __all__ = ['Deployments']
 __author__ = "Vivetha Madesh"
 __version__ = "1.0"
@@ -19,6 +20,7 @@ __status__ = "Production"
 
 
 class Deployments():
+
     """
     Defines handlers for Deployment related end points
 
@@ -78,17 +80,13 @@ class Deployments():
                           enterprise=None,
                           isProtected=None,
                           size=None,
-                          organizationId=None,
                           expected_response=None):
         properties = locals()
         properties_to_delete = ['session_alias', 'url', 'auth', 'expected_response']
-        for property_name in properties_to_delete:
-            del properties[property_name]
-        logger.debug(properties)
+        for property in properties_to_delete:
+            del properties[property]
         data = Utills.render_data_from_template(DeploymentModels.deployment_attributes,
                                                 properties)
-        logger.debug(data)
-
         connection = Connection()
         connection.create_session(session_alias,
                                   url,
@@ -98,11 +96,10 @@ class Deployments():
                                                json=data,
                                                headers=auth,
                                                expected_status=str(expected_response))
-        logger.debug(response.json())
-        logger.debug(response.text)
+        logger.info(response.json())
+        logger.info(response.text)
         if 'Deployment has been patched.' not in response.text:
             raise Exception("Expected response body not found")
-        return response
 
     @staticmethod
     def backup_ops(session_alias,
@@ -128,7 +125,7 @@ class Deployments():
                                               expected_status=str(expected_response))
         logger.info(response.json())
         logger.info(response.text)
-        if operation == "create" and 'Backup completed.' not in response.text:
+        if operation == "create" and 'Backup completed.' not in response.text :
             raise Exception("Backup not created")
         return response.json()
 
@@ -154,7 +151,7 @@ class Deployments():
                                               expected_status=str(expected_response))
         logger.info(response.json())
         logger.info(response.text)
-        if 'FREEZE OK' not in response.text:
+        if 'FREEZE OK' not in response.text :
             raise Exception("Deployment not Freezed !")
         return response.json()
 
@@ -254,3 +251,5 @@ class Deployments():
         logger.info(response.text)
         if response.text != 'OK':
             raise Exception("Expected response body not found")
+
+

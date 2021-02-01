@@ -1,7 +1,5 @@
-URL = "https://api.thegaas.com"
+URL = "https://api.thegaas.com/"
 BACKEND_NAME = "Test"
 BACKEND_ZONE = "us-east-1"
-HEADERS = {
-        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1ETXlNemcyTnpFME1qTkNORUUzTWpZME1UVTJNa0pCTVRjMFFUUkVPVEJFT0VZNE5UWXhSUSJ9.eyJpc3MiOiJodHRwczovL2Rldi1kZ3JhcGgtc2Fhcy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTU5Mjc4MjQ3NDEyNTc1NjE5NTYiLCJhdWQiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDcwIiwiaHR0cHM6Ly9kZXYtZGdyYXBoLXNhYXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTYxMjE1OTU2NSwiZXhwIjoxNjEyMjQ1OTY1LCJhenAiOiJnYnBWcTdpMWdNdmdtdEkzbXVBem9aSEpiVTJieDVqdCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.gw1U6ByBk23fI2wD_srd5y_P4OrYbmcNqUe89VN4RbwpziToLcg64YLmAr7Lb30vxzfanXnm08g-7HAmpy9oeNXDa9KzsdBIHmpnUrJ6lmIllRY6C9jO9Q72yiJzRR01xha-YN9WLgubhInpyQCnqr-V7hx93AFQAxlsa-PM6OCXRalW1prXaq60bzUd59Y793prFrguUXkFyZ5WDQIqSpSOeiNnHLLLNVtcL4wTsPJwPmZuRly8BNjB-XK2JiUk8o_8r3q8KRIcqGEIluakIxMQLPmgHUTHQAfmkiTAatnUWiE6rUOGbkwQYrB7VtS50CgMkJ863dRfW0y6XhQ7Qw",
-        "Content-Type": "application/json"
-    }
+HEADERS = { "Authorization" : "Bearer TESTVAR",
+            "Content-Type" : "application/json" }

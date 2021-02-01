@@ -10,8 +10,7 @@ class DeploymentModels:
     "query": "mutation { freeze(deepFreeze: {{properties['deep_freeze']}}, backup: {{properties['backup']}}) }"
     }"""
 
-    deployment_attributes = """
-    {
+    deployment_attributes = """{
         {% if properties['name'] and properties['name'] != "" %}
         "name": {{ '"' + properties['name'] + '"' }}
         {% endif %}
@@ -54,12 +53,6 @@ class DeploymentModels:
     
         {% if properties['size'] and properties['size'] != "" %}
         ,"size": {{ '"' + properties['size'] + '"' }}
-        {% endif %}
-        
-        {% if properties['organizationId'] and properties['organizationId'] == "empty" %}
-        "organizationId": null
-        {% elif properties['organizationId'] and properties['organizationId'] != "" %}
-        "organizationId": {{'"' + properties['organizationId'] + '"' }}
         {% endif %}
     
         {% if properties['enterprise'] and properties['enterprise'] != "" %}
