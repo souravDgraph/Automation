@@ -7,6 +7,9 @@ Library           SlashAPI
 Variables         ../../../conf/slash/slash_api/variables.py
 
 *** Variables ***
+${backend_name}     Pokemon
+${user_email}       krishna+test1@dgraph.io
+${org_name}     test 5
 
 *** Test Cases ***
 #Create Organization
@@ -16,10 +19,10 @@ Variables         ../../../conf/slash/slash_api/variables.py
 
 Test Case to Manage Organization
 #    Remove Org From Deployment   Pokemon
-    Add Org To Deployment   Pokemon     test 5
-    Add New Member To Existing Organization    test 5    krishna+test1@dgraph.io
-    Remove Member From Existing Organization    test 5    krishna+test1@dgraph.io
-    Add Org To Deployment   Pokemon     test6
-    Remove Org From Deployment   Pokemon
+    Add Org To Deployment   ${backend_name}     ${org_name}
+    Add New Member To Existing Organization    ${org_name}    ${user_email}
+    Remove Member From Existing Organization    ${org_name}    ${user_email}
+    Add Org To Deployment   ${backend_name}     ${org_name}
+    Remove Org From Deployment   ${backend_name}
 
 
