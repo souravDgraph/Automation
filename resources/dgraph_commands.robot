@@ -157,7 +157,7 @@ Execute Parallel Loader with rdf and schema parameters
         Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Aplha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}
-        Wait For Process    30 s
+        Wait For Process    timeout=30 s
         Log    ${loader_alias}.txt is log file name for this process.
     END
     FOR    ${i}    IN    @{loader_type}
