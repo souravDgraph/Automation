@@ -9,7 +9,7 @@ from robot.api import logger
 from SlashAPI.components.client.client import Connection
 from SlashAPI.components.handlers.utills.utills import Utills
 from SlashAPI.components.models.deployment.deployment import DeploymentModels
-
+import requests
 
 __all__ = ['Deployments']
 __author__ = "Vivetha Madesh"
@@ -252,4 +252,89 @@ class Deployments():
         if response.text != 'OK':
             raise Exception("Expected response body not found")
 
+    @staticmethod
+    def update_schema_to_deployment(session_alias,
+                                    url,
+                                    auth,
+                                    schema,
+                                    expected_response=None):
+        properties = {
+            "schema": schema
+        }
+        data = Utills.render_data_from_template(DeploymentModels.update_schema,
+                                                properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
 
+    @staticmethod
+    def perform_operation_to_database(session_alias,
+                                      url,
+                                      auth,
+                                      mutation,
+                                      expected_response=None):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              data=mutation,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
+
+    @staticmethod
+    def drop_data_from_database(session_alias,
+                                url,
+                                auth,
+                                expected_response=None):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              data=DeploymentModels.drop_data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        if 'Done' not in response.text or 'Success' not in response.text:
+            raise Exception("Expected response body not found")
+
+    @staticmethod
+    def drop_data_and_schema_from_database(session_alias,
+                                           url,
+                                           auth,
+                                           expected_response=None):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              data=DeploymentModels.drop_schema_and_data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        if 'Done' not in response.text or 'Success' not in response.text:
+            raise Exception("Expected response body not found")
+
+    @staticmethod
+    def get_schema_from_deployment(session_alias,
+                                   url,
+                                   auth,
+                                   expected_response=None):
+        properties = {}
+        data = Utills.render_data_from_template(DeploymentModels.get_schema,
+                                                properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
