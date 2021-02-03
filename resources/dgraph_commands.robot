@@ -224,7 +224,7 @@ Perform a restore on backup
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
 
 Perform a restore on backup present at other location
     [Arguments]    ${url}    ${path}
@@ -240,7 +240,7 @@ Perform a restore on backup present at other location
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
     # Validations:
 
 Verify restore file Content in results folder
