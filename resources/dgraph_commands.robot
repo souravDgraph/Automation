@@ -157,7 +157,7 @@ Execute Parallel Loader with rdf and schema parameters
         Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Aplha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}
-        Wait For Process    30 s
+        Wait For Process    timeout=30 s
         Log    ${loader_alias}.txt is log file name for this process.
     END
     FOR    ${i}    IN    @{loader_type}
@@ -224,7 +224,7 @@ Perform a restore on backup
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
 
 Perform a restore on backup present at other location
     [Arguments]    ${url}    ${path}
@@ -240,7 +240,7 @@ Perform a restore on backup present at other location
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
     # Validations:
 
 Verify restore file Content in results folder

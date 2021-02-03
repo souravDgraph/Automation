@@ -9,7 +9,6 @@ from robot.api import logger
 from SlashAPI.components.client.client import Connection
 from SlashAPI.components.handlers.utils.utils import Utils
 from SlashAPI.components.models.deployment.deployment import DeploymentModels
-import requests
 
 __all__ = ['Deployments']
 __author__ = "Vivetha Madesh"
@@ -20,7 +19,6 @@ __status__ = "Production"
 
 
 class Deployments():
-
     """
     Defines handlers for Deployment related end points
 
@@ -80,13 +78,17 @@ class Deployments():
                           enterprise=None,
                           isProtected=None,
                           size=None,
+                          organizationId=None,
                           expected_response=None):
         properties = locals()
         properties_to_delete = ['session_alias', 'url', 'auth', 'expected_response']
-        for property in properties_to_delete:
-            del properties[property]
+        for property_name in properties_to_delete:
+            del properties[property_name]
+        logger.debug(properties)
         data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
                                                 properties)
+        logger.debug(data)
+
         connection = Connection()
         connection.create_session(session_alias,
                                   url,
@@ -96,10 +98,11 @@ class Deployments():
                                                json=data,
                                                headers=auth,
                                                expected_status=str(expected_response))
-        logger.info(response.json())
-        logger.info(response.text)
+        logger.debug(response.json())
+        logger.debug(response.text)
         if 'Deployment has been patched.' not in response.text:
             raise Exception("Expected response body not found")
+        return response
 
     @staticmethod
     def backup_ops(session_alias,
