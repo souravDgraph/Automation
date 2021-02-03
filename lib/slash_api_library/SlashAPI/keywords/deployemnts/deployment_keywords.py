@@ -246,3 +246,61 @@ class DeploymentKeywords():
                                                auth,
                                                expected_response)
         return response
+
+    @staticmethod
+    def update_schema_to_deployment(session_alias,
+                                    base_url,
+                                    auth,
+                                    schema,
+                                    expected_response=200):
+        logger.info("Updating schema to deployment : %s" % base_url)
+        url = base_url + "/admin"
+        response = Deployments.update_schema_to_deployment(session_alias,
+                                                           url,
+                                                           auth,
+                                                           schema,
+                                                           expected_response)
+        return response
+
+    @staticmethod
+    def perform_operation_to_database(session_alias,
+                                      base_url,
+                                      auth,
+                                      mutation,
+                                      expected_response=200):
+        logger.info("perform operation to deployment : %s" % base_url)
+        url = base_url + "/graphql"
+        response = Deployments.perform_operation_to_database(session_alias,
+                                                             url,
+                                                             auth,
+                                                             mutation,
+                                                             expected_response)
+        return response
+
+    @staticmethod
+    def drop_data_from_database(session_alias,
+                                base_url,
+                                auth,
+                                drop_schema=False,
+                                expected_response=200):
+        logger.info("Drop all the data from deployment : %s" % base_url)
+        url = base_url + "/admin/slash"
+        Deployments.drop_data_from_database(session_alias,
+                                            url,
+                                            auth,
+                                            drop_schema,
+                                            expected_response)
+
+    @staticmethod
+    def get_schema_from_deployment(session_alias,
+                                   base_url,
+                                   auth,
+                                   expected_response=200):
+        logger.info("Get schema from deployment : %s" % base_url)
+        url = base_url + "/admin"
+        response = Deployments.get_schema_from_deployment(session_alias,
+                                                          url,
+                                                          auth,
+                                                          expected_response)
+        logger.info(response["data"]["getGQLSchema"]["schema"])
+        return response["data"]["getGQLSchema"]["schema"]
