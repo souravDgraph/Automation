@@ -10,7 +10,7 @@ from jinja2 import Template
 import json, os
 
 
-__all__ = ['Utills']
+__all__ = ['Utils']
 __author__ = "Vivetha Madesh"
 __version__ = "1.0"
 __maintainer__ = "Vivetha Madesh"
@@ -18,7 +18,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class Utills():
+class Utils():
     """
 
     """
