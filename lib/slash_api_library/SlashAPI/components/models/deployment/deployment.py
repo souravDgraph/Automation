@@ -1,4 +1,14 @@
 class DeploymentModels:
+    update_schema = """
+    {"query":"mutation updateGQLSchema($sch: String!) {updateGQLSchema(input: { set: { schema: $sch } }) {gqlSchema {schema generatedSchema}}}",
+    "variables":{"sch":{{ '"' + properties['schema'] + '"' }}}}
+    """
+    get_schema = """{"query":"{getGQLSchema {schema generatedSchema }}"}"""
+
+    drop_data = """{"query":"mutation { dropData(allData: true) { response { code message } } }"}"""
+
+    drop_schema_and_data = """{"query":"mutation { dropData(allDataAndSchema: true) { response { code message } } }"}"""
+
     list_backup = """{"query": "{ listBackups{ response { type backupNum folder timestamp }, errors { message } } }" }"""
 
     create_backup = """{

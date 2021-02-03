@@ -7,7 +7,7 @@ Author: vivetha@dgraph.io
 
 from robot.api import logger
 from SlashAPI.components.client.client import Connection
-from SlashAPI.components.handlers.utills.utills import Utills
+from SlashAPI.components.handlers.utils.utils import Utils
 from SlashAPI.components.models.deployment.deployment import DeploymentModels
 
 __all__ = ['Deployments']
@@ -39,7 +39,7 @@ class Deployments():
         if organization:
             properties["organization"] = organization
 
-        data = Utills.render_data_from_template(DeploymentModels.deployment_attributes,
+        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
                                                 properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
@@ -85,7 +85,7 @@ class Deployments():
         for property_name in properties_to_delete:
             del properties[property_name]
         logger.debug(properties)
-        data = Utills.render_data_from_template(DeploymentModels.deployment_attributes,
+        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
                                                 properties)
         logger.debug(data)
 
@@ -112,10 +112,10 @@ class Deployments():
                    expected_response=None):
         properties = {}
         if operation == "list":
-            data = Utills.render_data_from_template(DeploymentModels.list_backup,
+            data = Utils.render_data_from_template(DeploymentModels.list_backup,
                                                     properties)
         elif operation == "create":
-            data = Utills.render_data_from_template(DeploymentModels.create_backup,
+            data = Utils.render_data_from_template(DeploymentModels.create_backup,
                                                     properties)
         else:
             raise Exception("Not supported operation")
@@ -128,7 +128,7 @@ class Deployments():
                                               expected_status=str(expected_response))
         logger.info(response.json())
         logger.info(response.text)
-        if operation == "create" and 'Backup completed.' not in response.text:
+        if operation == "create" and 'Backup completed.' not in response.text :
             raise Exception("Backup not created")
         return response.json()
 
@@ -143,7 +143,7 @@ class Deployments():
             "deep_freeze": deep_freeze,
             "backup": backup
         }
-        data = Utills.render_data_from_template(DeploymentModels.freeze_deployment,
+        data = Utils.render_data_from_template(DeploymentModels.freeze_deployment,
                                                 properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
@@ -154,7 +154,7 @@ class Deployments():
                                               expected_status=str(expected_response))
         logger.info(response.json())
         logger.info(response.text)
-        if 'FREEZE OK' not in response.text:
+        if 'FREEZE OK' not in response.text :
             raise Exception("Deployment not Freezed !")
         return response.json()
 
@@ -172,9 +172,9 @@ class Deployments():
                                     size='small'):
         properties = locals()
         del properties["response_data"]
-        data = Utills.render_data_from_template(DeploymentModels.deployment_attributes,
+        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
                                                 properties)
-        Utills.compare_dict_based_on_primary_dict_keys(data,
+        Utils.compare_dict_based_on_primary_dict_keys(data,
                                                        response_data)
 
     @staticmethod
@@ -254,3 +254,80 @@ class Deployments():
         logger.info(response.text)
         if response.text != 'OK':
             raise Exception("Expected response body not found")
+
+    @staticmethod
+    def update_schema_to_deployment(session_alias,
+                                    url,
+                                    auth,
+                                    schema,
+                                    expected_response=None):
+        properties = {
+            "schema": schema
+        }
+        data = Utils.render_data_from_template(DeploymentModels.update_schema,
+                                                properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
+
+    @staticmethod
+    def perform_operation_to_database(session_alias,
+                                      url,
+                                      auth,
+                                      mutation,
+                                      expected_response=None):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              data=mutation,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
+
+    @staticmethod
+    def drop_data_from_database(session_alias,
+                                url,
+                                auth,
+                                drop_schema=False,
+                                expected_response=None):
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        if drop_schema:
+            payload = DeploymentModels.drop_schema_and_data
+        else:
+            payload = DeploymentModels.drop_data
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              data=payload,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        if 'Done' not in response.text or 'Success' not in response.text:
+            raise Exception("Expected response body not found")
+
+
+    @staticmethod
+    def get_schema_from_deployment(session_alias,
+                                   url,
+                                   auth,
+                                   expected_response=None):
+        properties = {}
+        data = Utils.render_data_from_template(DeploymentModels.get_schema,
+                                                properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
