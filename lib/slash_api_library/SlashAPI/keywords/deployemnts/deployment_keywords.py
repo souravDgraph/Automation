@@ -281,25 +281,15 @@ class DeploymentKeywords():
     def drop_data_from_database(session_alias,
                                 base_url,
                                 auth,
+                                drop_schema=False,
                                 expected_response=200):
         logger.info("Drop all the data from deployment : %s" % base_url)
         url = base_url + "/admin/slash"
         Deployments.drop_data_from_database(session_alias,
                                             url,
                                             auth,
+                                            drop_schema,
                                             expected_response)
-
-    @staticmethod
-    def drop_data_and_schema_from_database(session_alias,
-                                           base_url,
-                                           auth,
-                                           expected_response=200):
-        logger.info("Drop all the data from deployment : %s" % base_url)
-        url = base_url + "/admin/slash"
-        Deployments.drop_data_and_schema_from_database(session_alias,
-                                                       url,
-                                                       auth,
-                                                       expected_response)
 
     @staticmethod
     def get_schema_from_deployment(session_alias,
