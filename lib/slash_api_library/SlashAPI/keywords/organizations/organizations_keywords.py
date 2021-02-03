@@ -82,6 +82,19 @@ class OrganizationsKeywords:
         """
         return self.org_handler.add_member_to_organization(org_name, member_email)
 
+    def check_if_member_is_already_existing_in_organization(self, org_name, member_email):
+        """
+        Method to check a member to existing organization
+        \n:param org_name:<existing_organization_name>
+        \n:param member_email:<new_member_email-id>
+        \n:return: isExisting <boolean>
+
+        Example:
+        | add new member to existing organization |  org_name | member_email
+        | add new member to existing organization |  test_org | tester@gmail.com
+        """
+        return self.org_handler.check_member_in_organization(org_name, member_email)
+
     def remove_member_from_existing_organization(self, org_name, member_email, appender=None):
         """
         Method to remove a member from organization

@@ -55,10 +55,10 @@ class OrganizationsHandler:
     def create_session(self, headers, url, session_alias=None):
         """
         Method to set connection for organization
-        \n:param session_alias:
-        \n:param auth:
-        \n:param url:
-        \n:return:
+        :param session_alias:
+        :param auth:
+        :param url:
+        :return:
         """
         if session_alias is not None:
             self.session_alias = session_alias
@@ -71,15 +71,15 @@ class OrganizationsHandler:
     def create_organization(self, organization_name, expected_response=200):
         """
         Method to create organizations
-        \n:param organization_name:
-        \n:param expected_response:
-        \n:return:
+        :param organization_name:
+        :param expected_response:
+        :return:
         """
 
         create_org_payload = organization_model.create_organization(organization_name)
         logger.debug(create_org_payload)
         response = self.connection.post_on_session(self.session_alias, "", json=create_org_payload,
-                                                   headers=self.headers, expected_status=expected_response)
+                                                   headers=self.headers, expected_status=str(expected_response))
         self.connection.request_should_be_successful(response)
         validate_create_resp_details(response, organization_name)
 
@@ -88,16 +88,18 @@ class OrganizationsHandler:
     def delete_organization(self):
         """
         Method yet to be implemented.
-        \n:param session_alias:
-        \n:param expected_response:
-        \n:return:
+        :param session_alias:
+        :param expected_response:
+        :return:
         """
         response = self.connection.delete_on_session(self.session_alias, "", headers=self.header)
         logger.info(response.json)
 
-    def get_organizations(self, appender=None):
+    def get_organizations(self, appender=None, expected_response=200):
         """
         Method to get the organization
+        :param appender:
+        :param expected_response:
         :return:
         """
         if appender is None:
@@ -105,13 +107,14 @@ class OrganizationsHandler:
         get_org_payload = organization_model.get_organization()
         logger.debug(get_org_payload)
         response = self.connection.post_on_session(self.session_alias, appender, json=get_org_payload,
-                                                   headers=self.headers)
+                                                   headers=self.headers, expected_status=str(expected_response))
         self.connection.request_should_be_successful(response)
         return response
 
-    def get_members_in_organization(self, appender=None):
+    def get_members_in_organization(self, appender=None, expected_response=200):
         """
         Method to get members for all the organizations
+        :param expected_response:
         :param appender:
         :return:
         """
@@ -119,7 +122,7 @@ class OrganizationsHandler:
             appender = "graphql"
         existing_org_res = self.connection.post_on_session(self.session_alias, appender,
                                                            json=organization_model.get_members_in_organization(),
-                                                           headers=self.headers)
+                                                           headers=self.headers, expected_status=str(expected_response))
         self.connection.request_should_be_successful(existing_org_res)
 
     def get_organization_uid(self, org_name):
@@ -140,9 +143,10 @@ class OrganizationsHandler:
             raise Exception("Organization not found for: " + org_name)
         return org_id
 
-    def get_member_uid_from_organization(self, member_email, appender=None):
+    def get_member_uid_from_organization(self, member_email, expected_response=200, appender=None):
         """
         Method to get member uid from organization
+        :param expected_response:
         :param appender:
         :param member_email:
         :return:
@@ -152,7 +156,7 @@ class OrganizationsHandler:
 
         existing_org_res = self.connection.post_on_session(self.session_alias, appender,
                                                            json=organization_model.get_members_in_organization(),
-                                                           headers=self.headers)
+                                                           headers=self.headers, expected_status=str(expected_response))
         member_uid = None
         for org in existing_org_res.json()["data"]["organizations"]:
             for member in org["members"]:
@@ -162,12 +166,14 @@ class OrganizationsHandler:
             raise Exception("Member not found in organization: " + member_email)
         return member_uid
 
-    def add_member_to_organization(self, org_name, member_email, appender=None):
+    def add_member_to_organization(self, org_name, member_email, expected_response=200, appender=None):
         """
         Method to add a member to organization
-        \n:param org_name: <existing_org_name>
-        \n:param member_email: <new member mail>
-        \n:return:<response>
+        :param appender:
+        :param expected_response:
+        :param org_name: <existing_org_name>
+        :param member_email: <new member mail>
+        :return:<response>
         """
 
         if appender is None:
@@ -183,21 +189,57 @@ class OrganizationsHandler:
         if org_id:
             response = self.connection.post_on_session(self.session_alias, appender,
                                                        json=add_mem_payload,
-                                                       headers=self.headers)
+                                                       headers=self.headers, expected_status=str(expected_response))
             self.connection.request_should_be_successful(response)
         else:
             raise Exception("Organization is not found: " + org_name)
         if "errors" in response.json():
-            if response.json() == "The user is already a part of the organization.":
+            if response.json()["errors"][0]["message"] == "The user is already a part of the organization.":
                 logger.info("User already exists..")
         return response.json()
 
-    def remove_member_from_organization(self, org_name, member_email, appender=None):
+    def check_member_in_organization(self, org_name, member_email, expected_response=200, appender=None):
+        """
+        Method to add a member to organization
+        :param appender:
+        :param expected_response:
+        :param org_name: <existing_org_name>
+        :param member_email: <new member mail>
+        :return:<response>
+        """
+
+        if appender is None:
+            appender = "graphql"
+
+        org_id = self.get_organization_uid(org_name)
+        logger.debug(org_id)
+
+        # add member to org req
+        add_mem_payload = organization_model.add_member_to_organization(member_email, org_id)
+        logger.debug(add_mem_payload)
+
+        if org_id:
+            response = self.connection.post_on_session(self.session_alias, appender,
+                                                       json=add_mem_payload,
+                                                       headers=self.headers, expected_status=str(expected_response))
+            self.connection.request_should_be_successful(response)
+        else:
+            raise Exception("Organization is not found: " + org_name)
+        check = False
+        if "errors" in response.json():
+            if response.json()["errors"][0]["message"] == "The user is already a part of the organization.":
+                logger.info("User already exists..")
+                check = True
+        return check
+
+    def remove_member_from_organization(self, org_name, member_email, expected_response=200, appender=None):
         """
         Method to delete a member from organization
-        \n:param org_name: <existing_org_name>
-        \n:param member_email: <new member mail>
-        \n:return:<response>
+        :param appender:
+        :param org_name: <existing_org_name>
+        :param member_email: <new member mail>
+        :param expected_response:
+        :return:<response>
         """
 
         if appender is None:
@@ -215,7 +257,7 @@ class OrganizationsHandler:
         if org_id and member_uid:
             response = self.connection.post_on_session(self.session_alias, appender,
                                                        json=del_mem_payload,
-                                                       headers=self.headers)
+                                                       headers=self.headers, expected_status=str(expected_response))
             self.connection.request_should_be_successful(response)
             if "errors" in response.json():
                 if "The user is already a part of the organization." in response.json():
@@ -225,15 +267,16 @@ class OrganizationsHandler:
 
         return response.json()
 
-    def remove_org_from_deployment(self, deployment_name):
+    def remove_org_from_deployment(self, deployment_name, expected_response=200):
         """
         Method to remove organization from deployment
+        :param expected_response:
         :param deployment_name:
         :return:
         """
         deployment_handler = Deployments()
         session_alias = "remove_dep"
-        dep_data = deployment_handler.get_deployments(session_alias, self.url+"/deployments", self.headers, 200)
+        dep_data = deployment_handler.get_deployments(session_alias, self.url+"/deployments", self.headers, expected_response)
         logger.debug(dep_data)
         dep_uid = None
         for dep_res in dep_data:
@@ -245,12 +288,13 @@ class OrganizationsHandler:
                             ", deployment was not found: " + deployment_name)
 
         response = deployment_handler.update_deployment(session_alias, self.url+"/deployment/" + str(dep_uid),
-                                                        organizationId="empty", auth=self.headers, expected_response=200)
+                                                        organizationId="empty", auth=self.headers, expected_response=str(expected_response))
         return response
 
-    def add_org_from_deployment(self, deployment_name, org_name):
+    def add_org_from_deployment(self, deployment_name, org_name, expected_response=200):
         """
         Method to add organization to deployment
+        :param expected_response:
         :param deployment_name:
         :param org_name:
         :return:
@@ -259,7 +303,7 @@ class OrganizationsHandler:
         deployment_handler = Deployments()
         org_uid = self.get_organization_uid(org_name)
         session_alias = "add_dep"
-        dep_data = deployment_handler.get_deployments(session_alias, self.url+"/deployments", self.headers, 200)
+        dep_data = deployment_handler.get_deployments(session_alias, self.url+"/deployments", self.headers, expected_response)
         logger.debug(dep_data)
         dep_uid = None
         for dep_res in dep_data:
@@ -271,6 +315,6 @@ class OrganizationsHandler:
             raise Exception("Exception occurred while removing deployment from organization"
                             ", deployment not found: " + deployment_name)
         response = deployment_handler.update_deployment(session_alias, self.url+"/deployment/" + dep_uid,
-                                                        organizationId=org_uid, auth=self.headers, expected_response=200)
+                                                        organizationId=org_uid, auth=self.headers, expected_response=str(expected_response))
         logger.debug(response.json())
         return response
