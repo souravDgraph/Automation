@@ -125,6 +125,26 @@ class CustomRequestKeywords:
         state = response.json()
         return state
 
+    def state_check(self, appender):
+        """
+        Method to check the state of the deployed database instance
+        :param appender: URL segment to add to the base URL
+        :return state: Complete state of the database
+
+        Example:
+        | state check |  appender
+        | state check |  /state
+        """
+        cert = self.cert
+        headers = self.headers
+        response = None
+        try:
+            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+        except Exception as err:
+            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+        state = response.json()
+        return state
+
     def remove_node(self, appender, alpha_id, group):
         """
         Method to remove alpha node from a cluster, this API sends the request on the zero port and removes a alpha node
