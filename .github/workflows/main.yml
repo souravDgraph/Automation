@@ -34,22 +34,6 @@ jobs:
           architecture: x64 # optional
           # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
           token: ${{ github.token }} # optional, default is ${{ github.token }}
-         
-      # Download Dgraph Repo
-      - name: Check out Dgraph repo
-        uses: actions/checkout@master
-        with:
-          repository: dgraph-io/dgraph
-          
-      # Build Dgraph
-      -  name: Build Dgraph
-         run: |
-           cd dgraph
-           make install
-           sudo go build
-           ls
-           ./dgraph version
-           alias dgraph='$GOPATH/bin/dgraph'
           
       # Navigating to the directory and installing the requiremenets file
       - name: Install requirements for Dgraph
@@ -66,6 +50,23 @@ jobs:
           ls -alh
           python3 env_setup.py -l Slash -c enabled
         
+      # Download Dgraph Repo
+      - name: Check out Dgraph repo
+        uses: actions/checkout@master
+        with:
+          repository: dgraph-io/dgraph
+          
+      # Build Dgraph
+      -  name: Build Dgraph
+         run: |
+           cd dgraph
+           make install
+           sudo go build
+           ls
+           ./dgraph version
+           alias dgraph="`pwd`/dgraph"
+           dgraph version
+         
       - name: Run Robot Framework Testcases
         run: |
           echo ${{ github.workspace }}
