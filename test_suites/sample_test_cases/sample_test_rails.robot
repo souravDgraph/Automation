@@ -2,11 +2,14 @@
 Library           CustomTestRailListener
 Suite Setup     test rail Setup    https://dgraph.testrail.io    krishna@dgraph.io    dgrapH@619     Dgraph    Automation_Test_Run
 
+*** Variables ***
+${version}      V20.11.2
+
 *** Test Cases ***
 
 Update Check for test rail
     [Documentation]      Test case to add test run and update results
-    [Tags]  C1496
+    [Tags]  C1496   ${version}
     ${proj_id}=     test rail get project id       Dgraph
 #    ${suite_id}=    test rail get suite id     ${proj_id}      Automation_Suite
 #    ${case_ids}      Create List     1496
