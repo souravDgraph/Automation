@@ -61,10 +61,9 @@ jobs:
          run: |
            cd dgraph
            make install
-           sudo go build
+           sudo go install
            ls
            ./dgraph version
-           alias dgraph="`pwd`/dgraph"
            dgraph version
          
       - name: Run Robot Framework Testcases
