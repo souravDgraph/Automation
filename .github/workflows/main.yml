@@ -45,8 +45,10 @@ jobs:
       -  name: Build Dgraph
          run: |
            cd dgraph
-           sudo make install
-           $GOPATH/bin/dgraph version
+           make install
+           sudo go build
+           ls
+           ./dgraph version
            alias dgraph='$GOPATH/bin/dgraph'
           
       # Navigating to the directory and installing the requiremenets file
