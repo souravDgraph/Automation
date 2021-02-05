@@ -68,9 +68,12 @@ jobs:
          
       - name: Run Robot Framework Testcases
         run: |
+          find .
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}
-          robot -A conf/dgraph_live_args.txt
+          cd test_suites/dgraph/Linux
+          pwd
+          robot -A dgraph_live_suite.robot
           
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
