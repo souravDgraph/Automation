@@ -84,6 +84,9 @@ jobs:
           ls
           robot -A conf/dgraph_live_args.txt
           
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2.0.8
+          
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
         uses: fylein/python-pylint-github-action@v4
