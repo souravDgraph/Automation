@@ -2,14 +2,15 @@
 Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph    local
 Suite Teardown     End All Process    true
+Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
 Library           String
 
 *** Variables ***
-${rdf_file}       21million.json
-${schema_file}    21million.schema
+${rdf_file}       1million.rdf.gz
+${schema_file}    1million.schema
 
 *** Test Cases ***
 TC_01 Perform live load data.
