@@ -35,7 +35,7 @@ class CustomTestRailListener(TestRailsKeywords):
         Initializes framework properties such as absolute code path
         """
         self.ROBOT_LIBRARY_LISTENER = self
-        print('Common Library')
+        print('CustomTestRailListener Library')
 
     def about(self):
         """
