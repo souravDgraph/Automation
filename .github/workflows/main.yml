@@ -7,8 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
+  pull_request:
+     branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,6 +24,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with: 
+          path: Automation_workspace
         
       - name: Setup Python
         uses: actions/setup-python@v2.2.1
@@ -39,14 +41,14 @@ jobs:
       - name: Install requirements for Dgraph
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/utilities
+          cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 env_setup.py -l Dgraph -c enabled
         
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/utilities
+          cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 env_setup.py -l Slash -c enabled
         
@@ -55,22 +57,26 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
+          clean: false  
+          path: dgraph_workspace  
+        
           
       # Build Dgraph
       -  name: Build Dgraph
          run: |
-           cd dgraph
+           tree
+           cd dgraph_workspace/dgraph
            make install
            sudo go build
            ls
            ./dgraph version
            sudo mv ./dgraph /bin
+           dgraph version
          
       - name: Run Robot Framework Testcases
         run: |
-          find .
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}
+          cd ${{ github.workspace }}/Automation_workspace
           cd test_suites/dgraph/Linux
           pwd
           robot -A dgraph_live_suite.robot
