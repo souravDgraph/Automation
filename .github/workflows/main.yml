@@ -64,7 +64,6 @@ jobs:
       # Build Dgraph
       -  name: Build Dgraph
          run: |
-           tree
            cd dgraph_workspace/dgraph
            make install
            sudo go build
@@ -77,6 +76,7 @@ jobs:
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
+          tree
           cd test_suites/dgraph/Linux
           pwd
           robot -A dgraph_live_suite.robot
