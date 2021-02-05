@@ -76,8 +76,9 @@ jobs:
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
-          tree
           pwd
+          mkdir -p backup
+          ls
           robot -A conf/dgraph_live_args.txt
           
       # Linting the Python code whenever there is a push in main branch
