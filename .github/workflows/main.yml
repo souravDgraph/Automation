@@ -84,12 +84,6 @@ jobs:
           ls
           robot --include CI test_suites/dgraph/Linux/dgraph_live_suite.robot
           
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v2.0.8
-        with:
-          name: 'run-results'
-          path: ${{ github.workspace }}/Automation_workspace/results
-          
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
         uses: fylein/python-pylint-github-action@v4
