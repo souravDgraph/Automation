@@ -80,10 +80,10 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
           mkdir -p backup
-          ls
           cd test_suites/dgraph/Linux
           pwd
-          robot --include CI .
+          ls
+          robot --include CI dgraph_live_suite.robot
           
       - name: Download workflow artifact
         # You may pin to the exact commit or the version.
