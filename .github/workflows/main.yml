@@ -80,7 +80,7 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
           mkdir -p backup
-          pwd
+          tree
           ls
           robot --include CI test_suites/dgraph/Linux/dgraph_suite.robot
           
