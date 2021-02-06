@@ -82,7 +82,8 @@ jobs:
           pwd
           mkdir -p backup
           ls
-          robot -A conf/dgraph_live_args.txt
+          cd test_suites/dgraph/Linux
+          robot --include CI .
           
       - name: Download workflow artifact
         # You may pin to the exact commit or the version.
