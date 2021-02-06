@@ -88,6 +88,9 @@ jobs:
         # You may pin to the exact commit or the version.
         # uses: dawidd6/action-download-artifact@891cccee4b25d3306cf5edafa174ddc1d969871f
         uses: dawidd6/action-download-artifact@v2.11.0
+        with:
+          name: 'run-results'
+          path: ${{ github.workspace }}/Automation_workspace/results
           
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
