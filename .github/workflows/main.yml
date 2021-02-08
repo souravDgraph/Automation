@@ -21,7 +21,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest, macos-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -85,8 +85,8 @@ jobs:
           echo " ---- Running Dgraph Testcases ----"
           robot --include CI test_suites/dgraph/Linux/dgraph_live_suite.robot
           
-          echo " ---- Running Slash Testcases ----"
-          robot test_suites/slash/slash_api/sanity.robot
+          # echo " ---- Running Slash Testcases ----"
+          # robot test_suites/slash/slash_api/sanity.robot
           
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
