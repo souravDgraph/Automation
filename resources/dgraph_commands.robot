@@ -334,6 +334,30 @@ Monitor zero and alpha process
     Run Keyword If    "${alpha_process_check}"=="False"    Start Dgraph Alpha    false
     Run Keyword If    "${zero_process_check}"=="False"    Start Dgraph Zero    false
 
+Monitor health and state check
+    [Documentation]   Keyword to check the health and state of the connection.
+    connect request server
+    ${response}=    Health Check    /health
+    log     ${response}
+    Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
+    Monitor State Check
+
+Monitor health check
+    [Documentation]   Keyword to check the health of the connection.
+    connect request server
+    ${response}=    Health Check    /health
+    log     ${response}
+    Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
+
+Monitor State Check
+    [Documentation]  Keyword to check the state of the process.
+    connect request server
+    ${state_resposne}=  State Check     /state
+    ${leader}=    Get Value From Json   ${state_resposne}   $..members..leader
+    ${am_dead}=    Get Value From Json   ${state_resposne}   $..members..amDead
+    Should Be Equal As Strings  ${leader[0]}   True
+    Should Be Equal As Strings  ${am_dead[0]}   False
+
 Verify process to be stopped
     [Arguments]    ${process_alias}
     [Documentation]    Keyword to check if the process is still running and wait till process completes.
