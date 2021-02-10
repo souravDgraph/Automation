@@ -42,17 +42,20 @@ Get deployments
     [Tags]    C224    Sanity
     ${deployments}=    Get Deployments    ${Session_alias}    ${URL}    ${HEADERS}
     log    ${deployments}
-    sleep    200
     Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
 
 Update Deployment mode
     Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test-edit    deployment_mode=flexible
     Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
 
-Introspection API \ without Schema
+Introspection API without Schema
     ${response}=    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${introspection_query}
     ${errors}=    Get From Dictionary    ${response}    errors
-    Should Contain    ${errors}    ${No_schema_error}
+    ${error_messages}=    Get From List    ${errors}    0
+    ${message}=    Get From Dictionary    ${error_messages}    message
+    log    ${No_schema_error}
+    log    ${message}
+    Should Contain    ${message}    ${No_schema_error}
 
 Add schema and perform queries and mutation
     Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
@@ -65,11 +68,11 @@ Add schema and perform queries and mutation
     Log    Drop data from database
     Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Log    Drop data and schema from database
-    Drop Data And Schema From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
+    Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${True}
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Run Keyword If    '${schema}'!='${EMPTY}'    Fail
 
-Introspection API \ with Schema
+Introspection API with Schema
     Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Run Keyword If    '${schema}'=='${EMPTY}'    Fail
@@ -102,20 +105,17 @@ create , get and delete API key
 
 freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
-    ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
-    Set Suite Variable    ${deployment_id}
-    ${deployment_url}=    Collections.Get From Dictionary    ${data}    url
-    Get Deployment Health    ${Session_alias}    https://${deployment_url}    ${HEADERS}
-    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
 
 *** Keywords ***
 Create Backend
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
-    ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
-    Set Suite Variable    ${deployment_id}
+    sleep    600
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
+    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
+    ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
+    Set Suite Variable    ${deployment_id}
     Set Suite Variable    ${deployment_endpoint}
     ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     ${deployemnt_jwt_token}=    Collections.Get From Dictionary    ${data}    jwtToken
