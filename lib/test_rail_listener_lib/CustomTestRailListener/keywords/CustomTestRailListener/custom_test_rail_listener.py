@@ -24,11 +24,6 @@ class CustomTestRailListener(TestRailsKeywords):
     ROBOT_LIBRARY_VERSION = __version__
     ROBOT_LISTENER_API_VERSION = 2
 
-    ROBOT_CODE_ROOT_FOLDER_PATH = None
-    ROBOT_CODE_BRANCH_FOLDER_PATH = None
-    ROBOT_CODE_UTILS_FOLDER_PATH = None
-    OS = None
-
     def __init__(self):
         """
         Framework init

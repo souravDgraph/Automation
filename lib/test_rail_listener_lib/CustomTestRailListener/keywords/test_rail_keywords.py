@@ -53,7 +53,7 @@ class TestRailsKeywords:
     def test_rail_get_all_tests(self, run_id):
         """
         Method to get all the tests created as part of run_id
-        \n:param run_id: 7
+        \n:param run_id: <run_id>
         \n:return: <response>
 
          Example:
@@ -79,7 +79,7 @@ class TestRailsKeywords:
     def test_rail_get_all_projects(self):
         """
         Method to get all the projects
-        :return:<all_projects_response>
+        \n:return:<all_projects_response>
 
         Example:
         | test rails get all projects |

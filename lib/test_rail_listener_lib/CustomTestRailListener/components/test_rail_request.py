@@ -74,7 +74,6 @@ class TestRailsRequest:
             raise Exception("Project not found" + project_name)
         return proj_id
 
-
     def get_suite_id(self, project_id, suite_name):
         """
         Method to get suite id based on suite name
@@ -101,7 +100,6 @@ class TestRailsRequest:
         """
         response = self.api.suites.get_suites(project_id=project_id)
         return response
-
 
     def get_all_section_id(self, project_id, **kwargs):
         """
@@ -271,4 +269,3 @@ class TestRailsRequest:
         if run_id is None:
             raise Exception("Run id was not found for run name: " + run_name)
         return run_id
-
