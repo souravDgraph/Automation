@@ -83,8 +83,9 @@ jobs:
           tree
           ls
           echo " ---- Running Dgraph Testcases ----"
-          robot --include CI test_suites/dgraph/Linux/dgraph_live_suite.robot
+          robot --include CI test_suites/dgraph/Linux/
           
+          # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
           # robot test_suites/slash/slash_api/sanity.robot
           

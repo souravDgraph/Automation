@@ -206,7 +206,6 @@ Create NFS Backup
     ${res}=    Backup Using Admin    ${backup_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${backup_path}
-    # Restore Keywords
 
 Perform a restore on backup
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
@@ -373,6 +372,24 @@ Verify process to be stopped
     END
     Log    ${process_alias} Process is stopped
     Comment    Wait Until Keyword Succeeds    600x    5minute    Process Should Be Stopped    handle=${process_alias}    error_message=${error_message} is still running
+
+Build Dgraph Version
+    [Arguments]    ${version}
+    [Documentation]    Keyword builds Dgraph to a specific version
+    ${rc}    ${output}=    OperatingSystem.Remove Directory    dgraph    recursive=True
+    ${rc}    ${output}=    OperatingSystem.Run And Return Rc And Output    pwd
+    ${rc}    ${clone}=    OperatingSystem.Run And Return Rc And Output    git clone https://github.com/dgraph-io/dgraph.git
+    log    ${clone}
+    ${checkout_output}=    Process.Run Process    git    checkout    ${version}    alias=checkout_alias    cwd=dgraph    shell=True
+    log    ${checkout_output}
+    Should Be Equal As Integers    ${checkout_output.rc}    0
+    ${make_output}=    Process.Run Process    make    install    alias=make_alias    cwd=dgraph    shell=True
+    log    ${make_output}
+    Should Be Equal As Integers    ${make_output.rc}    0
+    ${output} =    OperatingSystem.Run    dgraph version
+    ${version_output} =    Get Lines Containing String    ${output}    version    case_insensitive
+    log    ${version_output}
+    should contain    ${version_output}    ${version}
 
 Check if parallel process is triggered
     [Arguments]    ${loader_alias}     ${rdf_filename}    ${schema_filename}  ${loader_name}
