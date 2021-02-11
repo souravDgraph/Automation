@@ -68,17 +68,20 @@ class OrganizationsHandler:
         logger.info("Created session as: " + self.session_alias + " organization request. ")
         return self.connection
 
-    def create_organization(self, organization_name, expected_response=200):
+    def create_organization(self, organization_name, expected_response=200, appender=None):
         """
         Method to create organizations
+        :param appender:
         :param organization_name:
         :param expected_response:
         :return:
         """
+        if appender is None:
+            appender = "graphql"
 
         create_org_payload = organization_model.create_organization(organization_name)
         logger.debug(create_org_payload)
-        response = self.connection.post_on_session(self.session_alias, "", json=create_org_payload,
+        response = self.connection.post_on_session(self.session_alias, appender, json=create_org_payload,
                                                    headers=self.headers, expected_status=str(expected_response))
         self.connection.request_should_be_successful(response)
         validate_create_resp_details(response, organization_name)
