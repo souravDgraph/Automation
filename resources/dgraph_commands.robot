@@ -130,10 +130,8 @@ Trigger Loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${value}=    Get Tls Value
     ${conf_live_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
-    ...    ELSE    Process.start Process    dgraph    ${loader_name}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt      stderr=${loader_alias}_err.txt    cwd=results
+    ${result_loader}=   Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}

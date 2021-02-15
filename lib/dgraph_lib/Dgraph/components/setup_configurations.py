@@ -72,6 +72,35 @@ class DgraphCLI:
         logger.debug(self.curr_path + tls_loc)
         return self.curr_path + tls_loc
 
+    def get_tls_certs(self, cli):
+        """
+        Method to get all the certificates for tls or mtls configuration
+        :return:<mtls_certificates>
+        """
+        logger.debug("Appending TLS and mTLS certificates.")
+        tls_location = self.curr_path + self.cfg['tls']['location']
+        tls_cert = ""
+        if self.tls_mutual:
+            mtls = {
+                "--tls_cacert": tls_location + "/ca.crt",
+                "--tls_cert": tls_location + "/client.groot.crt",
+                "--tls_key": tls_location + "/client.groot.key"
+            }
+        elif self.tls:
+            mtls = {
+                "--tls_cacert": tls_location + "/ca.crt",
+            }
+        if self.tls or self.tls_mutual:
+            if cli == "zero" or cli == "alpha":
+                mtls.update({
+                    "--tls_node_cert": tls_location + "/node.crt",
+                    "--tls_node_key": tls_location + "/node.key"
+                })
+            for key in mtls:
+                tls_cert = tls_cert + " " + key + " " + str(mtls[key])
+        logger.debug(tls_cert)
+        return tls_cert
+
     def get_mtls_verification_type(self):
         """
         Method to get the verification type specified in conf file.
@@ -111,32 +140,14 @@ class DgraphCLI:
         cli_command = "dgraph " + cli_name + " "
         appender = ""
 
+        # Configure tls and mtls
+        tls_str = self.get_tls_certs("zero")
         if self.tls_mutual:
             for key in self.cfg['tls']['mutual_tls']:
                 if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
                     appender = appender + " --tls_client_auth " + key
-            tls_location = self.curr_path + self.cfg['tls']['location']
-            tls = {
-                "--tls_cacert": tls_location + "/ca.crt",
-                "--tls_node_cert": tls_location + "/node.crt",
-                "--tls_node_key": tls_location + "/node.key",
-                "--tls_cert": tls_location + "/client.groot.crt",
-                "--tls_key": tls_location + "/client.groot.key"
-            }
-            tls_str = ""
-            for key in tls:
-                tls_str = tls_str + " " + key + " " + str(tls[key])
             appender = appender + tls_str + " --tls_internal_port_enabled=true "
         elif self.tls:
-            tls_location = self.curr_path + self.cfg['tls']['location']
-            tls = {
-                "--tls_cacert": tls_location + "/ca.crt",
-                "--tls_node_cert": tls_location + "/node.crt",
-                "--tls_node_key": tls_location + "/node.key",
-            }
-            tls_str = ""
-            for key in tls:
-                tls_str = tls_str + " " + key + " " + str(tls[key])
             appender = appender + tls_str
 
         cli_command = cli_command + appender + " 2>&1"
@@ -164,32 +175,15 @@ class DgraphCLI:
         if self.enc:
             enc_path = self.curr_path + self.cfg['enc']['location']
             appender = appender + " --encryption_key_file " + enc_path
+
+        # Configure tls and mtls
+        tls_str = self.get_tls_certs("alpha")
         if self.tls_mutual:
             for key in self.cfg['tls']['mutual_tls']:
                 if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
                     appender = appender + " --tls_client_auth " + key
-            tls_location = self.curr_path + self.cfg['tls']['location']
-            tls = {
-                "--tls_cacert": tls_location + "/ca.crt",
-                "--tls_node_cert": tls_location + "/node.crt",
-                "--tls_node_key": tls_location + "/node.key",
-                "--tls_cert": tls_location + "/client.groot.crt",
-                "--tls_key": tls_location + "/client.groot.key"
-            }
-            tls_str = ""
-            for key in tls:
-                tls_str = tls_str + " " + key + " " + str(tls[key])
             appender = appender + tls_str + " --tls_internal_port_enabled=true "
         elif self.tls:
-            tls_location = self.curr_path + self.cfg['tls']['location']
-            tls = {
-                "--tls_cacert": tls_location + "/ca.crt",
-                "--tls_node_cert": tls_location + "/node.crt",
-                "--tls_node_key": tls_location + "/node.key",
-            }
-            tls_str = ""
-            for key in tls:
-                tls_str = tls_str + " " + key + " " + str(tls[key])
             appender = appender + tls_str
 
         cli_command = cli_command + appender + " 2>&1"
@@ -213,26 +207,16 @@ class DgraphCLI:
                                      "localhost:8000 --zero=localhost:5080 "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']
-                cli_command = cli_command + " --encryption_key_file " + enc_path
+                cli_command = cli_command + " --encrypted=False  --encrypted_out=True " \
+                                            "--encryption_key_file " + enc_path
         if self.acl and loader_type != "bulk":
-            cli_command = cli_command + " --user groot --password password"
+            cli_command = cli_command + " --creds 'user=groot;password=password' "
+        #     cli_command = cli_command + " -u groot -p password"
 
-        tls_str = ""
+        mtls_certs = self.get_tls_certs("live")
         if self.tls_mutual:
-            tls_location = self.curr_path + self.cfg['tls']['location']
-            tls = {
-                "--tls_cacert": tls_location + "/ca.crt",
-                "--tls_cert": tls_location + "/client.groot.crt",
-                "--tls_key": tls_location + "/client.groot.key"
-            }
-            for key in tls:
-                tls_str = tls_str + " " + key + " " + str(tls[key])
-            cli_command = cli_command + tls_str + " --tls_server_name \"localhost\"" + \
+            cli_command = cli_command + mtls_certs + " --tls_server_name \"localhost\"" + \
                           " --tls_internal_port_enabled"
-
         elif self.tls:
-            tls_location = self.curr_path + self.cfg['tls']['location']
-            cli_command = cli_command + " --tls_server_name \"localhost\"" + \
-                          "--tls_cacert " + tls_location + "/ca.crt"
-
+            cli_command = cli_command + mtls_certs + " --tls_server_name \"localhost\""
         return cli_command

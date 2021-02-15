@@ -104,3 +104,11 @@ class SetupDgraphKeywords:
         """
         self.dgraph_cli = DgraphCLI()
         return self.dgraph_cli.get_enc()
+
+    def get_tls_certificates(self):
+        """
+        Method to get tls and mtls certificates depending on config file.
+        :return: <list of certs for tls and mtls>
+        """
+        self.dgraph_cli = DgraphCLI()
+        return self.dgraph_cli.get_tls_certs()
