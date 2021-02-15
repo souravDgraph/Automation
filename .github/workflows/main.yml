@@ -113,6 +113,5 @@ jobs:
           path: |
             ${{ github.workspace }}/Automation_workspace/
             !${{ github.workspace }}/Automation_workspace/test_data
-            
-
+            !${{ github.workspace }}/Automation_workspace/doc
         
