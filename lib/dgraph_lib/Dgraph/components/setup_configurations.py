@@ -215,7 +215,7 @@ class DgraphCLI:
                 enc_path = self.curr_path + self.cfg['enc']['location']
                 cli_command = cli_command + " --encryption_key_file " + enc_path
         if self.acl and loader_type != "bulk":
-            cli_command = cli_command + " -u groot -p password"
+            cli_command = cli_command + " --user groot --password password"
 
         tls_str = ""
         if self.tls_mutual:
