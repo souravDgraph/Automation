@@ -92,5 +92,12 @@ jobs:
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
         uses: fylein/python-pylint-github-action@v4
+      
+      # Publish Artifacts
+      - name: Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v2
+        with: 
+          name: results-artifacts
+          path: results
 
         
