@@ -5,7 +5,6 @@ import json
 import pathlib
 from subprocess import Popen, PIPE
 from robot.api import logger
-import io
 
 
 class DgraphCLI:
