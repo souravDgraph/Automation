@@ -1,5 +1,6 @@
-URL = "https://api.thegaas.com/"
+URL = "https://api.stage.thegaas.com/"
 BACKEND_NAME = "Test"
 BACKEND_ZONE = "us-east-1"
-HEADERS = { "Authorization" : "Bearer SlashSecret_UGF1bEZUVyBSb2Nrcw",
+HEADERS = { "Authorization" : "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1ETXlNemcyTnpFME1qTkNORUUzTWpZME1UVTJNa0pCTVRjMFFUUkVPVEJFT0VZNE5UWXhSUSJ9.eyJpc3MiOiJodHRwczovL2Rldi1kZ3JhcGgtc2Fhcy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWZjNWRlNjIxOWU1ZTQwMDY5MWFlZGUwIiwiYXVkIjpbImh0dHA6Ly9sb2NhbGhvc3Q6ODA3MCIsImh0dHBzOi8vZGV2LWRncmFwaC1zYWFzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2MTM0MDkyMzgsImV4cCI6MTYxMzQ5NTYzOCwiYXpwIjoiZ2JwVnE3aTFnTXZnbXRJM211QXpvWkhKYlUyYng1anQiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIn0.XE_c8ezbBP074dx4azbTFAW8MfQKYwCnf0VCVd5JYPW1twlbhmPwUYt71_3iKLRX8oLus-vpikyRMSL2SdurxC6NBMXMYytcXHcYdIJsaJN3dvWV30IJaT_41PxnRroGzfm2GK0Y91fwFH35fyA2u0WPGvFYE5g-nO-Tw9ttiuNERTaNc6WHJCAgi2YEK5PGDxqAKwAIOogJZvf96n8PTCZtMmALeT0PzGo8k4q1xFHekAfb-EX3ww3RXj6WEZc2oPnEq1xxY6SllB446wbOl_6Ka-V5lfow_U3EC-foOut0xnZLbDzFi-q7MsOl5R-FmChz5_siwfG2k4TyNvFlsw",
             "Content-Type" : "application/json" }
+DELETE_API_KEY_MESSAGE = "API Key Deleted Successfully."
