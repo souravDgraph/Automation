@@ -250,6 +250,8 @@ class DgraphCLI:
             else:
                 return False
         else:
+            logger.debug("Version is empty so considering it as latest dgraph"
+                         " from master branch.")
             return True
 
     def build_loader_command(self, rdf_file, schema_file, loader_type):
