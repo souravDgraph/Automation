@@ -9,6 +9,7 @@ from robot.api import logger
 from SlashAPI.components.client.client import Connection
 from SlashAPI.components.handlers.utils.utils import Utils
 from SlashAPI.components.models.deployment.deployment import DeploymentModels
+import requests, time
 
 __all__ = ['Deployments']
 __author__ = "Vivetha Madesh"
@@ -39,18 +40,24 @@ class Deployments():
         if organization:
             properties["organization"] = organization
 
-        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
+        data = Utils.render_data_from_template(DeploymentModels.create_deployment,
                                                 properties)
+        logger.info("-*-*-*"*40)
+        logger.info(data)
+        logger.info("-*-*-*" * 40)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
         response = connection.post_on_session(session_alias,
-                                              '', json=data,
+                                              '',
+                                              json=data,
                                               headers=auth,
                                               expected_status=str(expected_response))
-        Deployments.validate_deployment_details(response.json(),
+        deployment_details = response.json()['data']['createDeployment']
+        Deployments.validate_deployment_details(deployment_details,
                                                 deployment_name,
                                                 deployment_zone)
-        return response.json()
+        logger.info(deployment_details)
+        return deployment_details
 
     @staticmethod
     def delete_deployment(session_alias, url, auth,
@@ -166,9 +173,7 @@ class Deployments():
                                     organization=None,
                                     deploymentMode='graphql',
                                     dgraphHA='false',
-                                    doNotFreeze='false',
                                     enterprise='false',
-                                    isProtected='false',
                                     size='small'):
         properties = locals()
         del properties["response_data"]
@@ -194,31 +199,39 @@ class Deployments():
     @staticmethod
     def get_deployment_health(session_alias,
                               url,
-                              auth):
+                              auth,
+                              expected_response=200):
         connection = Connection()
         connection.create_session(session_alias, url, auth)
-        response = connection.get_on_session(session_alias,
-                                             '',
-                                             headers=auth)
-        logger.info(response.json())
+        for cycle in range(1, 20):
+            response_code = requests.get(url, headers=auth)
+            logger.info(response_code.status_code)
+            logger.info(response_code.json())
+            logger.info(type(response_code.status_code))
+            if int(response_code.status_code) == expected_response:
+                break
+            time.sleep(10)
 
     @staticmethod
     def create_api_keys(session_alias,
                         url,
                         auth,
+                        deployment_id,
                         name,
                         role,
                         expected_response=None):
         properties = {
+            "deploymentID": deployment_id,
             "name": name,
             "role": role
         }
-
+        data = Utils.render_data_from_template(DeploymentModels.create_api_key,
+                                               properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
         response = connection.post_on_session(session_alias,
                                               '',
-                                              json=properties,
+                                              json=data,
                                               headers=auth,
                                               expected_status=str(expected_response))
         logger.info(response.json())
@@ -228,14 +241,21 @@ class Deployments():
     def get_api_keys(session_alias,
                      url,
                      auth,
+                     deployment_id,
+                     expected_response_text,
                      expected_response=None):
-
+        properties = {
+            "deploymentID": deployment_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.get_api_key,
+                                               properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
-        response = connection.get_on_session(session_alias,
-                                             '',
-                                             headers=auth,
-                                             expected_status=str(expected_response))
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
         logger.info(response.json())
         return response.json()
 
@@ -243,16 +263,25 @@ class Deployments():
     def delete_api_keys(session_alias,
                         url,
                         auth,
+                        deployment_id,
+                        api_key_id,
+                        expected_response_text,
                         expected_response=None):
-
+        properties = {
+            "deploymentID" : deployment_id,
+            "apiKeyID" : api_key_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.delete_api_key,
+                                               properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
-        response = connection.delete_on_session(session_alias,
-                                                '',
-                                                headers=auth,
-                                                expected_status=str(expected_response))
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
         logger.info(response.text)
-        if response.text != 'OK':
+        if expected_response_text not in response.text :
             raise Exception("Expected response body not found")
 
     @staticmethod

@@ -21,6 +21,7 @@ ${mutation_query_1}    {\"query\":\"mutation AddTasks {\\n \ addTask(input: [\\n
 ${query_1}        {\"query\":\"query {\\n \ __schema {\\n \ \ \ __typename\\n \ }\\n}\"}
 ${introspection_query}    {"query":"query {__schema { __typename }}"}
 ${No_schema_error}    Not resolving __schema. There's no GraphQL schema in Dgraph. \ Use the /admin API to add a GraphQL schema
+${Backend_creation_timeout}    1
 
 *** Test Cases ***
 Create Deployment
@@ -29,10 +30,12 @@ Create Deployment
     ...    - Create Deployment
     ...    \ \ \ \ - Delete Deployment
     [Tags]    C236    Sanity
+    [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
     Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
+    [Teardown]
 
 Get deployments
     [Documentation]    List of tests covered
@@ -84,7 +87,6 @@ Introspection API with Schema
 
 create manual backup
     Backup Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    create
-    sleep    60
 
 list backups
     Comment    ${deployment_auth}=    Create Dictionary    x-auth-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzL3Byb3h5IiwiZHVpZCI6IjB4MTBhNDAxIiwiZXhwIjoxNjExNTYwMzg0LCJpc3MiOiJzL2FwaSJ9.NvLjMPzfdkaYO6puXErMIsJjr7x9FkvS7Px2BzfZ0ns
@@ -99,9 +101,11 @@ create , get and delete API key
     ...    - Get API key
     ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test
     log    ${api_key_details}
+    ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
+    ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
     Get Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}
+    Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
 
 freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
@@ -110,7 +114,6 @@ freeze deployment
 Create Backend
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
-    sleep    600
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
     Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}

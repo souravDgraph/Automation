@@ -43,11 +43,12 @@ class OrganizationsKeywords:
             res = self.org_handler.create_session(headers=headers, url=url)
         return res
 
-    def create_organization(self, org_name, expected_response: int):
+    def create_organization(self, org_name, expected_response: int, appender=None):
         """
         Method to create organization.
         \n:param org_name: <organization_name>
         \n:param expected_response: <status_code>
+        \n:param appender:
         \n:return:<response>
 
         Example:
@@ -55,7 +56,13 @@ class OrganizationsKeywords:
         | create organization | dgraph_org | expected_response=200
         """
         logger.info("Creating organization for: " + org_name)
-        self.org_handler.create_organization(organization_name=org_name, expected_response=expected_response)
+        if appender is None:
+            self.org_handler.create_organization(organization_name=org_name,
+                                                 expected_response=expected_response)
+        else:
+            self.org_handler.create_organization(organization_name=org_name,
+                                                 expected_response=expected_response,
+                                                 appender=appender)
 
     def get_organizations_list(self):
         """
@@ -69,18 +76,25 @@ class OrganizationsKeywords:
         logger.info("Getting lis of organizations for the client.")
         return self.org_handler.get_organizations()
 
-    def add_new_member_to_existing_organization(self, org_name, member_email):
+    def add_new_member_to_existing_organization(self, org_name, member_email, appender=None):
         """
         Method to add a member to existing organization
         \n:param org_name:<existing_organization_name>
         \n:param member_email:<new_member_email-id>
+        \n:param appender:
         \n:return: <response>
 
         Example:
         | add new member to existing organization |  org_name | member_email
         | add new member to existing organization |  test_org | tester@gmail.com
         """
-        return self.org_handler.add_member_to_organization(org_name, member_email)
+        if appender is None:
+            response = self.org_handler.add_member_to_organization(org_name, member_email)
+        else:
+            response = self.org_handler.add_member_to_organization(org_name,
+                                                                   member_email,
+                                                                   appender=appender)
+        return response
 
     def check_if_member_is_already_existing_in_organization(self, org_name, member_email):
         """

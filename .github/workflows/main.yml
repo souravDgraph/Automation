@@ -83,13 +83,35 @@ jobs:
           tree
           ls
           echo " ---- Running Dgraph Testcases ----"
-          robot --include CI test_suites/dgraph/Linux/dgraph_live_suite.robot
+          robot --include CI test_suites/dgraph/Linux/
           
+          # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
           # robot test_suites/slash/slash_api/sanity.robot
           
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
         uses: fylein/python-pylint-github-action@v4
-
+        if: always()
+      
+      
+      # Getting Current time
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        if: always()
+        id: current-time
+        with:
+          format: YYYYMMDD-HH_mm_ss
+          utcOffset: "+05:30"
+      
+      # Publish Artifacts
+      - name: Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v2
+        if: always()
+        with: 
+          name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
+          path: |
+            ${{ github.workspace }}/Automation_workspace/
+            !${{ github.workspace }}/Automation_workspace/test_data
+            !${{ github.workspace }}/Automation_workspace/doc
         
