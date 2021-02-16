@@ -153,7 +153,7 @@ class DgraphCLI:
         cli_name = "alpha"
         cli_command = "dgraph " + cli_name + " "
         appender = ""
-        cli_command = cli_command + "--cache_mb=6000 --badger.compression=zstd:3" \
+        cli_command = cli_command + "--cache_mb=6000" \
                                     " -v=2 --whitelist=0.0.0.0 " \
                                     "--zero=localhost:5080"
         if bulk_path:

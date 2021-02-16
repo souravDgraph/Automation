@@ -7,8 +7,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
+  pull_request:
+     branches: [ main ]
+  schedule:
+     # * is a special character in YAML so you have to quote this string
+     - cron:  '0 1 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,6 +27,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with: 
+          path: Automation_workspace
         
       - name: Setup Python
         uses: actions/setup-python@v2.2.1
@@ -39,19 +44,74 @@ jobs:
       - name: Install requirements for Dgraph
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/utilities
+          cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 env_setup.py -l Dgraph -c enabled
         
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/utilities
+          cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 env_setup.py -l Slash -c enabled
         
+      # Download Dgraph Repo
+      - name: Check out Dgraph repo
+        uses: actions/checkout@master
+        with:
+          repository: dgraph-io/dgraph
+          clean: false  
+          path: dgraph_workspace  
+        
+          
+      # Build Dgraph
+      -  name: Build Dgraph
+         run: |
+           cd dgraph_workspace/dgraph
+           make install
+           sudo go build
+           ls
+           ./dgraph version
+           sudo mv ./dgraph /bin
+           dgraph version
+         
+      - name: Run Robot Framework Testcases
+        run: |
+          echo ${{ github.workspace }}
+          cd ${{ github.workspace }}/Automation_workspace
+          mkdir -p backup
+          tree
+          ls
+          echo " ---- Running Dgraph Testcases ----"
+          robot --include CI test_suites/dgraph/Linux/
+          
+          # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
+          # echo " ---- Running Slash Testcases ----"
+          # robot test_suites/slash/slash_api/sanity.robot
+          
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
         uses: fylein/python-pylint-github-action@v4
-
+        if: always()
+      
+      
+      # Getting Current time
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        if: always()
+        id: current-time
+        with:
+          format: YYYYMMDD-HH_mm_ss
+          utcOffset: "+05:30"
+      
+      # Publish Artifacts
+      - name: Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v2
+        if: always()
+        with: 
+          name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
+          path: |
+            ${{ github.workspace }}/Automation_workspace/
+            !${{ github.workspace }}/Automation_workspace/test_data
+            !${{ github.workspace }}/Automation_workspace/doc
         

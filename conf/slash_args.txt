@@ -2,9 +2,9 @@
 #--timestampoutput
 --console verbose
 --consolemarkers on
+--loglevel TRACE:INFO
 test_suites/slash/slash_api/org.robot
 
 #Additional arguments
-#--loglevel TRACE:INFO
 #--tagdoc *:See *README.md*
 #--tagstatcombine smokeANDregression

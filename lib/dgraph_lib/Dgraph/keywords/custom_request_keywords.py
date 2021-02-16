@@ -16,8 +16,7 @@ from Dgraph.components.setup_configurations import DgraphCLI
 from Dgraph.keywords import constants
 
 
-# pylint: disable=R0912
-# pylint: disable=R0915
+# pylint: disable=R0912, R0915, C0301, W0201
 
 
 class CustomRequestKeywords:
@@ -30,6 +29,10 @@ class CustomRequestKeywords:
         Method to connect to url to perform backup.
         :param url:
         :return: the instance of RequestHandler object
+
+        Example:
+        | connect_request_server | url=None
+        | connect_request_server | url=https://localhost:8080
         """
         self.headers = constants.COMMON_HEADER
         self.dgraph_cli = DgraphCLI()
@@ -51,121 +54,14 @@ class CustomRequestKeywords:
         if self.dgraph_cli.get_acl():
             self.headers = self.login('/admin')
 
-    # def post_nfs_backup_restore_command(self, appender, path, req_type: str):
-    #     """
-    #     Method to post dgraph backup | restore  nfs request and validate the response.
-    #     \n:param appender: /admin || /admin/backup
-    #     \n:param path: path to the backup folder in the local.
-    #     \n:param req_type: <post type> | backup || restore
-    #     \n:return: <response>
-    #
-    #     Example:
-    #     | Post Nfs backup restore Command | /admin | /path/backup | backup
-    #     | Post Nfs backup restore Command | /admin/backup | /path/backup | backup
-    #     | Post Nfs backup restore Command | /admin | /path/backup | restore
-    #     """
-    #
-    #     login_response = ""
-    #     awt_token = ""
-    #     logger.info("backup path: " + path)
-    #     logger.info("POST command has been requested for: " + appender)
-    #
-    #     # Check the configurations
-    #     if self.dgraph_cli.get_acl() and "https" in self.req_handler.url and appender == "/admin":
-    #         login_body = "{\"query\":\"mutation {\\n    " \
-    #                      "login(userId: \\\"groot\\\", " \
-    #                      "password: \\\"password\\\") {\\n   " \
-    #                      "         response {\\n                        " \
-    #                      "accessJWT\\n                        " \
-    #                      "refreshJWT\\n                   " \
-    #                      " }\\n    }\\n}\",\"variables\":{}} "
-    #         cert = ""
-    #         if self.dgraph_cli.get_tls():
-    #             tls_cert = self.dgraph_cli.curr_path + \
-    #                        self.dgraph_cli.cfg['tls']['location'] + "/ca.crt"
-    #             cert = tls_cert
-    #         headers = {
-    #             'Content-Type': 'application/json'
-    #         }
-    #         # Generating awt_token
-    #         login_response = self.req_handler.post_request(appender, headers, login_body, cert)
-    #         awt_token = login_response.json()['data']['login']['response']['accessJWT']
-    #     elif self.dgraph_cli.get_acl():
-    #         raise Exception("Use https request to proceed with the post call "
-    #                         "since ACL is enabled or check if it's requested only "
-    #                         "for /admin call .\n url requested: "
-    #                         + self.req_handler.url + " appender's used: " + appender)
-    #
-    #     # Post call for /admin request
-    #     if appender == "/admin":
-    #         payload = ""
-    #         if req_type.lower() == "backup":
-    #             payload = "{\"query\":\"mutation {\\n  backup(input: {destination: " \
-    #                       "\\\"" + path + "\\\"}) {\\n    " \
-    #                                       "response {\\n      message\\n     " \
-    #                                       " code\\n    }\\n  }\\n}\\n\",\"variables\":{" \
-    #                                       "}} "
-    #         elif req_type.lower() == "restore":
-    #             payload = "{\"query\":\"mutation {\\n  restore(input: {location: " \
-    #                       "\\\"" + path + "\\\"}) " \
-    #                                       " {\\n      message\\n      code\\n    }" \
-    #                                       "\\n}\\n\",\"variables\":{" \
-    #                                       "}} "
-    #
-    #         post_res = ""
-    #         headers = {}
-    #         if self.dgraph_cli.get_acl():
-    #             logger.info(awt_token)
-    #             headers = {
-    #                 'X-Dgraph-AccessToken': awt_token,
-    #                 'Content-Type': 'application/json'
-    #             }
-    #             post_res = self.req_handler.post_request(appender, headers, payload, cert)
-    #         else:
-    #             headers = {
-    #                 'Content-Type': 'application/json'
-    #             }
-    #             post_res = self.req_handler.post_backup_request(appender, headers, payload)
-    #         logger.info("After hitting the request\n" + json.dumps(post_res.json()))
-    #
-    #     # Post call for /admin/backup request
-    #     elif appender == "/admin/backup":
-    #         payload = ""
-    #         post_res = ""
-    #         headers = {}
-    #         if req_type.lower() == "backup":
-    #             payload = {'destination': path}
-    #         elif req_type.lower() == "restore":
-    #             payload = {'location': path}
-    #         if self.dgraph_cli.get_acl():
-    #             logger.info(awt_token)
-    #             headers = {'X-Dgraph-AccessToken': awt_token}
-    #             post_res = self.req_handler.post_request(appender, headers, payload, cert)
-    #         else:
-    #             post_res = self.req_handler.post_backup_request(appender, headers, payload)
-    #         logger.info("After hitting the request\n" + json.dumps(post_res.json()))
-    #
-    #     # Validations for the output generated for backup | restore
-    #     try:
-    #         if req_type.lower() == "backup":
-    #             if 'Success' in post_res.json() and \
-    #                'Backup completed.' in  post_res.json():
-    #                 logger.info('Backup successfully completed')
-    #         elif req_type.lower() == "restore":
-    #             if post_res.json()['data']['restore']['code'] == 'Success' and \
-    #                     post_res.json()['data']['restore']['message'] == \
-    #                     'Restore operation started.':
-    #                 logger.info('Restore successfully completed')
-    #     except Exception as err:
-    #         raise Exception("Something went wrong with the data params.."
-    #                         + json.dumps(post_res.json())) from err
-    #
-    #     return post_res
-
     def login(self, appender):
         """
         Method to Login to the dgraph server and generate the jwt token
         :param appender: URL segment to append to the base URL
+
+        Example:
+        | login | appender
+        | login | /admin
         """
         query = constants.LOGIN_BODY
         variables = None
@@ -182,6 +78,9 @@ class CustomRequestKeywords:
     def get_certs(self):
         """
         Method to get TLS certificates if required by the configuration
+
+        Example:
+        | get certs |
         """
         tls_cert = f"{self.dgraph_cli.curr_path}{self.dgraph_cli.cfg['tls']['location']}/ca.crt"
         return tls_cert
@@ -191,6 +90,10 @@ class CustomRequestKeywords:
         Method to check the health of the deployed dgraph instance
         :param appender: URL segment to add to the base URL
         :return status: healthy/unhealthy
+
+         Example:
+        | health check |  appender
+        | health check |  /health
         """
         cert = self.cert
         headers = self.headers
@@ -207,6 +110,30 @@ class CustomRequestKeywords:
         Method to check the state of the deployed database instance
         :param appender: URL segment to add to the base URL
         :return state: Complete state of the database
+
+        Example:
+        | state check |  appender
+        | state check |  /state
+        """
+        cert = self.cert
+        headers = self.headers
+        response = None
+        try:
+            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+        except Exception as err:
+            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+        state = response.json()
+        return state
+
+    def state_check(self, appender):
+        """
+        Method to check the state of the deployed database instance
+        :param appender: URL segment to add to the base URL
+        :return state: Complete state of the database
+
+        Example:
+        | state check |  appender
+        | state check |  /state
         """
         cert = self.cert
         headers = self.headers
@@ -225,6 +152,9 @@ class CustomRequestKeywords:
         :param alpha_id: ID of the alpha in the cluster (can get this value from state check)
         :param group: group number in which the alpha belongs
         :return: <response>
+
+        Example:
+        | remove node |  appender | alpha_id | group
         """
         cert = self.cert
         headers = self.headers
@@ -242,6 +172,10 @@ class CustomRequestKeywords:
         :param appender: URL segment to add to the base URL
         :param path: Backup path
         :return: <response>
+
+         Example:
+        | backup using admin |  path
+        | backup using admin |  /backup/
         """
         cert = self.cert
         headers = self.headers
@@ -265,6 +199,10 @@ class CustomRequestKeywords:
         :param appender: URL segment to add to the base URL
         :param path: Path to the restore manifest to trigger a restore
         :return: <response>
+
+        Example:
+        | restore using admin |  path
+        | restore using admin |  /backup/backup_file_location
         """
         cert = self.cert
         headers = self.headers
@@ -289,6 +227,10 @@ class CustomRequestKeywords:
         :param appender: URL segment to add to the base URL
         :param path: path to backup the database
         :return: <response>
+
+        Example:
+        | backup using admin backup |  path
+        | backup using admin backup |  /backup/
         """
         cert = self.cert
         headers = self.headers
@@ -310,6 +252,10 @@ class CustomRequestKeywords:
         :param appender: URL segment to add to the base URL
         :param path: Path to the restore manifest to the database for triggering restore
         :return: <response>
+
+        Example:
+        | restore using admin backup |  path
+        | restore using admin backup |  /backup/backup_file_dir/
         """
         cert = self.cert
         headers = self.headers
@@ -331,6 +277,9 @@ class CustomRequestKeywords:
         :param appender: URL segment to add to the base URL
         :param data_format: The format of data to be exported, example rdf/json
         :return: <response>
+
+        Example:
+        | export data admin |  appender | data_format
         """
         cert = self.cert
         headers = self.headers

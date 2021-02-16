@@ -13,11 +13,11 @@ Start Dgraph
     # Dgraph alpha and zero command
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
 
@@ -107,11 +107,7 @@ Execute Live Loader with rdf and schema parameters
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
     ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${value}=    Get Tls Value
-    ${conf_live_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}    live
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Run Process    ${conf_live_command}    alias=live    stdout=live.txt    shell=True    cwd=results
-    ...    ELSE    Run Process    dgraph    live    --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=live    stdout=live.txt    cwd=results    shell=True
-    Log    live.txt is log file name for this process.
+    Trigger Loader Process      live     ${rdf_filename}    ${schema_filename}    live
     Verify process to be stopped    live
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/live.txt    N-Quads processed per second
     Log    ${loader_Text_File_Content}
@@ -124,19 +120,11 @@ Execute Bulk Loader with rdf and schema parameters
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${alpha_process_check}=    Is Process Running    alpha
     Run Keyword If    "${alpha_process_check}"=="True"    End Aplha Process    false
-    ${value}=    Get Tls Value
-    ${conf_bulk_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}    bulk
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Run Process    ${conf_bulk_command}    alias=bulk    stdout=bulk.txt    shell=True    cwd=results
-    ...    ELSE    Run Process    dgraph    bulk    --alsologtostderr    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    2>&1    alias=bulk    stdout=bulk.txt    cwd=results    shell=True
-    Log    bulk.txt is log file name for this process.
+    Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk
     Verify process to be stopped    bulk
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    100.00%
     Log    ${loader_Text_File_Content}
-    Should Contain    ${loader_Text_File_Content}    100.00%
-    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
-    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
-    End Aplha Process    false
-    Start Dgraph Alpha    local
+    Verify Bulk Process     ${loader_Text_File_Content}
 
 Trigger Loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
@@ -144,8 +132,8 @@ Trigger Loader Process
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${value}=    Get Tls Value
     ${conf_live_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    shell=True    cwd=results
-    ...    ELSE    Process.start Process    dgraph    ${loader_name}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt    cwd=results
+    ${result_loader}=    Run Keyword If    "${value}"=="True"    Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
+    ...    ELSE    Process.start Process    dgraph    ${loader_name}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt      stderr=${loader_alias}_err.txt    cwd=results
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
@@ -169,7 +157,7 @@ Execute Parallel Loader with rdf and schema parameters
         Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Aplha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}
-        Sleep    60s
+        Wait For Process    timeout=30 s
         Log    ${loader_alias}.txt is log file name for this process.
     END
     FOR    ${i}    IN    @{loader_type}
@@ -218,7 +206,6 @@ Create NFS Backup
     ${res}=    Backup Using Admin    ${backup_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${backup_path}
-    # Restore Keywords
 
 Perform a restore on backup
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
@@ -236,7 +223,7 @@ Perform a restore on backup
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
 
 Perform a restore on backup present at other location
     [Arguments]    ${url}    ${path}
@@ -252,7 +239,7 @@ Perform a restore on backup present at other location
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify retore file Content in results folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
     # Validations:
 
 Verify restore file Content in results folder
@@ -346,11 +333,36 @@ Monitor zero and alpha process
     Run Keyword If    "${alpha_process_check}"=="False"    Start Dgraph Alpha    false
     Run Keyword If    "${zero_process_check}"=="False"    Start Dgraph Zero    false
 
+Monitor health and state check
+    [Documentation]   Keyword to check the health and state of the connection.
+    connect request server
+    ${response}=    Health Check    /health
+    log     ${response}
+    Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
+    Monitor State Check
+
+Monitor health check
+    [Documentation]   Keyword to check the health of the connection.
+    connect request server
+    ${response}=    Health Check    /health
+    log     ${response}
+    Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
+
+Monitor State Check
+    [Documentation]  Keyword to check the state of the process.
+    connect request server
+    ${state_resposne}=  State Check     /state
+    ${leader}=    Get Value From Json   ${state_resposne}   $..members..leader
+    ${am_dead}=    Get Value From Json   ${state_resposne}   $..members..amDead
+    Should Be Equal As Strings  ${leader[0]}   True
+    Should Be Equal As Strings  ${am_dead[0]}   False
+
 Verify process to be stopped
     [Arguments]    ${process_alias}
     [Documentation]    Keyword to check if the process is still running and wait till process completes.
     log    Process which is runing ${process_alias}
     ${process_check}=    Is Process Running    ${process_alias}
+    Sleep   30s
     Run Keyword If    '${process_check}'=='False'    Return From Keyword
     FOR    ${i}    IN RANGE    99999
         log    ${i}
@@ -360,6 +372,24 @@ Verify process to be stopped
     END
     Log    ${process_alias} Process is stopped
     Comment    Wait Until Keyword Succeeds    600x    5minute    Process Should Be Stopped    handle=${process_alias}    error_message=${error_message} is still running
+
+Build Dgraph Version
+    [Arguments]    ${version}
+    [Documentation]    Keyword builds Dgraph to a specific version
+    ${rc}    ${output}=    OperatingSystem.Remove Directory    dgraph    recursive=True
+    ${rc}    ${output}=    OperatingSystem.Run And Return Rc And Output    pwd
+    ${rc}    ${clone}=    OperatingSystem.Run And Return Rc And Output    git clone https://github.com/dgraph-io/dgraph.git
+    log    ${clone}
+    ${checkout_output}=    Process.Run Process    git    checkout    ${version}    alias=checkout_alias    cwd=dgraph    shell=True
+    log    ${checkout_output}
+    Should Be Equal As Integers    ${checkout_output.rc}    0
+    ${make_output}=    Process.Run Process    make    install    alias=make_alias    cwd=dgraph    shell=True
+    log    ${make_output}
+    Should Be Equal As Integers    ${make_output.rc}    0
+    ${output} =    OperatingSystem.Run    dgraph version
+    ${version_output} =    Get Lines Containing String    ${output}    version    case_insensitive
+    log    ${version_output}
+    should contain    ${version_output}    ${version}
 
 Check if parallel process is triggered
     [Arguments]    ${loader_alias}     ${rdf_filename}    ${schema_filename}  ${loader_name}
