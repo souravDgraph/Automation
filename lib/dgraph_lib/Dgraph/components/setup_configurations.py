@@ -249,6 +249,8 @@ class DgraphCLI:
                 return True
             else:
                 return False
+        else:
+            return True
 
     def build_loader_command(self, rdf_file, schema_file, loader_type):
         """
