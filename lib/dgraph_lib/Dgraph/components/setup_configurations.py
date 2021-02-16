@@ -3,7 +3,9 @@ Python class to generated Dgraph commands based on configurations.
 """
 import json
 import pathlib
+from subprocess import Popen, PIPE
 from robot.api import logger
+import io
 
 
 class DgraphCLI:
@@ -15,13 +17,16 @@ class DgraphCLI:
         self.cfg = {}
         self.acl = False
         self.enc = False
+        self.enc_file_path = ""
         self.tls = False
         self.tls_mutual = False
         self.tls_mutual_flags = []
+        self.details = {}
         self.curr_path = str(pathlib.PurePath(pathlib.Path().absolute()))
         curr_dir = str(pathlib.Path.cwd())
         self.curr_path = curr_dir + "/"
         DgraphCLI.read_config(self)
+        self.store_dgraph_details()
         logger.info("Dgraph Configurations are ready to load.")
 
     def get_test_data_location(self):
@@ -46,6 +51,14 @@ class DgraphCLI:
         """
         logger.debug(self.enc)
         return self.enc
+
+    def get_enc_file(self):
+        """
+        Mehtod to get the ENC file path
+        :return: enc_flag
+        """
+        logger.debug(self.curr_path + self.enc_file_path)
+        return self.curr_path + self.enc_file_path
 
     def get_tls(self):
         """
@@ -96,8 +109,15 @@ class DgraphCLI:
                     "--tls_node_cert": tls_location + "/node.crt",
                     "--tls_node_key": tls_location + "/node.key"
                 })
-            for key in mtls:
-                tls_cert = tls_cert + " " + key + " " + str(mtls[key])
+                for key in mtls:
+                    tls_cert = tls_cert + " " + key + " " + str(mtls[key])
+            if cli == "live":
+                for key in mtls:
+                    tls_cert = tls_cert + " " + key + " " + str(mtls[key])
+            if cli == "pem":
+                pem_file = "/tls_certs.pem" if self.tls else "/mtls_certs.pem"
+                tls_cert = f"{tls_location}{pem_file}"
+
         logger.debug(tls_cert)
         return tls_cert
 
@@ -125,6 +145,7 @@ class DgraphCLI:
             self.acl = True
         if self.cfg['enc']['is_enabled']:
             self.enc = True
+            self.enc_file_path = self.cfg['enc']['location']
         if self.cfg['tls']['is_enabled']:
             self.tls = True
         if self.cfg['tls']['mutual_tls']['is_enabled']:
@@ -189,11 +210,58 @@ class DgraphCLI:
         cli_command = cli_command + appender + " 2>&1"
         return cli_command
 
+    def store_dgraph_details(self):
+        """
+        Method to store dgraph version details.
+        :return:
+        """
+        p = Popen(['dgraph', 'version'], stdin=PIPE, stdout=PIPE, stderr=PIPE, encoding="utf-8")
+        output, err = p.communicate()
+        output = output.split("\n")
+        for line in output:
+            if ":" in line:
+                key = line.split(":")[0].strip()
+                value = line.split(":")[1].strip()
+                self.details[key] = value
+        logger.debug(self.details)
+
+    def get_dgraph_version_details(self, details_key):
+        """
+        Method to get dgraph version details
+        :param details_key: <version details>
+        :return: <value>
+        """
+        return self.details.get(details_key)
+
+    @staticmethod
+    def check_version(version_details):
+        """
+        Method to check the version of dgraph
+        :return: <boolean>
+        """
+
+        if version_details:
+            first = str(version_details).split(".")[0]
+            first = first.split("v")[1]
+            second = str(version_details).split(".")[1]
+            logger.debug(first, second)
+            if int(first) == 20 and int(second) <= 11:
+                return True
+            else:
+                return False
+
     def build_loader_command(self, rdf_file, schema_file, loader_type):
         """
         Method to build bulk/live loader cli command
         :return: live loader cli command
         """
+        version = self.get_dgraph_version_details("Dgraph version")
+        if DgraphCLI.check_version(version):
+            cli_live_acl = " --creds 'user=groot;password=password' "
+            cli_bulk_encryption = " --encrypted=False  --encrypted_out=True "
+        else:
+            cli_live_acl = "  -u groot -p password "
+            cli_bulk_encryption = " --encrypted=False "
 
         loader_type = loader_type.lower()
 
@@ -207,11 +275,9 @@ class DgraphCLI:
                                      "localhost:8000 --zero=localhost:5080 "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']
-                cli_command = cli_command + " --encrypted=False  --encrypted_out=True " \
-                                            "--encryption_key_file " + enc_path
+                cli_command = cli_command + cli_bulk_encryption + "--encryption_key_file " + enc_path
         if self.acl and loader_type != "bulk":
-            cli_command = cli_command + " --creds 'user=groot;password=password' "
-        #     cli_command = cli_command + " -u groot -p password"
+            cli_command = cli_command + cli_live_acl
 
         mtls_certs = self.get_tls_certs("live")
         if self.tls_mutual:

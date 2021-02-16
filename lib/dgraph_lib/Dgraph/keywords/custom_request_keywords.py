@@ -82,7 +82,7 @@ class CustomRequestKeywords:
         Example:
         | get certs |
         """
-        tls_cert = f"{self.dgraph_cli.curr_path}{self.dgraph_cli.cfg['tls']['location']}/ca.crt"
+        tls_cert = self.dgraph_cli.get_tls_certs("pem")
         return tls_cert
 
     def health_check(self, appender):
@@ -207,7 +207,13 @@ class CustomRequestKeywords:
         cert = self.cert
         headers = self.headers
         query = constants.RESTORE_QUERY
-        variables = {'path': path}
+        if self.dgraph_cli.enc:
+            variables = {
+                'path': path,
+                '$enc_file': self.dgraph_cli.get_enc_file()
+            }
+        else:
+            variables = {'path': path}
         response = None
         appender = "/admin"
 

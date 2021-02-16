@@ -61,16 +61,16 @@ class SetupDgraphKeywords:
         \n:param rdf_file: <path to rdf file>
         \n:param schema_file: <path to schema file>
         \n:param loader_type: <live | bulk>
-        \n:return: live_loader_command <returns live loader command>
+        \n:return: loader_command <returns live loader command>
 
         Example:
-        | Get dgraph live loader command | <rdf_file_path> | <schema_file_path>
+        | Get Dgraph Loader Command | <rdf_file_path> | <schema_file_path>
 
         """
 
         self.dgraph_cli = DgraphCLI()
-        live_loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type)
-        return live_loader_command
+        loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type)
+        return loader_command
 
     def get_acl_value(self):
         """
@@ -112,3 +112,27 @@ class SetupDgraphKeywords:
         """
         self.dgraph_cli = DgraphCLI()
         return self.dgraph_cli.get_tls_certs()
+
+    def get_enc_file(self):
+        """
+        Method to get the encryption file.
+        :return:<encryption file>
+        """
+        self.dgraph_cli.get_enc()
+
+    @staticmethod
+    def check_dgraph_version(version):
+        """
+        Method to check the dgraph version
+        :param version:
+        :return:
+        """
+        DgraphCLI.check_version(version)
+
+    def get_dgraph_details(self, dgraph_details_key):
+        """
+        Method to get the dgraph version details.
+        :param dgraph_details_key:
+        :return:<value>
+        """
+        return self.dgraph_cli.get_dgraph_version_details(dgraph_details_key)
