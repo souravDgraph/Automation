@@ -33,7 +33,7 @@ class DeploymentKeywords():
                           organization=None,
                           expected_response=200):
         logger.info("Creating a Deployment of Name : %s" % deployment_name)
-        url = base_url + "deployments/create"
+        url = base_url + "graphql"
         response = Deployments.create_deployment(session_alias,
                                                  url,
                                                  auth,
@@ -99,7 +99,8 @@ class DeploymentKeywords():
                               auth,
                               expected_response=200):
         logger.info("Get health of the deployment ")
-        url = base_url + "/health"
+        url = base_url + "/probe/graphql"
+        logger.info(url)
         Deployments.get_deployment_health(session_alias,
                                           url,
                                           auth)
@@ -145,27 +146,17 @@ class DeploymentKeywords():
                                                  expected_response)
         return response
 
+    @staticmethod
     def get_deployments(session_alias,
                         base_url,
                         auth,
                         expected_response=200):
         logger.info("Get all deployments ")
         url = base_url + "deployments"
-        Deployments.get_deployments(session_alias,
+        return Deployments.get_deployments(session_alias,
                                       url,
                                       auth,
                                       expected_response)
-
-    @staticmethod
-    def get_deployment_health(session_alias,
-                        base_url,
-                        auth,
-                        expected_response=200):
-        logger.info("Get health of the deployment ")
-        url = base_url + "/health"
-        Deployments.get_deployment_health(session_alias,
-                                    url,
-                                    auth)
 
     @staticmethod
     def backup_ops(session_alias,
@@ -209,10 +200,11 @@ class DeploymentKeywords():
                        role='admin',
                        expected_response=200):
         logger.info("Create API key for deployment id : %s" % deployment_id)
-        url = base_url + "deployments/" + deployment_id + "/api-keys"
+        url = base_url + "graphql"
         response = Deployments.create_api_keys(session_alias,
                                                url,
                                                auth,
+                                               deployment_id,
                                                name,
                                                role,
                                                expected_response)
@@ -225,10 +217,11 @@ class DeploymentKeywords():
                     deployment_id,
                     expected_response=200):
         logger.info("Get API key for deployment id : %s " % deployment_id)
-        url = base_url + "deployments/" + deployment_id + "/api-keys"
+        url = base_url + "graphql"
         response = Deployments.get_api_keys(session_alias,
                                             url,
                                             auth,
+                                            deployment_id,
                                             expected_response)
         return response
 
@@ -238,12 +231,16 @@ class DeploymentKeywords():
                        auth,
                        deployment_id,
                        api_key_uid,
+                       expected_response_text,
                        expected_response=200):
         logger.info("Delete  API key of uid %s for deployment id : %s " % (api_key_uid, deployment_id))
-        url = base_url + "deployments/" + deployment_id + "/api-keys/" + api_key_uid
+        url = base_url + "graphql"
         response = Deployments.delete_api_keys(session_alias,
                                                url,
                                                auth,
+                                               deployment_id,
+                                               api_key_uid,
+                                               expected_response_text,
                                                expected_response)
         return response
 

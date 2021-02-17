@@ -32,7 +32,7 @@ TC_03 Perform NFS backup and restore data
      Create NFS Backup      full
      perform a restore on backup
 
-TC_04 Perform parallel live and bulk load backup restore data.
+TC_04 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
      [Tags]    regression

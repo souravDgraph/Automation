@@ -94,7 +94,7 @@ def generate_config(arg_value):
             "location": "conf/dgraph/acl/hmac_secret_file"
         },
         "enc": {
-            "is_enabled": False,
+            "is_enabled": True,
             "location": "conf/dgraph/encryption/enc_key_file"
         },
 
