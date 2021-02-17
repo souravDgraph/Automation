@@ -3,7 +3,7 @@
 --console verbose
 --consolemarkers on
 --loglevel TRACE:INFO
-test_suites/dgraph/Linux/dgraph_live_suite.robot
+test_suites/dgraph/Linux/dgraph_suite_01.robot
 
 #Additional arguments
 #--tagdoc *:See *README.md*

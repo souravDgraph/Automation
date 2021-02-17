@@ -100,7 +100,17 @@ End Aplha Process
     Verify file Content in results folder    alpha    @{alpha_context}
     @{dir}    Create List    p    t    w    out    alpha
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
-    # Bulk/Live Loader
+
+Get Dgraph Version Details
+    [Documentation]  Keyword to get dgraph version details
+    Start Process   dgraph  version     alias=version    stdout=dgraph_version.txt    stderr=dgraph_version_err.txt    shell=True    cwd=results
+    Wait For Process    timeout=30 s
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${dgraph_Text_File_Content}=    Grep File    ${dir_path}/results/dgraph_version.txt     Dgraph version*
+    ${key}     ${value}=    Split String    ${dgraph_Text_File_Content}     :
+    ${value}=   Replace String  ${value}    ${space}     ${empty}
+    [Return]    ${value}
+
 
 Execute Live Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
@@ -130,10 +140,8 @@ Trigger Loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${value}=    Get Tls Value
-    ${conf_live_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}
-    ${result_loader}=    Run Keyword If    "${value}"=="True"    Process.start Process    ${conf_live_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
-    ...    ELSE    Process.start Process    dgraph    ${loader_name}    -f    ${dir_path}/test_data/datasets/${rdf_filename}    -s    ${dir_path}/test_data/datasets/${schema_filename}    alias=${loader_alias}    stdout=${loader_alias}.txt      stderr=${loader_alias}_err.txt    cwd=results
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}
+    ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
@@ -209,6 +217,7 @@ Create NFS Backup
 
 Perform a restore on backup
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
+    Connect request server
     ${root_dir}=    normalize path    ${CURDIR}/..
     ${path}=    Join Path    ${root_dir}/backup
     @{dirs_backup}=    List Directories In Directory    ${path}
@@ -336,15 +345,16 @@ Monitor zero and alpha process
 Monitor health and state check
     [Documentation]   Keyword to check the health and state of the connection.
     connect request server
-    ${response}=    Health Check    /health
-    log     ${response}
-    Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
+    Monitor health check
     Monitor State Check
 
 Monitor health check
     [Documentation]   Keyword to check the health of the connection.
     connect request server
-    ${response}=    Health Check    /health
+    ${version}=     Get Dgraph Details      Dgraph version
+    ${check}=       Check Dgraph Version    ${version}
+    ${appender}=    Set Variable If      "${check}"=="True"      /health    /health?all
+    ${response}=    Health Check    ${appender}
     log     ${response}
     Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
 
