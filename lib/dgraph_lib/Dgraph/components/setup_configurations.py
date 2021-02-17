@@ -244,7 +244,7 @@ class DgraphCLI:
             first = first.split("v")[1]
             second = str(version_details).split(".")[1]
             logger.debug(first, second)
-            if int(first) == 20 and int(second) <= 11:
+            if int(first) == 21:
                 return True
             else:
                 return False
@@ -259,12 +259,12 @@ class DgraphCLI:
         :return: live loader cli command
         """
         version = self.get_dgraph_version_details("Dgraph version")
-        if DgraphCLI.check_version(version):
+        branch = self.get_dgraph_version_details("Branch")
+        cli_bulk_encryption = ""
+        if DgraphCLI.check_version(version) or branch == "master":
             cli_live_acl = " --creds 'user=groot;password=password' "
-            cli_bulk_encryption = " --encrypted=False  --encrypted_out=True "
         else:
             cli_live_acl = "  -u groot -p password "
-            cli_bulk_encryption = " --encrypted=False "
 
         loader_type = loader_type.lower()
 
@@ -278,7 +278,9 @@ class DgraphCLI:
                                      "localhost:8000 --zero=localhost:5080 "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']
-                cli_command = cli_command + cli_bulk_encryption + "--encryption_key_file " + enc_path
+                cli_command = cli_command + cli_bulk_encryption + \
+                              " --encrypted_out=True --encrypted=False" \
+                              " --encryption_key_file " + enc_path
         if self.acl and loader_type != "bulk":
             cli_command = cli_command + cli_live_acl
 

@@ -351,9 +351,7 @@ Monitor health and state check
 Monitor health check
     [Documentation]   Keyword to check the health of the connection.
     connect request server
-    ${version}=     Get Dgraph Details      Dgraph version
-    ${check}=       Check Dgraph Version    ${version}
-    ${appender}=    Set Variable If      "${check}"=="True"      /health    /health?all
+    ${appender}=    Set Variable      /health
     ${response}=    Health Check    ${appender}
     log     ${response}
     Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
