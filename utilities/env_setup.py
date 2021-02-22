@@ -9,6 +9,8 @@ import subprocess
 import logging
 import sys
 
+# pylint: disable=C0301
+
 
 def main(argv):
     """
@@ -23,10 +25,11 @@ def main(argv):
         logging.debug(args)
         if not opts:
             print('Usage: python/python3 env_setup.py -l <proj_name>'
-                  + '\n proj_name = Dgraph, Slash, Common')
+                  + '\n proj_name = All, Dgraph, Slash, Common, CustomTestRailListener')
             sys.exit(2)
     except getopt.GetoptError:
-        print('Usage: python/python3 env_setup.py -l <proj_name>' + '\n proj_name = Dgraph, Slash, Common')
+        print('Usage: python/python3 env_setup.py -l <proj_name>' +
+              '\n proj_name = All, Dgraph, Slash, Common, CustomTestRailListener')
         sys.exit(2)
 
     dgraph_check = False
@@ -36,7 +39,7 @@ def main(argv):
             usage()
             sys.exit()
         elif opt in ("-l", "--lib"):
-            if arg_value == "Dgraph":
+            if arg_value.lower() == "dgraph" or arg_value.lower() == "all":
                 dgraph_check = True
             setup_lib(arg_value)
         elif opt in ("-c", "--config"):
@@ -57,7 +60,11 @@ def usage():
     """
     print("Usage:\n")
     print('python/python3 env_setup.py -l <proj_name> -c <configuration>'
-          + '\n proj_name = Dgraph | Slash | Common, configuration = enabled | disabled')
+          + '\n proj_name = All, CustomTestRailListener, Dgraph | Slash | Common,'
+            ' configuration = enabled | disabled')
+    print('')
+    print('Ex: python/python3 env_setup.py -l All -c enabled'
+          + '\n proj_name = All, config = enabled|disabled.')
     print('')
     print('Ex: python/python3 env_setup.py -l Dgraph -c enabled'
           + '\n proj_name = Dgraph, config = enabled|disabled.')
@@ -67,6 +74,9 @@ def usage():
     print('')
     print('Ex: python/python3 env_setup.py -l Common'
           + '\n proj_name = Common')
+    print('')
+    print('Ex: python/python3 env_setup.py -l CustomTestRailListener'
+          + '\n proj_name = CustomTestRailListener')
 
 
 def generate_config(arg_value):
@@ -84,7 +94,7 @@ def generate_config(arg_value):
             "location": "conf/dgraph/acl/hmac_secret_file"
         },
         "enc": {
-            "is_enabled": False,
+            "is_enabled": True,
             "location": "conf/dgraph/encryption/enc_key_file"
         },
 
@@ -130,15 +140,23 @@ def setup_lib(proj_name):
 
     subprocess.check_call([pip_name, 'install', '-r', '../requirements.txt'])
     proj_lib_paths = []
-    if proj_name == "Dgraph":
+    if proj_name.lower() == "dgraph":
         proj_lib_paths = ['./lib/dgraph_lib/']
-    elif proj_name == "Slash":
+    elif proj_name.lower() == "slash":
         proj_lib_paths = ['./lib/selenium_client/',
                           './lib/slash_ui_library/',
-                         './lib/slash_api_library/',
-                         './lib/requests_client']
-    elif proj_name == "Common":
+                          './lib/slash_api_library/',
+                          './lib/requests_client']
+    elif proj_name.lower() == "common":
         proj_lib_paths = ['./lib/common_lib/']
+    elif proj_name.lower() == "customtestraillistener":
+        proj_lib_paths = ['./lib/test_rail_listener_lib/']
+    elif proj_name.lower() == "all":
+        proj_lib_paths = ['./lib/dgraph_lib/', './lib/selenium_client/', './lib/slash_ui_library/',
+                          './lib/slash_api_library/', './lib/requests_client', './lib/common_lib/',
+                          './lib/test_rail_listener_lib/'
+                          ]
+        proj_name = "Dgraph, Slash, Common, Test Rails Listener"
 
     print("\n\n\n*********Installing Lib for: " + proj_name + " *****************\n\n\n")
     cwd_path = pathlib.PurePath(pathlib.Path().absolute(), '../')
@@ -151,7 +169,6 @@ def setup_lib(proj_name):
             subprocess.check_call([python_name, 'setup.py', 'install'], cwd=cur_lib_path)
         except:
             print("Skipping " + str(cur_lib_path))
-            pass
 
 
 if __name__ == "__main__":

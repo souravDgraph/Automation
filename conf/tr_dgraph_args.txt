@@ -1,9 +1,10 @@
---outputdir ./results/slash_results
+--outputdir ./results/testrail_results
 #--timestampoutput
 --console verbose
 --consolemarkers on
 --loglevel TRACE:INFO
-test_suites/slash/slash_api/org.robot
+--listener CustomTestRailListener
+test_suites/sample_test_cases/sample_test_rails.robot
 
 #Additional arguments
 #--tagdoc *:See *README.md*

@@ -6,7 +6,7 @@ import requests
 from requests import RequestException, Response
 from robot.api import logger
 
-# pylint: disable=E1121
+# pylint: disable=E1121, R0913, C0301
 
 __all__ = ['RequestHandler']
 __author__ = "Krishna Kaushik"
@@ -93,11 +93,11 @@ class RequestHandler:
             else:
                 response = requests.post(self.url + appender, headers=headers,
                                          json=payload, verify=cert)
+            logger.debug(response.text)
             if "errors" in response.json():
                 raise Exception(f"POST Request failed:\n {json.dumps(response.json())}")
         except RequestException as res_error:
             logger.warn(res_error, response.text)
-        logger.debug(response.json())
         return response
 
     def get(self, appender, headers, parameters=None, cert=None):
