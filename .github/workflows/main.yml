@@ -41,19 +41,19 @@ jobs:
           token: ${{ github.token }} # optional, default is ${{ github.token }}
           
       # Navigating to the directory and installing the requiremenets file
-      - name: Install requirements for Dgraph
+      - name: Install requirements for Dgraph and Slash
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          python3 env_setup.py -l Dgraph -c enabled
+          python3 env_setup.py -l All -c enabled
         
-      - name: Install requirements for Slash
+      - name: Configuring docker-compose file
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          python3 env_setup.py -l Slash -c enabled
+          python3 create_docker_yml.py -c enabled
         
       # Download Dgraph Repo
       - name: Check out Dgraph repo
