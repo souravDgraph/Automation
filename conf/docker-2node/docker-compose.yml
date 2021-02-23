@@ -1,10 +1,7 @@
 services:
   alpha0:
-    command: dgraph alpha  --logtostderr -v=2 --whitelist=0.0.0.0/0 --encryption_key_file
-      /dgraph-enc/enc_key_file  --acl_secret_file /dgraph-acl/hmac_secret_file  --tls_cacert
-      /dgraph-tls/ca.crt --tls_cert /dgraph-tls/client.groot.crt --tls_key /dgraph-tls/client.groot.key
-      --tls_node_cert /dgraph-tls/node.crt --tls_node_key /dgraph-tls/node.key --tls_client_auth
-      VERIFYIFGIVEN  --tls_internal_port_enabled=true  --my=alpha0:7080 --zero=zero0:5080
+    command: dgraph alpha  --logtostderr -v=2 --whitelist=0.0.0.0/0 --my=alpha0:7080
+      --zero=zero0:5080
     image: dgraph/dgraph:master
     labels:
       cluster: test
@@ -12,25 +9,10 @@ services:
     ports:
     - 8080:8080
     - 9080:9080
-    volumes:
-    - read_only: true
-      source: ../dgraph/acl
-      target: /dgraph-acl/
-      type: bind
-    - read_only: true
-      source: ../dgraph/encryption/
-      target: /dgraph-enc/
-      type: bind
-    - read_only: true
-      source: ../dgraph/mTLS/tls/
-      target: /dgraph-tls/
-      type: bind
+    volumes: []
     working_dir: /data/alpha0
   zero0:
-    command: dgraph zero --my=zero0:5080 --logtostderr -v=2   --bindall   --tls_cacert
-      /dgraph-tls/ca.crt --tls_cert /dgraph-tls/client.groot.crt --tls_key /dgraph-tls/client.groot.key
-      --tls_node_cert /dgraph-tls/node.crt --tls_node_key /dgraph-tls/node.key --tls_client_auth
-      VERIFYIFGIVEN  --tls_internal_port_enabled=true
+    command: 'dgraph zero --my=zero0:5080 --logtostderr -v=2  '
     image: dgraph/dgraph:master
     labels:
       cluster: test
@@ -38,10 +20,6 @@ services:
     ports:
     - 5080:5080
     - 6080:6080
-    volumes:
-    - read_only: true
-      source: ../dgraph/mTLS/tls/
-      target: /dgraph-tls/
-      type: bind
+    volumes: []
     working_dir: /data/zero0
 version: '3.2'

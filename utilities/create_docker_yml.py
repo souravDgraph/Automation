@@ -1,4 +1,70 @@
+import getopt
+import sys
+import logging
+
 import yaml
+
+
+def main(argv):
+    """
+    Method to setup the docker-compose file
+    """
+    try:
+        opts, args = getopt.getopt(argv, "hc:", "conf=")
+        logging.debug(args)
+        if not opts:
+            print('Usage: python/python3 create_docker_yml.py -c <configuration>'
+                  + '\n -c enabled | disabled')
+            sys.exit(2)
+    except getopt.GetoptError:
+        print('Usage: python/python3 create_docker_yml.py -c <configuration>' +
+              '\n -c enabled | disabled')
+        sys.exit(2)
+
+    for opt, arg_value in opts:
+        if opt == '-h':
+            usage()
+            sys.exit()
+        elif opt in ("-c", "--config"):
+            conf_check = True
+            generate_config(arg_value)
+        else:
+            usage()
+            raise (Exception("invalid argument for the setup process "
+                             "Dgraph please also add the configuration argument."))
+
+
+def generate_config(arg_value):
+    """
+    Method to generate the docker-compose file based on requirement.
+    :param arg_value:
+    :return:
+    """
+    if arg_value not in ['enabled', 'disabled']:
+        raise Exception("Configuration not enabled check if there is a typo\n"
+                        " input for configuration: " + arg_value)
+    if arg_value == "enabled":
+        create_docker_compose_file(alphas=3, is_configured=True)
+        create_docker_compose_file(alphas=1, is_configured=True)
+
+    elif arg_value == "disabled":
+        create_docker_compose_file(alphas=3, is_configured=False)
+        create_docker_compose_file(alphas=1, is_configured=False)
+
+
+def usage():
+    """
+    Method to define the usage of the code from command line.
+    :return:
+    """
+    usage_text = """
+        Usage:
+        python/python3 create_docker_yml.py -c <configuration>
+             configuration = enabled | disabled
+        EX:     
+        python/python3 create_docker_yml.py -c enabled
+    """
+    print(usage_text)
 
 
 def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: bool = False):
@@ -65,8 +131,8 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
         ports_list = []
         opening_port = 8080
         closing_port = 9080
-        ports_list.append(f"{opening_port}:{ opening_port}")
-        ports_list.append(f"{closing_port}:{ closing_port}")
+        ports_list.append(f"{opening_port}:{opening_port}")
+        ports_list.append(f"{closing_port}:{closing_port}")
         alpha_name = 'alpha' + str(alpha_count)
         if alpha_count >= 1:
             ports_list.clear()
@@ -133,3 +199,7 @@ def build_tls_command(tls_location, sec=None):
     for cert in certs:
         tls_conf = tls_conf + " " + cert + " " + str(certs[cert])
     return tls_conf
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
