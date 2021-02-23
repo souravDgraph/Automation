@@ -8,8 +8,9 @@ import platform
 import subprocess
 import logging
 import sys
-
+from create_docker_yml import create_docker_compose_file
 # pylint: disable=C0301
+
 
 
 def main(argv):
@@ -112,9 +113,13 @@ def generate_config(arg_value):
         }
     }
     if arg_value == "enabled":
+        create_docker_compose_file(alphas=3, is_configured=True)
+        create_docker_compose_file(alphas=1, is_configured=True)
         with open('../conf/dgraph/conf_dgraph.json', 'w') as outfile:
             json.dump(conf, outfile, indent=4)
     elif arg_value == "disabled":
+        create_docker_compose_file(alphas=3, is_configured=False)
+        create_docker_compose_file(alphas=1, is_configured=False)
         conf["acl"]["is_enabled"] = False
         conf["enc"]["is_enabled"] = False
         conf["tls"]["is_enabled"] = False

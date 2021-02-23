@@ -150,12 +150,11 @@ class DgraphCLI:
         if self.cfg['tls']['mutual_tls']['is_enabled']:
             self.tls_mutual = True
 
-    def build_zero_cli(self):
+    def build_zero_cli(self, **kwargs):
         """
         Method to generate zero commands based on conf.
         :return:
         """
-
         cli_name = "zero"
         cli_command = "dgraph " + cli_name + " "
         appender = ""
@@ -173,7 +172,7 @@ class DgraphCLI:
         cli_command = cli_command + appender + " 2>&1"
         return cli_command
 
-    def build_alpha_cli(self, bulk_path=None):
+    def build_alpha_cli(self, bulk_path=None, **kwargs):
         """
         Method to generate alpha commands based on conf.
         \n accepts one param for bulk data initializing
@@ -185,7 +184,7 @@ class DgraphCLI:
         cli_command = "dgraph " + cli_name + " "
         appender = ""
         cli_command = cli_command + "--cache_mb=6000" \
-                                    " -v=2 --whitelist=0.0.0.0 " \
+                                    " -v=2 --whitelist=0.0.0.0/0 " \
                                     "--zero=localhost:5080"
         if bulk_path:
             appender = appender + " -p " + bulk_path
@@ -205,6 +204,11 @@ class DgraphCLI:
             appender = appender + tls_str + " --tls_internal_port_enabled=true "
         elif self.tls:
             appender = appender + tls_str
+
+        # Enabling ludicrous_mode
+        for name, value in kwargs.items():
+            if name == "ludicrous_mode" and value == "enabled":
+                appender = appender + " --ludicrous_mode "
 
         cli_command = cli_command + appender + " 2>&1"
         return cli_command
@@ -283,6 +287,30 @@ class DgraphCLI:
                               " --encryption_key_file " + enc_path
         if self.acl and loader_type != "bulk":
             cli_command = cli_command + cli_live_acl
+
+        mtls_certs = self.get_tls_certs("live")
+        if self.tls_mutual:
+            cli_command = cli_command + mtls_certs + " --tls_server_name \"localhost\"" + \
+                          " --tls_internal_port_enabled"
+        elif self.tls:
+            cli_command = cli_command + mtls_certs + " --tls_server_name \"localhost\""
+        return cli_command
+
+    def build_increment_cli_command(self, alpha_offset: int = 0):
+        """
+        Method to generate command for increment operation.
+        :param alpha_offset: <offset value set for alpha> | default=0
+        """
+        version = self.get_dgraph_version_details("Dgraph version")
+        branch = self.get_dgraph_version_details("Branch")
+
+        if DgraphCLI.check_version(version) or branch == "master":
+            cli_creds_acl = " --creds 'user=groot;password=password' "
+        else:
+            cli_creds_acl = "  -u groot -p password "
+
+        cli_command = f"dgraph increment  --alpha localhost:{9080 + alpha_offset} " \
+                      f" {cli_creds_acl}"
 
         mtls_certs = self.get_tls_certs("live")
         if self.tls_mutual:

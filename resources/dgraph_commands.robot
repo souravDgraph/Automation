@@ -21,6 +21,20 @@ Start Dgraph
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
 
+Start Dgraph Ludicrous Mode
+    [Arguments]    ${platform}
+    [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
+    # Dgraph alpha and zero command
+    Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
+    ${zero_command}    Generate Dgraph Zero Cli Command
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
+    Process Should Be Running    zero
+    Wait For Process    timeout=10 s    on_timeout=continue
+    ${alpha_command}    Generate Dgraph Alpha Cli Command       ludicrous_mode=enabled
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
+    Process Should Be Running    alpha
+    Wait For Process    timeout=10 s    on_timeout=continue
+
 Start Dgraph In Docker
     [Documentation]    Start Dgraph alpha and Zero process in Helm with cwd pointing to results folder.
     # Dgraph alpha and zero command
@@ -201,6 +215,25 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         Run Keyword And Return If    "${result_check}" == "PASS"    Fail    Error while processing schema file
         Verify process to be stopped    ${loader_alias}
         Grep and Verify file Content in results folder    ${loader_alias}    N-Quads processed per second
+    END
+
+Execute Increment
+    [Arguments]     ${num_threads}      ${alpha_offset}
+    [Documentation]  Keyword to verify increment..
+    FOR    ${i}    IN RANGE    ${num_threads}
+        ${alpha_offset}    Set Variable If     ${i}>=1     ${alpha_offset}      0
+        ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
+        ${inc_command}  Get dgraph increment command    ${alpha_offset}
+        ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results/inc_logs    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
+        Wait For Process    ${inc_alias}    timeout=10 s
+    END
+    FOR    ${i}    IN RANGE    ${num_threads}
+        ${dir_path}=    normalize path    ${CURDIR}/..
+        ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
+        Terminate Process   ${inc_alias}
+        Sleep   5s
+        ${grep_file}=    Grep File    ${dir_path}/results/inc_logs/${inc_alias}.txt    1
+        Should Contain    ${grep_file}    1
     END
 
 Create NFS Backup

@@ -9,6 +9,8 @@ __email__ = "krishna@dgraph.io"
 __status__ = "Staging"
 
 from Dgraph.components.setup_configurations import DgraphCLI
+
+
 # pylint: disable=C0301
 
 
@@ -20,7 +22,7 @@ class SetupDgraphKeywords:
     def __init__(self):
         self.dgraph_cli = DgraphCLI
 
-    def generate_dgraph_zero_cli_command(self):
+    def generate_dgraph_zero_cli_command(self, **kwargs):
         """
         Method to build CLI command for zero and alpha.
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
@@ -29,29 +31,30 @@ class SetupDgraphKeywords:
 
         Example:
         | Get dgraph cli command | zero
-        | Get dgraph cli command | alpha
 
         """
 
         self.dgraph_cli = DgraphCLI()
-        cli_command = self.dgraph_cli.build_zero_cli()
+        cli_command = self.dgraph_cli.build_zero_cli(**kwargs)
         return cli_command
 
-    def generate_dgraph_alpha_cli_command(self, bulk_path=None):
+    def generate_dgraph_alpha_cli_command(self, bulk_path=None, **kwargs):
         """
         Method to build CLI command for zero and alpha.
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
         \n:param cli_name: <zero | alpha>
+        \nkwargs:
+            \n:param ludicrous_mode: enabled|disabled
         \n:return: cli_command <returns zero | alpha command>
 
         Example:
-        | Get dgraph cli command | zero
         | Get dgraph cli command | alpha
+        | Get dgraph cli command | alpha | ludicrous_mode=enabled
 
         """
 
         self.dgraph_cli = DgraphCLI()
-        cli_command = self.dgraph_cli.build_alpha_cli(bulk_path)
+        cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, **kwargs)
         return cli_command
 
     def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type):
@@ -71,6 +74,21 @@ class SetupDgraphKeywords:
         self.dgraph_cli = DgraphCLI()
         loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type)
         return loader_command
+
+    def get_dgraph_increment_command(self, alpha_offset: int = 0):
+        """
+        Method to generate increment command for dgraph.
+        :param alpha_offset: <offset value set for alpha> | default : 0
+
+        Example:
+        | Get Dgraph Increment Command | <alpha_offset> |
+        | Get Dgraph Increment Command |
+        | Get Dgraph Increment Command | 100 |
+
+        """
+        self.dgraph_cli = DgraphCLI()
+        inc_command = self.dgraph_cli.build_increment_cli_command(alpha_offset)
+        return inc_command
 
     def get_acl_value(self):
         """
