@@ -128,7 +128,7 @@ dmypy.json
 .pyre/
 
 # results folder
-results/*
+results/**
 !results/inc_logs/.gitkeep
 
 # backup folder
