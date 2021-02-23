@@ -129,7 +129,6 @@ dmypy.json
 
 # results folder
 results/*
-!results/.gitkeep
 !results/inc_logs/.gitkeep
 
 # backup folder
