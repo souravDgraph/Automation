@@ -10,18 +10,7 @@ Library           Collections
 Variables         ../../../conf/slash/slash_api/variables.py
 
 *** Variables ***
-${deployment_id}    ${EMPTY}
 ${Session_alias}    Session1
-${deployment_endpoint}    ${EMPTY}
-${deployemnt_jwt_token}    ${EMPTY}
-${deployment_auth}    ${EMPTY}
-${api_key_uid}    ${EMPTY}
-${Schema}         type Task { \ \ id: ID! \ \ title: String! @search(by: [fulltext]) \ \ completed: Boolean! @search \ \ user: User! } \ type User { \ \ username: String! @id @search(by: [hash]) \ \ name: String @search(by: [exact]) \ \ tasks: [Task] @hasInverse(field: user) }
-${mutation_query_1}    {\"query\":\"mutation AddTasks {\\n \ addTask(input: [\\n \ \ \ {title: \\\"Create a database\\\", completed: false, user: {username: \\\"your-email@example.com\\\"}}]) {\\n \ \ \ numUids\\n \ \ \ task {\\n \ \ \ \ \ title\\n \ \ \ \ \ user {\\n \ \ \ \ \ \ \ username\\n \ \ \ \ \ }\\n \ \ \ }\\n \ }\\n}\"}
-${query_1}        {\"query\":\"query {\\n \ __schema {\\n \ \ \ __typename\\n \ }\\n}\"}
-${introspection_query}    {"query":"query {__schema { __typename }}"}
-${No_schema_error}    Not resolving __schema. There's no GraphQL schema in Dgraph. \ Use the /admin API to add a GraphQL schema
-${Backend_creation_timeout}    1
 
 *** Test Cases ***
 Create Deployment
@@ -61,13 +50,13 @@ Introspection API without Schema
     Should Contain    ${message}    ${No_schema_error}
 
 Add schema and perform queries and mutation
-    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
+    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${SCHEMA}
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Run Keyword If    '${schema}'=='${EMPTY}'    Fail
     Log    Add data to database - Mutation
-    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${mutation_query_1}
+    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${MUTATION_QUERY_1}
     Log    Fetch data from database - Query
-    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${query_1}
+    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${QUERY}
     Log    Drop data from database
     Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Log    Drop data and schema from database
