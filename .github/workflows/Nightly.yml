@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Nightly
+name: nightly
 
 # Controls when the action will run. 
 on:
@@ -79,7 +79,7 @@ jobs:
           tree
           ls
           echo " ---- Running Dgraph Testcases ----"
-          robot test_suites/dgraph/Linux/
+          robot test_suites/dgraph/Linux/dgraph_suite_01.robot
           
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
