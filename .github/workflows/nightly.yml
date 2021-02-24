@@ -78,9 +78,14 @@ jobs:
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
+          sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
+          cd ./test_data/datasets
+          wget -q https://github.com/dgraph-io/benchmarks/blob/master/data/21million.rdf.gz
+          wget -q https://github.com/dgraph-io/benchmarks/blob/master/data/21million.schema
+          cd ../..
           mkdir -p backup
           tree
-          ls
+          cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           echo " ---- Running Dgraph Testcases ----"
           robot test_suites/dgraph/Linux/dgraph_suite_01.robot
           
