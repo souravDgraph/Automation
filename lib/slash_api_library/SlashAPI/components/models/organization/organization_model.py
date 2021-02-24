@@ -46,6 +46,23 @@ GET_MEMBERS_IN_ORGANIZATIONS = """
                     }
                     """
 
+GET_MEMBERS_IN_ORGANIZATION = """
+                    query GetOrganizationById($id: ID!) {
+                      getOrganizationByID(organizationUID: $id) {
+                        uid
+                        name
+                        members {
+                            uid
+                            auth0User {
+                                name
+                                email
+                                id
+                            }
+                        } 
+                      }
+                    }
+                    """
+
 
 def get_organization():
     """
@@ -60,14 +77,20 @@ def get_organization():
     return query
 
 
-def get_members_in_organization():
+def get_members_in_organization(org_uid = None):
     """
     Method to create a get query for organizations
     :return:
     """
-    variables = {}
+    if(org_uid != None):
+        variables = {"id": org_uid}
+        query = GET_MEMBERS_IN_ORGANIZATION
+    else:
+        variables = {}
+        query = GET_MEMBERS_IN_ORGANIZATIONS
+
     query = {
-        "query": GET_MEMBERS_IN_ORGANIZATIONS,
+        "query": query,
         "variables": variables
     }
     return query

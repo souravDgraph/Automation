@@ -86,6 +86,7 @@ class Deployments():
                           isProtected=None,
                           size=None,
                           organizationId=None,
+                          expected_response_text="Deployment has been patched.",
                           expected_response=None):
         properties = locals()
         properties_to_delete = ['session_alias', 'url', 'auth', 'expected_response']
@@ -107,8 +108,10 @@ class Deployments():
                                                expected_status=str(expected_response))
         logger.debug(response.json())
         logger.debug(response.text)
-        if 'Deployment has been patched.' not in response.text:
-            raise Exception("Expected response body not found")
+        if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
+            raise Exception("Expected error not found")
+        elif expected_response_text not in response.text:
+            raise Exception("Expected response body is not found")
         return response
 
     @staticmethod
@@ -193,6 +196,27 @@ class Deployments():
                                              '',
                                              headers=auth,
                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
+
+    @staticmethod
+    def get_deployment_with_deployment_id(session_alias, url, auth, deployment_id, expected_response_text="OK", expected_response=200):
+        properties = {
+            "deployment_id": deployment_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.get_deployment,
+                                                properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias, '', 
+                                                json=data,
+                                                headers=auth,
+                                                expected_status=str(expected_response))
+        logger.info(response.text)
+        if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
+            raise Exception("Expected error not found")
+        elif expected_response_text not in response.reason :
+            raise Exception("Expected Body Response is not Found")
         logger.info(response.json())
         return response.json()
 
