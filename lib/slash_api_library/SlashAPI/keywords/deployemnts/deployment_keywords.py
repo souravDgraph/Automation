@@ -127,9 +127,11 @@ class DeploymentKeywords():
                           enterprise=None,
                           isProtected=None,
                           size=None,
+                          organizationId=None,
                           expected_response=200):
-        logger.info("Creating a Deployment of Name : %s" % deployment_id)
+        logger.info("Updating a Deployment of Name : %s" % deployment_id)
         url = base_url + "deployment/" + str(deployment_id)
+        logger.info(url)
         response = Deployments.update_deployment(session_alias,
                                                  url,
                                                  auth,
@@ -143,6 +145,7 @@ class DeploymentKeywords():
                                                  enterprise,
                                                  isProtected,
                                                  size,
+                                                 organizationId,
                                                  expected_response)
         return response
 
