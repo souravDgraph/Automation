@@ -82,7 +82,7 @@ jobs:
           cd ./test_data/datasets
           wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.rdf.gz
           wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.schema
-          head 21million.rdf.gz
+          zcat 21million.rdf.gz | head -n 5
           head 21million.schema
           cd ../..
           mkdir -p backup
