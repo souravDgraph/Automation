@@ -1,3 +1,5 @@
+[![nightly](https://github.com/souravDgraph/Automation/actions/workflows/nightly.yml/badge.svg?branch=main&event=schedule)](https://github.com/souravDgraph/Automation/actions/workflows/nightly.yml)
+
 # Automation
 This is a Automation Repo for Dgraph including Slash.
 
