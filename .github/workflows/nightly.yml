@@ -21,7 +21,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -65,30 +65,31 @@ jobs:
         
           
       # Build Dgraph
-#       -  name: Build Dgraph on GitAction Runner
-#          run: |
-#            cd dgraph_workspace/dgraph
-#            make install
-#            sudo go build
-#            ls
-#            ./dgraph version
-#            sudo mv ./dgraph /bin
-#            dgraph version
-           
-      -  name: Build Dgraph on Self-Hosted Runner
+      -  name: Build Dgraph on GitAction Runner
          run: |
            cd dgraph_workspace/dgraph
            make install
-           # sudo go build
-           # ls
-           # ./dgraph version
-           # sudo mv ./dgraph /bin
+           sudo go build
+           ls
+           ./dgraph version
+           sudo mv ./dgraph /bin
            dgraph version
+           
+#       -  name: Build Dgraph on Self-Hosted Runner
+#          run: |
+#            cd dgraph_workspace/dgraph
+#            make install
+#            # sudo go build
+#            # ls
+#            # ./dgraph version
+#            # sudo mv ./dgraph /bin
+#            dgraph version
          
       - name: Run Robot Framework Testcases
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
+          
           # ---- Commenting the below lines as Git Actions are failing, due to heavy workload. ----
           # sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
           # cd ./test_data/datasets
@@ -97,6 +98,8 @@ jobs:
           # zcat 21million.rdf.gz | head -n 5
           # head 21million.schema
           # cd ../..
+          # ----------------------------------------------------------------------------------------
+          
           mkdir -p backup
           tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
