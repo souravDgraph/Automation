@@ -147,6 +147,7 @@ def setup_lib(proj_name):
         proj_lib_paths = ['./lib/selenium_client/',
                           './lib/slash_ui_library/',
                           './lib/slash_api_library/',
+                          './lib/slash_cli_library/',
                           './lib/requests_client']
     elif proj_name.lower() == "common":
         proj_lib_paths = ['./lib/common_lib/']
@@ -154,9 +155,8 @@ def setup_lib(proj_name):
         proj_lib_paths = ['./lib/test_rail_listener_lib/']
     elif proj_name.lower() == "all":
         proj_lib_paths = ['./lib/dgraph_lib/', './lib/selenium_client/', './lib/slash_ui_library/',
-                          './lib/slash_api_library/', './lib/requests_client', './lib/common_lib/',
-                          './lib/test_rail_listener_lib/'
-                          ]
+                          './lib/slash_api_library/', './lib/requests_client', './lib/common_lib/', 
+                          './lib/slash_cli_library/', './lib/test_rail_listener_lib/']
         proj_name = "Dgraph, Slash, Common, Test Rails Listener"
 
     print("\n\n\n*********Installing Lib for: " + proj_name + " *****************\n\n\n")

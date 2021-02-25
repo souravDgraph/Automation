@@ -6,3 +6,4 @@ ACL_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for ACL for S
 HA_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for Dgraph HA for Slash"
 JAEGER_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for Jaeger for Slash"
 DELETE_DEPLOYMENT = "Deleted"
+EXISTING_USER_ERROR = "The user is already a part of the organization."
