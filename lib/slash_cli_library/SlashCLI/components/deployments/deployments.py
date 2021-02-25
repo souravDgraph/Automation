@@ -53,6 +53,7 @@ class Deployments:
                           deployment_name,
                           type="slash-graphql",
                           region="stgdgraph",
+                          organizationId=None,
                           subdomain=None,
                           mode="graphql",
                           acl=None,
@@ -184,6 +185,7 @@ class Deployments:
         return output
 
     @staticmethod
+<<<<<<< HEAD
     def get_lambda(environment,
                    endpoint,
                    expected_return_code=0):
@@ -196,4 +198,31 @@ class Deployments:
         output, error = Utils.execute_slash_graphql_command(base_command,
                                                             options,
                                                             expected_return_code)
+=======
+    def update_deployment(environment, endpoint,
+                                        mode,
+                                        name,
+                                        organizationId,
+                                        token,
+                                        skip_confirmation,
+                                        expected_return_code=0):
+        properties = locals()
+        properties_to_exclude = ["skip_confirmation", "expected_return_code"]
+        base_command = "update-backend"
+        options = ""
+        for key in properties.keys():
+            if properties[key] and key not in properties_to_exclude:
+                logger.info(type(key))
+                logger.info(properties[key])
+                logger.info(type(options))
+                options += " --" + key + "=" + properties[key]
+        if skip_confirmation:
+            options += " --confirm"
+        logger.info(base_command)
+        logger.info(options)
+        output, error = Utils.execute_slash_graphql_command(base_command,
+                                                            options,
+                                                            expected_return_code)
+        logger.info(error)
+>>>>>>> Added Test Cases For Slash CLI
         return output

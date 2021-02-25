@@ -34,6 +34,7 @@ class DeploymentKeywords:
                           deployment_name,
                           type="slash-graphql",
                           region="stgdgraph",
+                          organization_id=None,
                           subdomain=None,
                           deployment_mode="graphql",
                           acl=None,
@@ -52,6 +53,7 @@ class DeploymentKeywords:
                                                     deployment_name,
                                                     type,
                                                     region,
+                                                    organization_id,
                                                     subdomain,
                                                     deployment_mode,
                                                     acl,
@@ -124,6 +126,7 @@ class DeploymentKeywords:
                                                expected_return_code)
 
     @staticmethod
+<<<<<<< HEAD
     def list_backups(environment,
                      deployment_id,
                      expected_output_text,
@@ -142,3 +145,23 @@ class DeploymentKeywords:
         Deployments.get_lambda(environment,
                                deployment_id,
                                expected_return_code)
+=======
+    def update_deployment(environment,
+                          endpoint=None,
+                          organization_id=None,
+                          mode=None,
+                          name=None,
+                          token=None,
+                          skip_confirmation=True,
+                          expected_return_code=0):
+
+        logger.info("Update deployment with endpoint %s" % endpoint)
+        Deployments.update_deployment(environment, endpoint,
+                                                   mode,
+                                                   name,
+                                                   organization_id,
+                                                   token,
+                                                   skip_confirmation,
+                                                   expected_return_code)
+                                        
+>>>>>>> Added Test Cases For Slash CLI
