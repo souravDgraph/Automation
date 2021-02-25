@@ -77,6 +77,7 @@ jobs:
           cd ./test_data/datasets
           wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.com.rdf.gz
           wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.schema
+          mv ./stackoverflow.com.rdf.gz ./stackoverflow.rdf.gz
           zcat stackoverflow.rdf.gz | head -n 5
           head stackoverflow.schema
           cd ../..
