@@ -6,7 +6,7 @@ name: weeklyLargeData
 on:
   # Triggers the workflow
   schedule:     
-     - cron:  '0 13 * * 1,4'
+     - cron:  '0 22 * * 1,4'
      
 
   # Allows you to run this workflow manually from the Actions tab
@@ -25,7 +25,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with: 
-          path: Automation_workspace
+          path: Automation_workspace_weeklyLargeData
         
       - name: Setup Python
         uses: actions/setup-python@v2.2.1
@@ -41,14 +41,14 @@ jobs:
       - name: Install requirements for Dgraph
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/Automation_workspace/utilities
+          cd ${{ github.workspace }}/Automation_workspace_weeklyLargeData/utilities
           ls -alh
           python3 env_setup.py -l Dgraph -c enabled
         
       - name: Install requirements for Slash
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/Automation_workspace/utilities
+          cd ${{ github.workspace }}/Automation_workspace_weeklyLargeData/utilities
           ls -alh
           python3 env_setup.py -l Slash -c enabled
         
@@ -58,30 +58,20 @@ jobs:
         with:
           repository: dgraph-io/dgraph
           clean: false  
-          path: dgraph_workspace  
+          path: dgraph_workspace_weeklyLargeData 
         
           
-      # Build Dgraph
-#       -  name: Build Dgraph on GitAction Runner
-#          run: |
-#            cd dgraph_workspace/dgraph
-#            make install
-#            sudo go build
-#            ls
-#            ./dgraph version
-#            sudo mv ./dgraph /bin
-#            dgraph version
-           
+      # Build Dgraph          
       -  name: Build Dgraph on Self-Hosted Runner
          run: |
-           cd dgraph_workspace/dgraph
+           cd dgraph_workspace_weeklyLargeData/dgraph
            make install
            dgraph version
          
       - name: Run Robot Framework Testcases
         run: |
           echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/Automation_workspace
+          cd ${{ github.workspace }}/Automation_workspace_weeklyLargeData
           # ---- Commenting the below lines as Git Actions are failing, due to heavy workload. ----
           sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
           cd ./test_data/datasets
@@ -117,7 +107,7 @@ jobs:
         with: 
           name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
           path: |
-            ${{ github.workspace }}/Automation_workspace/
-            !${{ github.workspace }}/Automation_workspace/test_data
-            !${{ github.workspace }}/Automation_workspace/doc
+            ${{ github.workspace }}/Automation_workspace_weeklyLargeData/
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/test_data
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/doc
         
