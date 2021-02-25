@@ -52,6 +52,7 @@ class Deployments:
     def create_deployment(environment,
                           deployment_name,
                           region="stgdgraph",
+                          organizationId=None,
                           subdomain=None,
                           mode="graphql",
                           expected_return_code=0):
@@ -121,4 +122,32 @@ class Deployments:
         output, error = Utils.execute_slash_graphql_command(base_command,
                                                             options,
                                                             expected_return_code)
+        return output
+
+    @staticmethod
+    def update_deployment(environment, endpoint,
+                                        mode,
+                                        name,
+                                        organizationId,
+                                        token,
+                                        skip_confirmation,
+                                        expected_return_code=0):
+        properties = locals()
+        properties_to_exclude = ["skip_confirmation", "expected_return_code"]
+        base_command = "update-backend"
+        options = ""
+        for key in properties.keys():
+            if properties[key] and key not in properties_to_exclude:
+                logger.info(type(key))
+                logger.info(properties[key])
+                logger.info(type(options))
+                options += " --" + key + "=" + properties[key]
+        if skip_confirmation:
+            options += " --confirm"
+        logger.info(base_command)
+        logger.info(options)
+        output, error = Utils.execute_slash_graphql_command(base_command,
+                                                            options,
+                                                            expected_return_code)
+        logger.info(error)
         return output

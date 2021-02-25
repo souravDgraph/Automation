@@ -33,6 +33,7 @@ class DeploymentKeywords:
     def create_deployment(environment,
                           deployment_name,
                           region="stgdgraph",
+                          organization_id=None,
                           subdomain=None,
                           deployment_mode="graphql",
                           expected_return_code=0):
@@ -40,6 +41,7 @@ class DeploymentKeywords:
         deployments = Deployments.create_deployment(environment,
                                                     deployment_name,
                                                     region,
+                                                    organization_id,
                                                     subdomain,
                                                     deployment_mode,
                                                     expected_return_code)
@@ -74,3 +76,23 @@ class DeploymentKeywords:
         Deployments.get_schema_from_deployment(environment,
                                                deployment_id,
                                                expected_return_code)
+
+    @staticmethod
+    def update_deployment(environment,
+                          endpoint=None,
+                          organization_id=None,
+                          mode=None,
+                          name=None,
+                          token=None,
+                          skip_confirmation=True,
+                          expected_return_code=0):
+
+        logger.info("Update deployment with endpoint %s" % endpoint)
+        Deployments.update_deployment(environment, endpoint,
+                                                   mode,
+                                                   name,
+                                                   organization_id,
+                                                   token,
+                                                   skip_confirmation,
+                                                   expected_return_code)
+                                        
