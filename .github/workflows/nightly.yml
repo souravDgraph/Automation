@@ -65,14 +65,24 @@ jobs:
         
           
       # Build Dgraph
-      -  name: Build Dgraph
+#       -  name: Build Dgraph on GitAction Runner
+#          run: |
+#            cd dgraph_workspace/dgraph
+#            make install
+#            sudo go build
+#            ls
+#            ./dgraph version
+#            sudo mv ./dgraph /bin
+#            dgraph version
+           
+      -  name: Build Dgraph on Self-Hosted Runner
          run: |
            cd dgraph_workspace/dgraph
            make install
-           sudo go build
-           ls
-           ./dgraph version
-           sudo mv ./dgraph /bin
+           # sudo go build
+           # ls
+           # ./dgraph version
+           # sudo mv ./dgraph /bin
            dgraph version
          
       - name: Run Robot Framework Testcases
