@@ -113,24 +113,24 @@ Create and use Multiple API Keys
     @{api_keys_uid}=    Create List
     &{api_keys}=  Create Dictionary
     FOR   ${i}  IN RANGE  1   7
-        ${api_key_uid}     ${api_key}      Create API Keys
+        ${api_key_uid}     ${api_key}      Create API Keys      ${deployment_id}      test${i}
         Append To List      ${api_keys_uid}     ${api_key_uid}
-        Set To Dictionary      ${api_keys}      api_key${i}      ${api_key}
+        Set To Dictionary      ${api_keys}      test${i}      ${api_key}
         log     ${api_key_uid}
         log     ${api_key}
     END
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[api_key1]    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test1]    Content-Type=application/json
     Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[api_key2]    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test2]    Content-Type=application/json
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Run Keyword If    '${schema}'=='${EMPTY}'    Fail
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[api_key3]    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test3]    Content-Type=application/json
     Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${mutation_query_1}
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[api_key4]    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test4]    Content-Type=application/json
     Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[api_key5]    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test5]    Content-Type=application/json
     Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${True}
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[api_key6]    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test6]    Content-Type=application/json
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     FOR   ${api_key_uid}  IN   @{api_keys_uid}
         Delete API Keys    ${api_key_uid}
@@ -153,7 +153,8 @@ Create Backend
     Set Suite Variable    ${deployment_auth}
 
 Create API Keys
-    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test1
+    [Arguments]     ${deployment_id}      ${api_name}
+    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_name}
     ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
