@@ -10,3 +10,4 @@ grpcio
 pydgraph==20.7.0
 Jinja2
 robotframework-pabot
+pyyaml==5.4.1
