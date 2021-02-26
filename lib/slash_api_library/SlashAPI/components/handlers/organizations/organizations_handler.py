@@ -272,7 +272,11 @@ class OrganizationsHandler:
                                                         organizationId="empty", auth=self.headers, expected_response=str(expected_response))
         return response
 
+<<<<<<< HEAD
     def add_org_from_deployment(self, deployment_name, org_uid, expected_response=200):
+=======
+    def add_organization_to_deployment(self, deployment_name, org_name, expected_response=200):
+>>>>>>> Added changes
         """
         Method to add organization to deployment
         :param expected_response:

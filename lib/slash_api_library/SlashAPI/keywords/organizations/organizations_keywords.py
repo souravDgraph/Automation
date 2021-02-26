@@ -149,4 +149,4 @@ class OrganizationsKeywords:
         | add org to deployment |  deployment_name | org_uid |
         | add org to deployment |  Pokemon | 0x201ef |
         """
-        return self.org_handler.add_org_from_deployment(deployment_name, org_uid)
+        return self.org_handler.add_organization_to_deployment(deployment_name, org_name)
