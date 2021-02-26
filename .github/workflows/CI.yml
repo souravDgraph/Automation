@@ -50,7 +50,7 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          python3 create_docker_yml.py -c enabled
+          python3 create_docker_yml.py -v master -c enabled
         
       # Download Dgraph Repo
       - name: Check out Dgraph repo
