@@ -82,7 +82,7 @@ class CustomRequestKeywords:
         Example:
         | get certs |
         """
-        tls_cert = self.dgraph_cli.get_tls_certs("pem")
+        tls_cert = self.dgraph_cli.get_cert_from_pem_file()
         return tls_cert
 
     def health_check(self, appender):
