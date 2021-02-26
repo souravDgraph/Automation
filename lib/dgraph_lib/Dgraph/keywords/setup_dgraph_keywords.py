@@ -19,9 +19,6 @@ class SetupDgraphKeywords:
     Setup Library Keywords
     """
 
-    def __init__(self):
-        self.dgraph_cli = DgraphCLI
-
     def generate_dgraph_zero_cli_command(self, **kwargs):
         """
         Method to build CLI command for zero and alpha.
@@ -52,33 +49,33 @@ class SetupDgraphKeywords:
         | Get dgraph cli command | alpha | ludicrous_mode=enabled
 
         """
-
-        self.dgraph_cli = DgraphCLI()
         cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, **kwargs)
         return cli_command
 
-    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type):
+    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version: None, docker_string=None):
         """
         Method to build CLI command for live | bulk loading
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
         \n:param rdf_file: <path to rdf file>
         \n:param schema_file: <path to schema file>
         \n:param loader_type: <live | bulk>
+        \n:param is_latest_version:
+        \n:param docker_string: <if executing on docker>
         \n:return: loader_command <returns live loader command>
 
         Example:
         | Get Dgraph Loader Command | <rdf_file_path> | <schema_file_path>
 
         """
-
-        self.dgraph_cli = DgraphCLI()
-        loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type)
+        loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type, is_latest_version, docker_string)
         return loader_command
 
-    def get_dgraph_increment_command(self, alpha_offset: int = 0):
+    def get_dgraph_increment_command(self, is_latest_version: None, docker_string=None, alpha_offset: int = 0):
         """
         Method to generate increment command for dgraph.
         :param alpha_offset: <offset value set for alpha> | default : 0
+        :param is_latest_version:
+        :param docker_string:
 
         Example:
         | Get Dgraph Increment Command | <alpha_offset> |
@@ -86,8 +83,7 @@ class SetupDgraphKeywords:
         | Get Dgraph Increment Command | 100 |
 
         """
-        self.dgraph_cli = DgraphCLI()
-        inc_command = self.dgraph_cli.build_increment_cli_command(alpha_offset)
+        inc_command = self.dgraph_cli.build_increment_cli_command(is_latest_version,docker_string, alpha_offset)
         return inc_command
 
     def get_acl_value(self):
@@ -136,6 +132,7 @@ class SetupDgraphKeywords:
         Method to get the encryption file.
         :return:<encryption file>
         """
+        self.dgraph_cli = DgraphCLI()
         self.dgraph_cli.get_enc()
 
     @staticmethod
@@ -154,3 +151,10 @@ class SetupDgraphKeywords:
         :return:<value>
         """
         return self.dgraph_cli.get_dgraph_version_details(dgraph_details_key)
+
+    def set_execution_to_docker(self, version, branch):
+        """
+        Method to set DgaphCLI to docker mode.
+        """
+        self.dgraph_cli = DgraphCLI()
+        return self.dgraph_cli.set_dgraph_version(version, branch)

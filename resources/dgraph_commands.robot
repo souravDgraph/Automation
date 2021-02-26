@@ -6,12 +6,14 @@ Library           JSONLibrary
 Library           String
 Library           Collections
 
+*** Variables ***
+${is_latest}
+${docker_exe_string}
+
 *** Keywords ***
 Start Dgraph
-    [Arguments]    ${platform}
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
-    Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
     Process Should Be Running    zero
@@ -20,12 +22,14 @@ Start Dgraph
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
+    ${version}=     Get Dgraph Version Details
+    ${check}=   check dgraph version    ${version}
+    Set Suite Variable      ${is_latest}    ${check}
 
 Start Dgraph Ludicrous Mode
-    [Arguments]    ${platform}
+    [Arguments]
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
-    Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
     Process Should Be Running    zero
@@ -34,21 +38,33 @@ Start Dgraph Ludicrous Mode
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
+    ${version}=     Get Dgraph Version Details
+    ${check}=   check dgraph version    ${version}
+    Set Suite Variable      ${is_latest}    ${check}
 
 Start Dgraph In Docker
+    [Arguments]     ${folder_name}
     [Documentation]    Start Dgraph alpha and Zero process in Helm with cwd pointing to results folder.
-    # Dgraph alpha and zero command
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
-    ${result_docker}=    Process.start Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=True
+    ${result_docker}=    Process.Run Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=True
     log    ${result_docker.stdout}
-    Should Be Equal As Integers    ${result_docker.rc}    0
     ${result_docker_compose}=    Process.start Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt    cwd=results    shell=True
-    Should Be Equal As Integers    ${result_docker_compose.rc}    0
     OperatingSystem.Create Directory    ${dir_path}/data
-    Process.start Process    docker-compose    -f    ${dir_path}/conf/docker-compose.yml    up    alias=dc_up    cwd=results    shell=True    stdout=docker_compose_up.txt
+    Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    up    alias=dc_up    cwd=results    shell=True    stdout=docker_compose_up.txt
     Process Should Be Running    dc_up
+    Wait For Process    timeout=40 s    on_timeout=continue
+    Set Dgraph Version from docker  ${folder_name}
+
+End Docker Execution
+    [Arguments]     ${folder_name}      ${is_clear_folder}
+    Terminate All Processes
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    down    alias=dc_down    cwd=results    shell=True    stdout=docker_compose_down.txt
+    Process Should Be Running    dc_down
     Wait For Process    timeout=10 s    on_timeout=continue
+    @{dir}    Create List    p    t    w    out    alpha
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Start Dgraph Zero
     [Arguments]    ${platform}
@@ -125,6 +141,31 @@ Get Dgraph Version Details
     ${value}=   Replace String  ${value}    ${space}     ${empty}
     [Return]    ${value}
 
+Get Dgraph Docker Version Details
+    [Documentation]  Keyword to get dgraph version details
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${dgraph_Text_File_Content}=    Grep File    ${dir_path}/results/dgraph_version.txt     Dgraph version*
+    ${key}     ${value}=    Split String    ${dgraph_Text_File_Content}     :
+    ${value}=   Replace String  ${value}    ${space}     ${empty}
+    [Return]    ${value}
+
+Get Dgraph Docker Branch Details
+    [Documentation]  Keyword to get dgraph version details
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${dgraph_Text_File_Content}=    Grep File    ${dir_path}/results/dgraph_version.txt     Branch*
+    ${key}     ${value}=    Split String    ${dgraph_Text_File_Content}     :
+    ${value}=   Replace String  ${value}    ${space}     ${empty}
+    [Return]    ${value}
+
+Set Dgraph Version from docker
+    [Arguments]     ${folder_name}
+    [Documentation]     Keyword to get the dgraph version from docker
+    ${docker_process}=     Run Process   docker       exec    ${folder_name}_zero0_1   dgraph  version     alias=version   stdout=dgraph_version.txt    shell=True    cwd=results
+    ${version}=     Get Dgraph Docker Version Details
+    ${branch}=      Get Dgraph Docker Branch Details
+    ${check}=   Set Execution To Docker     ${version}      ${branch}
+    Set Suite Variable      ${is_latest}        ${check}
+    Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_zero0_1
 
 Execute Live Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
@@ -154,7 +195,7 @@ Trigger Loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Verify Bulk Process
@@ -217,13 +258,13 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         Grep and Verify file Content in results folder    ${loader_alias}    N-Quads processed per second
     END
 
-Execute Increment
+Execute Increment Command
     [Arguments]     ${num_threads}      ${alpha_offset}
     [Documentation]  Keyword to verify increment..
     FOR    ${i}    IN RANGE    ${num_threads}
         ${alpha_offset}    Set Variable If     ${i}>=1     ${alpha_offset}      0
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
-        ${inc_command}  Get dgraph increment command    ${alpha_offset}
+        ${inc_command}  Get dgraph increment command    is_latest_version=${is_latest}  docker_string=${docker_exe_string}      alpha_offset=${alpha_offset}
         ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results/inc_logs    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
         Wait For Process    ${inc_alias}    timeout=10 s
     END
@@ -247,6 +288,7 @@ Create NFS Backup
     ${res}=    Backup Using Admin    ${backup_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${backup_path}
+
 
 Perform a restore on backup
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.

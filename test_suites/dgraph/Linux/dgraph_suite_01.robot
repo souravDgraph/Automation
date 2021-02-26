@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
-Suite Setup        Start Dgraph    local
+Suite Setup        Start Dgraph
 Suite Teardown     End All Process    true
 Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process

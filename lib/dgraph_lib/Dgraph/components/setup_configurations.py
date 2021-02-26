@@ -249,12 +249,7 @@ class DgraphCLI:
         cli_command = "dgraph " + cli_name + " "
         appender = ""
 
-        version = self.get_dgraph_version_details("Dgraph version")
-        branch = self.get_dgraph_version_details("Branch")
-
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
-            else False
-
+        is_latest = self.set_dgraph_version()
         # Configure tls and mtls
         if is_latest:
             tls_str = self.get_tls_certs_latest("zero")
@@ -279,11 +274,7 @@ class DgraphCLI:
         cli_command = cli_command + "--cache_mb=6000" \
                                     " -v=2 --zero=localhost:5080"
 
-        version = self.get_dgraph_version_details("Dgraph version")
-        branch = self.get_dgraph_version_details("Branch")
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
-            else False
-
+        is_latest = self.set_dgraph_version()
         cli_command = cli_command + self.get_security_command(is_latest)
 
         if bulk_path:
@@ -356,11 +347,29 @@ class DgraphCLI:
                          " from master branch.")
             return True
 
-    @staticmethod
-    def get_creds_command_for_acl_login(is_latest, username="groot", password="password"):
+    def set_dgraph_version(self, version=None, branch=None):
+        """
+        Method to check and set dgraph version
+        """
+        if version is None:
+            logger.info("dgraph local setup is executed.")
+            version = self.get_dgraph_version_details("Dgraph version")
+            branch = self.get_dgraph_version_details("Branch")
+            is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
+                else False
+        else:
+            logger.debug("Dgraph docker setup is executed.")
+            is_latest = True if self.check_version(version) == "latest" or branch == "master"\
+                else False
+        logger.debug(is_latest)
+        return is_latest
+
+    def get_creds_command_for_acl_login(self, is_latest, username="groot", password="password"):
         """
         Method to get command for Acl login
         """
+        logger.debug(f"is latest: {is_latest}")
+
         if is_latest:
             cli_live_acl = f" --creds 'user={username};password={password}' "
         else:
@@ -368,25 +377,30 @@ class DgraphCLI:
 
         return cli_live_acl
 
-    def build_loader_command(self, rdf_file, schema_file, loader_type):
+    def build_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version=None, docker_string=None):
         """
         Method to build bulk/live loader cli command
         :return: live loader cli command
         """
-        version = self.get_dgraph_version_details("Dgraph version")
-        branch = self.get_dgraph_version_details("Branch")
+
+        if is_latest_version:
+            is_latest = is_latest_version
+        else:
+            is_latest = self.set_dgraph_version()
+
         cli_bulk_encryption = ""
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
-            else False
 
         cli_live_acl = self.get_creds_command_for_acl_login(is_latest)
 
         loader_type = loader_type.lower()
 
-        cli_command = ""
+        cli_command = " dgraph"
+        if docker_string:
+            cli_command = docker_string + cli_command
+
         if loader_type == "live":
-            cli_command = "dgraph " + loader_type + " -s " + schema_file + \
-                          " -f " + rdf_file + " -a localhost:9080 -z localhost:5080 "
+            cli_command = f"{cli_command} {loader_type} -s {schema_file} " \
+                          f"-f " + rdf_file + " -a localhost:9080 -z localhost:5080 "
         elif loader_type == "bulk":
             cli_command = "dgraph " + loader_type + " -s " + schema_file + " -f " + \
                           rdf_file + " --map_shards=2 --reduce_shards=1 --http " \
@@ -407,20 +421,26 @@ class DgraphCLI:
         cli_command = cli_command + mtls_certs
         return cli_command
 
-    def build_increment_cli_command(self, alpha_offset: int = 0):
+    def build_increment_cli_command(self, is_latest_version=None, docker_string=None, alpha_offset: int = 0):
         """
         Method to generate command for increment operation.
         :param alpha_offset: <offset value set for alpha> | default=0
+        :param docker_string:
+        :param is_latest_version:
         """
-        version = self.get_dgraph_version_details("Dgraph version")
-        branch = self.get_dgraph_version_details("Branch")
 
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
-            else False
+        if is_latest_version:
+            is_latest = is_latest_version
+        else:
+            is_latest = self.set_dgraph_version()
 
         cli_creds_acl = self.get_creds_command_for_acl_login(is_latest)
 
-        cli_command = f"dgraph increment  --alpha localhost:{9080 + alpha_offset} " \
+        if docker_string:
+            cli_command = docker_string + " dgraph"
+        else:
+            cli_command = "dgraph"
+        cli_command = f"{cli_command} increment  --alpha localhost:{9080 + alpha_offset} " \
                       f" {cli_creds_acl}"
 
         if is_latest:
