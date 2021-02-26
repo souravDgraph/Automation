@@ -13,33 +13,6 @@ Variables         ../../../conf/slash/slash_api/variables.py
 ${Session_alias}    Session1
 
 *** Test Cases ***
-Create Deployment
-    [Documentation]    List of tests covered
-    ...
-    ...    - Create Deployment
-    ...    \ \ \ \ - Delete Deployment
-    [Tags]    C236    Sanity
-    [Template]
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
-    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
-    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
-    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
-    [Teardown]
-
-Get deployments
-    [Documentation]    List of tests covered
-    ...
-    ...    - Get Deployments
-    ...    \ \ \ \ - Deployments health API
-    [Tags]    C224    Sanity
-    ${deployments}=    Get Deployments    ${Session_alias}    ${URL}    ${HEADERS}
-    log    ${deployments}
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
-
-Update Deployment mode
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test-edit    deployment_mode=flexible
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
-
 Introspection API without Schema
     ${response}=    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${introspection_query}
     ${errors}=    Get From Dictionary    ${response}    errors
@@ -78,23 +51,8 @@ create manual backup
     Backup Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    create
 
 list backups
-    Comment    ${deployment_auth}=    Create Dictionary    x-auth-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJzL3Byb3h5IiwiZHVpZCI6IjB4MTBhNDAxIiwiZXhwIjoxNjExNTYwMzg0LCJpc3MiOiJzL2FwaSJ9.NvLjMPzfdkaYO6puXErMIsJjr7x9FkvS7Px2BzfZ0ns
     ${backups} =    Backup Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    list
     log    ${backups}
-
-create , get and delete API key
-    [Documentation]    List of tests covered
-    ...
-    ...    - Create API key
-    ...    \ \ \ \ - Delete API Key
-    ...    - Get API key
-    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test
-    log    ${api_key_details}
-    ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
-    ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
-    ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
-    Get Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
 
 freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
@@ -111,6 +69,16 @@ Create Backend
     Set Suite Variable    ${deployment_endpoint}
     ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     ${deployemnt_jwt_token}=    Collections.Get From Dictionary    ${data}    jwtToken
+    ${api_key}=    Generate_APIKEY    ${deployment_id}    key1
     Set Suite Variable    ${deployemnt_jwt_token}
-    ${deployment_auth}=    Create Dictionary    x-auth-token=${deployemnt_jwt_token}    Content-Type=application/json
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_key}    Content-Type=application/json
     Set Suite Variable    ${deployment_auth}
+
+Generate_APIKEY
+    [Arguments]    ${deployment_id}    ${api_key_name}    ${api_key_type}=admin
+    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_name}    ${api_key_type}
+    log    ${api_key_details}
+    ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
+    ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
+    ${api_key}=    Collections.Get From Dictionary    ${api_key_details}    key
+    [Return]    ${api_key}

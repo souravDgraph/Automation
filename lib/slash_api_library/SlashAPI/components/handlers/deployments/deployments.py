@@ -93,7 +93,7 @@ class Deployments():
             del properties[property_name]
         logger.debug(properties)
         data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
-                                                properties)
+                                               properties)
         logger.debug(data)
 
         connection = Connection()
@@ -205,8 +205,7 @@ class Deployments():
         connection.create_session(session_alias, url, auth)
         for cycle in range(1, 20):
             response_code = requests.get(url, headers=auth)
-            logger.info(response_code.status_code)
-            logger.info(response_code.json())
+            logger.info(response_code)
             logger.info(type(response_code.status_code))
             if int(response_code.status_code) == expected_response:
                 break
@@ -242,7 +241,6 @@ class Deployments():
                      url,
                      auth,
                      deployment_id,
-                     expected_response_text,
                      expected_response=None):
         properties = {
             "deploymentID": deployment_id
