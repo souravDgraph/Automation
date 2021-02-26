@@ -1,0 +1,10 @@
+--outputdir ./results/docker_exe_res
+#--timestampoutput
+--console verbose
+--consolemarkers on
+--loglevel TRACE:INFO
+test_suites/dgraph/docker/dgraph_docker_suite.robot
+
+#Additional arguments
+#--tagdoc *:See *README.md*
+#--tagstatcombine smokeANDregression

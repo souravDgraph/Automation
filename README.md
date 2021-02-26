@@ -29,6 +29,12 @@ This is a Automation Repo for Dgraph including Slash.
     * Slash
     * Common
     * CustomTestRailListener
+* To setup-docker compose file goto utilities dir->  `python3 create_docker_yml.py -v master -c disabled`
+    * Setup supports 
+        * 2node - ( 1 zero and 1 alpha )
+        * 4node - ( 1 zero and 3 alpha )
+    * Currently tested only on master branch.
+
 
 ## Execution Commands:
 * To run the suite with virtualenv enabled `cd utilities &&  runner.sh -l Dgraph -c disabled -t /Users/souravmukherjee/Desktop/Sourav/office/repos/Automation/test_suites/dgraph/Linux/dgraph_suite.robot`. This is a prefered way to execute.
