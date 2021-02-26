@@ -252,7 +252,7 @@ class DgraphCLI:
         version = self.get_dgraph_version_details("Dgraph version")
         branch = self.get_dgraph_version_details("Branch")
 
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" \
+        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
             else False
 
         # Configure tls and mtls
@@ -281,7 +281,7 @@ class DgraphCLI:
 
         version = self.get_dgraph_version_details("Dgraph version")
         branch = self.get_dgraph_version_details("Branch")
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" \
+        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
             else False
 
         cli_command = cli_command + self.get_security_command(is_latest)
@@ -415,7 +415,7 @@ class DgraphCLI:
         version = self.get_dgraph_version_details("Dgraph version")
         branch = self.get_dgraph_version_details("Branch")
 
-        is_latest = True if self.check_version(version) == "latest" or branch == "master" \
+        is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
             else False
 
         cli_creds_acl = self.get_creds_command_for_acl_login(is_latest)
