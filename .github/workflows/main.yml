@@ -46,14 +46,14 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          python3 env_setup.py -l All -c disabled
+          python3 env_setup.py -l All -c enabled
         
       - name: Configuring docker-compose file
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          python3 create_docker_yml.py -c disabled
+          python3 create_docker_yml.py -c enabled
         
       # Download Dgraph Repo
       - name: Check out Dgraph repo
