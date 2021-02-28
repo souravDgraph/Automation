@@ -142,7 +142,7 @@ List backups of a non existing backend
     List Backups    ${Environment}    ${deployment_id}    ${NO_BACKEND_ERROR}    2
     [Teardown]
 
-Create a shared backend with ACL oprtion
+Create a shared backend with ACL option
     [Documentation]    List of test cases covered
     ...    \ -> Create deployment
     ...    -> Delete Deployment
@@ -154,7 +154,7 @@ Create a shared backend with ACL oprtion
     SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    slash-graphql    ap-south-1    acl=true    expected_output_text=${ACL_INVALID_INPUT_ERROR}    expected_return_code=2
     [Teardown]
 
-Create a shared backend with HA oprtion
+Create a shared backend with HA option
     [Documentation]    List of test cases covered
     ...    \ -> Create deployment
     ...    -> Delete Deployment
@@ -166,7 +166,7 @@ Create a shared backend with HA oprtion
     SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    slash-graphql    ap-south-1    dgraphHA=true    expected_output_text=${HA_INVALID_INPUT_ERROR}    expected_return_code=2
     [Teardown]
 
-Create a shared backend with jaeger oprtion
+Create a shared backend with jaeger option
     [Documentation]    List of test cases covered
     ...    \ -> Create deployment
     ...    -> Delete Deployment
