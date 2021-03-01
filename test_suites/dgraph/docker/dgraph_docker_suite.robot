@@ -2,9 +2,9 @@
 Documentation     Dgraph Docker Test Suite
 Suite Setup       Start Dgraph In Docker    ${docker-file}
 Test Setup      Monitor Health And State check
-#Suite Teardown    End Docker Execution    ${docker-file}    true
+Suite Teardown    End Docker Execution    ${docker-file}    false
 Default Tags    docker
-Resource          ../../resources/dgraph_commands.robot
+Resource          ../../../resources/dgraph_commands.robot
 
 *** Variables ***
 ${rdf_file}        1million.rdf.gz
@@ -25,11 +25,3 @@ TC_02 Docker - Import a big dataset with the live loader - Ubuntu or CentOS
     ...    *Author*: Krishna, Sourav, Vivetha and Sankalan
     [Tags]    regression    C698
     Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
-
-*** Keywords ***
-End Docker
-    [Arguments]     ${is_clear_folder}
-    Terminate All Processes
-    Docker Compose Down
-    @{dir}    Create List    p    t    w    out    alpha
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
