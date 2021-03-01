@@ -165,7 +165,7 @@ Set Dgraph Version from docker
     ${branch}=      Get Dgraph Docker Branch Details
     ${check}=   Set Execution To Docker     ${version}      ${branch}
     Set Suite Variable      ${is_latest}        ${check}
-    Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_zero0_1
+    Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
 
 Execute Live Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
@@ -195,7 +195,8 @@ Trigger Loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${dir_path}/test_data/datasets/${rdf_filename}    ${dir_path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}
+    ${path}=    Set Variable If      '${docker_exe_string}' != 'None'   ${dir_path}     /Automation
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Verify Bulk Process

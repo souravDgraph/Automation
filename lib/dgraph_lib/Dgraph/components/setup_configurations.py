@@ -364,8 +364,7 @@ class DgraphCLI:
         logger.debug(is_latest)
         return is_latest
 
-    @staticmethod
-    def get_creds_command_for_acl_login(is_latest, operation="default", username="groot", password="password"):
+    def get_creds_command_for_acl_login(self, is_latest, operation="default", username="groot", password="password"):
         """
         Method to get command for Acl login
         :param is_latest: <dgraph_version>
@@ -374,13 +373,13 @@ class DgraphCLI:
         :param password: <acl_password>
         """
         logger.debug(f"is latest: {is_latest}")
-
-        if is_latest:
-            cli_live_acl = f" --creds 'user={username};password={password}' "
-        else:
-            cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
+        cli_live_acl = ""
+        if self.acl:
+            if is_latest:
+                cli_live_acl = f" --creds 'user={username};password={password}' "
+            else:
+                cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
                                                                                         f" --password {password} "
-
         return cli_live_acl
 
     def build_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version=None, docker_string=None):
@@ -401,16 +400,19 @@ class DgraphCLI:
         loader_type = loader_type.lower()
 
         cli_command = " dgraph"
+        zero_addr = "localhost"
+        alpha_addr = "localhost"
         if docker_string:
             cli_command = docker_string + cli_command
+            zero_addr = "zero0"
 
         if loader_type == "live":
             cli_command = f"{cli_command} {loader_type} -s {schema_file} " \
-                          f"-f " + rdf_file + " -a localhost:9080 -z localhost:5080 "
+                          f"-f {rdf_file} -a {alpha_addr}:9080 -z {zero_addr}:5080 "
         elif loader_type == "bulk":
-            cli_command = "dgraph " + loader_type + " -s " + schema_file + " -f " + \
-                          rdf_file + " --map_shards=2 --reduce_shards=1 --http " \
-                                     "localhost:8000 --zero=localhost:5080 "
+            cli_command = f"dgraph {loader_type} -s {schema_file} -f {rdf_file} " \
+                          f"--map_shards=2 --reduce_shards=1 " \
+                          f"--http localhost:8000 --zero={zero_addr}:5080 "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']
                 cli_command = cli_command + cli_bulk_encryption + \
