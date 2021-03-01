@@ -359,21 +359,27 @@ class DgraphCLI:
                 else False
         else:
             logger.debug("Dgraph docker setup is executed.")
-            is_latest = True if self.check_version(version) == "latest" or branch == "master"\
+            is_latest = True if self.check_version(version) == "latest" or branch == "master" \
                 else False
         logger.debug(is_latest)
         return is_latest
 
-    def get_creds_command_for_acl_login(self, is_latest, username="groot", password="password"):
+    @staticmethod
+    def get_creds_command_for_acl_login(is_latest, operation="default", username="groot", password="password"):
         """
         Method to get command for Acl login
+        :param is_latest: <dgraph_version>
+        :param operation: <dgraph command: live, bulk, inc>
+        :param username: <acl_username>
+        :param password: <acl_password>
         """
         logger.debug(f"is latest: {is_latest}")
 
         if is_latest:
             cli_live_acl = f" --creds 'user={username};password={password}' "
         else:
-            cli_live_acl = f"  -u {username} -p {password} "
+            cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
+                                                                                        f" --password {password} "
 
         return cli_live_acl
 
@@ -434,7 +440,7 @@ class DgraphCLI:
         else:
             is_latest = self.set_dgraph_version()
 
-        cli_creds_acl = self.get_creds_command_for_acl_login(is_latest)
+        cli_creds_acl = self.get_creds_command_for_acl_login(is_latest, operation="inc")
 
         if docker_string:
             cli_command = docker_string + " dgraph"
