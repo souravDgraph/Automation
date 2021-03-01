@@ -205,8 +205,6 @@ class Deployments():
         connection.create_session(session_alias, url, auth)
         for cycle in range(1, 20):
             response_code = requests.get(url, headers=auth)
-            logger.info("Ib hete")
-            #logger.info(response_code.status_code)
             logger.info(response_code)
             logger.info(type(response_code.status_code))
             if int(response_code.status_code) == expected_response:
