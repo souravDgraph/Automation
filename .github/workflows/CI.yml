@@ -66,6 +66,7 @@ jobs:
          run: |
            cd dgraph_workspace/dgraph
            make install
+           export PATH=~/go/bin/:$PATH
            dgraph version
          
       - name: Run Robot Framework Testcases
