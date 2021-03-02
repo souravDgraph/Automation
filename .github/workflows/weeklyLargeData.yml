@@ -6,7 +6,8 @@ name: weeklyLargeData
 on:
   # Triggers the workflow
   schedule:     
-     - cron:  '0 22 * * 1,4'
+     - cron:  '0 22 * * 6'
+     - cron:  '0 10 * * 3'
      
 
   # Allows you to run this workflow manually from the Actions tab
@@ -18,8 +19,9 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: self-hosted
-
+    runs-on: [self-hosted, dgin-delta]
+    timeout-minutes: 4320
+    
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
