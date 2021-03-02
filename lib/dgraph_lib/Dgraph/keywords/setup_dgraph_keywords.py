@@ -52,7 +52,8 @@ class SetupDgraphKeywords:
         cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, **kwargs)
         return cli_command
 
-    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version: None, docker_string=None):
+    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version: None,
+                                  docker_string=None):
         """
         Method to build CLI command for live | bulk loading
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
@@ -67,7 +68,8 @@ class SetupDgraphKeywords:
         | Get Dgraph Loader Command | <rdf_file_path> | <schema_file_path>
 
         """
-        loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type, is_latest_version, docker_string)
+        loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type, is_latest_version,
+                                                              docker_string)
         return loader_command
 
     def get_dgraph_increment_command(self, is_latest_version: None, docker_string=None, alpha_offset: int = 0):
@@ -83,7 +85,7 @@ class SetupDgraphKeywords:
         | Get Dgraph Increment Command | 100 |
 
         """
-        inc_command = self.dgraph_cli.build_increment_cli_command(is_latest_version,docker_string, alpha_offset)
+        inc_command = self.dgraph_cli.build_increment_cli_command(is_latest_version, docker_string, alpha_offset)
         return inc_command
 
     def get_acl_value(self):
