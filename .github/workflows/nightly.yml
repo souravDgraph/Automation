@@ -22,7 +22,8 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    timeout-minutes:  4000
+    
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -90,21 +91,21 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
           
-          # ---- Commenting the below lines as Git Actions are failing, due to heavy workload. ----
-          # sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
-          # cd ./test_data/datasets
-          # wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.rdf.gz
-          # wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.schema
-          # zcat 21million.rdf.gz | head -n 5
-          # head 21million.schema
-          # cd ../..
+          # ---- Preparing 21million dataset. ----
+          sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
+          cd ./test_data/datasets
+          wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.rdf.gz
+          wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.schema
+          zcat 21million.rdf.gz | head -n 5
+          head 21million.schema
+          cd ../..
           # ----------------------------------------------------------------------------------------
           
           mkdir -p backup
           tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           echo " ---- Running Dgraph Testcases ----"
-          robot test_suites/dgraph/Linux/dgraph_suite_01.robot
+          robot -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
           
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
