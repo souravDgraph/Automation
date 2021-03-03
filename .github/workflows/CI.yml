@@ -66,10 +66,7 @@ jobs:
          run: |
            cd dgraph_workspace/dgraph
            make install
-           sudo go build
-           ls
-           ./dgraph version
-           sudo mv ./dgraph /bin
+           export PATH=~/go/bin/:$PATH
            dgraph version
          
       - name: Run Robot Framework Testcases
@@ -80,6 +77,7 @@ jobs:
           tree
           ls
           echo " ---- Running Dgraph Testcases ----"
+          export PATH=~/go/bin/:$PATH
           robot --include CI -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/
           
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.

@@ -70,10 +70,7 @@ jobs:
          run: |
            cd dgraph_workspace/dgraph
            make install
-           sudo go build
-           ls
-           ./dgraph version
-           sudo mv ./dgraph /bin
+           export PATH=~/go/bin/:$PATH
            dgraph version
            
 #       -  name: Build Dgraph on Self-Hosted Runner
@@ -104,6 +101,7 @@ jobs:
           mkdir -p backup
           tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
+          export PATH=~/go/bin/:$PATH
           echo " ---- Running Dgraph Testcases ----"
           robot -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
           
