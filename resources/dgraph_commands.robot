@@ -102,7 +102,7 @@ End All Process
     Terminate All Processes
     Sleep    5s
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
-    @{alpha_context}    Create List    Buffer flushed successfully.    Operation completed with id: opRestore
+    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
     Verify file Content in results folder    zero    @{zero_context}
     Verify file Content in results folder    alpha    @{alpha_context}
@@ -126,7 +126,7 @@ End Aplha Process
     Switch Process    alpha
     Terminate Process    handle=alpha
     Sleep    5s
-    @{alpha_context}    Create List    Buffer flushed successfully.
+    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify file Content in results folder    alpha    @{alpha_context}
     @{dir}    Create List    p    t    w    out    alpha
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}

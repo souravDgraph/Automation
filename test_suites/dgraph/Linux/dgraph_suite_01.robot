@@ -32,22 +32,22 @@ TC_03 Perform NFS backup and restore data
      Create NFS Backup      full
      perform a restore on backup
 
-TC_04 Perform parallel live and bulk load on data
-     [Documentation]    Perform live load data.
-     ...    *Author*: Sourav
-     [Tags]    regression
-     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
-
-TC_05 Perform Increment backup and restore data
-     [Documentation]    Perform NFS backup and restore data.
-     ...    *Author*: Sourav
-     [Tags]    regression
-     Create NFS Backup    full
-     Create NFS Backup    increment
-     perform a restore on backup
-
-TC_06 Perform parallel live loads.
-     [Documentation]    Perform live load data.
-     ...    *Author*: Sourav
-     [Tags]    regression
-     Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2
+#TC_04 Perform parallel live and bulk load on data
+#     [Documentation]    Perform live load data.
+#     ...    *Author*: Sourav
+#     [Tags]    regression
+#     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
+#
+#TC_05 Perform Increment backup and restore data
+#     [Documentation]    Perform NFS backup and restore data.
+#     ...    *Author*: Sourav
+#     [Tags]    regression
+#     Create NFS Backup    full
+#     Create NFS Backup    increment
+#     perform a restore on backup
+#
+#TC_06 Perform parallel live loads.
+#     [Documentation]    Perform live load data.
+#     ...    *Author*: Sourav
+#     [Tags]    regression
+#     Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2
