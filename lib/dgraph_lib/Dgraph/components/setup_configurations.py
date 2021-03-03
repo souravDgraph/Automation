@@ -289,8 +289,7 @@ class DgraphCLI:
 
         cli_name = "alpha"
         appender = ""
-        cli_command = f"dgraph {cli_name} "
-        cli_command = f"{cli_command} --cache_mb=6000 -v=2 " \
+        cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
                       f"--zero={self.zero_server_name}:{self.zero_addr}"
 
         is_latest = self.set_dgraph_version()
@@ -411,29 +410,35 @@ class DgraphCLI:
         :param latest_version_check: <True || False>
         :return: live loader cli command
         """
-        logger.debug(f"inside loader: {latest_version_check}")
+        logger.debug(f"Externally passed version check: {latest_version_check}")
+
+        # Checking the dgraph version locally..
+        is_latest_version = self.set_dgraph_version()
+
+        # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
             is_latest_version = latest_version_check
-        else:
-            is_latest_version = self.set_dgraph_version()
 
+        logger.debug(f"Is dgraph latest version? {is_latest_version}")
+
+        # Loader CLI command generation
+        cli_command = " dgraph"
         cli_bulk_encryption = ""
 
-        cli_live_acl = self.get_creds_command_for_acl_login(is_latest_version)
-
         loader_type = loader_type.lower()
-
-        cli_command = " dgraph"
         docker_location = None
         if docker_string:
             cli_command = docker_string + cli_command
-            zero_addr = "zero0"
+            self.zero_server_name = "zero0"
             docker_location = "/Automation/"
 
+        # Building command for live loader
         if loader_type == "live":
             cli_command = f"{cli_command} {loader_type} -s {schema_file} " \
                           f"-f {rdf_file} -a {self.alpha_server_name}:{self.alpha_addr} " \
                           f"-z {self.zero_server_name}:{self.zero_addr} "
+
+        # Building command for bulk loader
         elif loader_type == "bulk":
             cli_command = f"dgraph {loader_type} -s {schema_file} -f {rdf_file} " \
                           f"--map_shards=2 --reduce_shards=1 " \
@@ -443,13 +448,18 @@ class DgraphCLI:
                 cli_command = cli_command + cli_bulk_encryption + \
                               " --encrypted_out=True --encrypted=False" \
                               " --encryption_key_file " + enc_path
+
+        # Fetch ACL args based on configuration
         if self.acl and loader_type != "bulk":
+            cli_live_acl = self.get_creds_command_for_acl_login(is_latest_version)
             cli_command = cli_command + cli_live_acl
 
+        # Fetching tls certs based on configuration
+        mtls_certs = self.get_tls_certs("live", location=docker_location)
+
+        # Fetching latest tls args based on configuration
         if is_latest_version:
             mtls_certs = self.get_tls_certs_latest("live", location=docker_location)
-        else:
-            mtls_certs = self.get_tls_certs("live", location=docker_location)
 
         cli_command = cli_command + mtls_certs
         return cli_command
@@ -461,12 +471,18 @@ class DgraphCLI:
         :param docker_string: <docker exec string>
         :param latest_version_check: <True || False>
         """
-        logger.debug(f"inside inc: {latest_version_check}")
+        logger.debug(f"Externally passed version check: {latest_version_check}")
+
+        # Checking the dgraph version locally..
+        is_latest_version = self.set_dgraph_version()
+
+        # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
             is_latest_version = latest_version_check
-        else:
-            is_latest_version = self.set_dgraph_version()
 
+        logger.debug(f"dgraph is latest version: {is_latest_version}")
+
+        # Increment CLI command generation
         cli_creds_acl = self.get_creds_command_for_acl_login(is_latest_version, operation="inc")
 
         docker_location = None
@@ -478,10 +494,13 @@ class DgraphCLI:
         cli_command = f"{cli_command} increment  --alpha {self.alpha_server_name}:{self.alpha_addr + alpha_offset} " \
                       f" {cli_creds_acl}"
 
+        # Fetching tls certs based on configuration
+        mtls_certs = self.get_tls_certs("live", location=docker_location)
+
+        # Fetching latest tls args based on configuration
         if is_latest_version:
             mtls_certs = self.get_tls_certs_latest("live", location=docker_location)
-        else:
-            mtls_certs = self.get_tls_certs("live", location=docker_location)
+
         cli_command = cli_command + mtls_certs
 
         return cli_command

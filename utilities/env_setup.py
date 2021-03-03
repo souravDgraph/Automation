@@ -55,21 +55,24 @@ def main(argv):
             if dgraph_check:
                 conf_check = True
                 zero_port = arg_value
+
+    # Config Check for Dgraph library
     if dgraph_check:
-        if not conf_check:
+        if conf_check:
+            if zero_port != 0:
+                generate_config(conf_value, zero_addr=zero_port)
+            elif alpha_port != 0:
+                generate_config(conf_value, alpha_addr=alpha_port)
+            elif zero_port != 0 and alpha_port != 0:
+                generate_config(conf_value, alpha_addr=alpha_port, zero_addr=zero_port)
+            else:
+                generate_config(conf_value)
+        else:
             usage()
             raise (Exception("invalid argument for the setup process "
                              "Dgraph please also add the configuration argument."))
+    # Setting up the libraries
     setup_lib(lib_name)
-    if conf_check:
-        if zero_port != 0:
-            generate_config(conf_value, zero_addr=zero_port)
-        elif alpha_port != 0:
-            generate_config(conf_value, alpha_addr=alpha_port)
-        elif zero_port != 0 and alpha_port != 0:
-            generate_config(conf_value, alpha_addr=alpha_port, zero_addr=zero_port)
-        else:
-            generate_config(conf_value)
 
 
 def usage():
