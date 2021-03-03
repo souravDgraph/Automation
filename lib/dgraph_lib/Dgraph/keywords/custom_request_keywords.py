@@ -300,3 +300,34 @@ class CustomRequestKeywords:
         assert_equal(response.json()['data']['export']['response']['code'], 'Success')
         assert_equal(response.json()['data']['export']['response']['message'], 'Export completed.')
         logger.info('Export successfully completed')
+        return response
+
+    def export_nfs_data_admin(self, data_format, destination, appender="/admin"):
+        """
+        Method to export the database using the GraphQL export mutation
+        :param destination: Export data destination
+        :param appender: URL segment to add to the base URL
+        :param data_format: The format of data to be exported, example rdf/json
+        :return: <response>
+
+        Example:
+        | export data admin |  appender | data_format
+        """
+        cert = self.cert
+        headers = self.headers
+        query = constants.EXPORT_NFS_QUERY
+        variables = {
+            'data_format': data_format,
+            'destination': destination
+        }
+        response = None
+        try:
+            response = self.req_handler.post(appender=appender, headers=headers, query=query,
+                                             variables=variables, cert=cert)
+        except Exception as err:
+            raise Exception(f"Something went wrong with the export request... {json.dumps(response.json())}") from err
+        assert_equal(response.json()['data']['export']['response']['code'], 'Success')
+        assert_equal(response.json()['data']['export']['response']['message'], 'Export completed.')
+        logger.info('Export successfully completed')
+        return response
+
