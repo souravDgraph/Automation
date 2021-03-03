@@ -57,7 +57,7 @@ Only Owner Add Member To Organization
 	Create Session For Organization      ${HEADERS}     ${API_endpoint}
 	${data}=	Add New Member To Existing Organization		${org_uid}	   ${user_email}
 	log		${data}
-	Remove Member From Existing Organization    ${org_name}     ${user_email}
+	Remove Member From Existing Organization    ${org_uid}     ${user_email}
 	Create Session For Organization 	 ${USER2_HEADER}     ${API_endpoint}
 	Add New Member To Existing Organization		${org_uid}	${user_email}	  ${response}
 
@@ -75,7 +75,7 @@ Only Owner View Members From Organization
 	Add New Member To Existing Organization	    ${org_uid} 	   ${user_email}
 	${data}=	Get Members From Organization	  ${org_uid}
 	log	  ${data}
-	Remove Member From Existing Organization    ${org_name}    ${user_email}
+	Remove Member From Existing Organization    ${org_uid}    ${user_email}
 	Create Session For Organization     ${USER2_HEADER}    ${API_endpoint}
 	Get Members From Organization	  ${org_uid}	 ${response}
 
@@ -115,7 +115,7 @@ Only Owner Update the Organization for Deployment
 	${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     ${deployment_name}=    Collections.Get From Dictionary    ${data}    name
 	Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${deployment_name}		 organizationId=${org_uid}		
-	Update Deployment    ${Session_alias}    ${URL}    ${USER2_HEADER}    ${deployment_id}    ${deployment_name}     organizationId=${org_uid}		expected_response_text=Unauthorized
+	Update Deployment    ${Session_alias}    ${URL}    ${USER2_HEADER}    ${deployment_id}    ${deployment_name}     organizationId=${org_uid}		expected_response_text=Not Authorized       expected_response=403
 	Delete Deployment	   ${Session_alias}		${URL}		${HEADERS}		${deployment_id}
 
 *** Keywords ***

@@ -89,7 +89,7 @@ class Deployments():
                           expected_response_text="Deployment has been patched.",
                           expected_response=None):
         properties = locals()
-        properties_to_delete = ['session_alias', 'url', 'auth', 'expected_response']
+        properties_to_delete = ['session_alias', 'url', 'auth', 'expected_response', 'expected_response_text']
         for property_name in properties_to_delete:
             del properties[property_name]
         logger.debug(properties)
@@ -215,7 +215,7 @@ class Deployments():
         logger.info(response.text)
         if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
             raise Exception("Expected error not found")
-        elif expected_response_text not in response.reason :
+        elif "errors" not in response.json() and expected_response_text not in response.reason :
             raise Exception("Expected Body Response is not Found")
         logger.info(response.json())
         return response.json()

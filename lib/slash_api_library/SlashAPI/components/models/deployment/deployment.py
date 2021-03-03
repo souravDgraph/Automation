@@ -105,7 +105,7 @@ class DeploymentModels:
         {% if properties['organizationId'] and properties['organizationId'] == "empty" %}
         "organizationId": null
         {% elif properties['organizationId'] and properties['organizationId'] != "" %}
-        "organizationId": {{'"' + properties['organizationId'] + '"' }}
+        ,"organizationId": {{'"' + properties['organizationId'] + '"' }}
         {% endif %}
         
         {% if properties['enterprise'] and properties['enterprise'] != "" %}

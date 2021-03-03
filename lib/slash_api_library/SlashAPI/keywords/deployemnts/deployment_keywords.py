@@ -136,7 +136,7 @@ class DeploymentKeywords():
                           isProtected=None,
                           size=None,
                           organizationId=None,
-                          expected_response_text=None,
+                          expected_response_text="Deployment has been patched.",
                           expected_response=200):
         logger.info("Updating a Deployment of Name : %s" % deployment_id)
         url = base_url + "deployment/" + str(deployment_id)
