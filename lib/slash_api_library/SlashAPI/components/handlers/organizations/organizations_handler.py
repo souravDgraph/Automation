@@ -165,7 +165,7 @@ class OrganizationsHandler:
             appender = "graphql"
 
         # add member to org req
-        add_mem_payload = organization_model.add_member_to_organization(member_email, org_id)
+        add_mem_payload = organization_model.add_member_to_organization(member_email, org_uid)
         logger.debug(add_mem_payload)
 
         response = self.connection.post_on_session(self.session_alias, appender,
@@ -190,7 +190,7 @@ class OrganizationsHandler:
             appender = "graphql"
 
         # add member to org req
-        add_mem_payload = organization_model.add_member_to_organization(member_email, org_id)
+        add_mem_payload = organization_model.add_member_to_organization(member_email, org_uid)
         logger.debug(add_mem_payload)
 
         response = self.connection.post_on_session(self.session_alias, appender,
@@ -222,7 +222,7 @@ class OrganizationsHandler:
         logger.debug(member_uid)
 
         # remove member from org request
-        del_mem_payload = organization_model.del_member_from_organization(member_uid, org_id)
+        del_mem_payload = organization_model.del_member_from_organization(member_uid, org_uid)
         logger.debug(del_mem_payload)
 
         if member_uid:

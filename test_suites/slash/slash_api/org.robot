@@ -1,9 +1,11 @@
 *** Settings ***
 Documentation     This is a simple test with Robot Framework
+Suite Setup       Run Keywords    Create Session For Organization  ${HEADERS}    https://api.stage.thegaas.com    AND    Create Organization And Fetch Organization Id
 Suite Teardown
-Test Setup        Run Keywords    Create Session For Organization  ${HEADERS}    ${URL}    AND    Create Organization And Fetch Organization Id
+Test Setup        
 Test Teardown
 Library           SlashAPI
+Library           Collections
 Variables         ../../../conf/slash/slash_api/variables.py
 
 *** Variables ***

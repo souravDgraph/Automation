@@ -43,7 +43,7 @@ class OrganizationsKeywords:
             res = self.org_handler.create_session(headers=headers, url=url)
         return res
 
-    def create_organization(self, org_name, expected_response: int, appender=None):
+    def create_organization(self, org_name, expected_response=200, appender=None):
         """
         Method to create organization.
         \n:param org_name: <organization_name>
@@ -57,10 +57,10 @@ class OrganizationsKeywords:
         """
         logger.info("Creating organization for: " + org_name)
         if appender is None:
-            self.org_handler.create_organization(organization_name=org_name,
+            return self.org_handler.create_organization(organization_name=org_name,
                                                  expected_response=expected_response)
         else:
-            self.org_handler.create_organization(organization_name=org_name,
+            return self.org_handler.create_organization(organization_name=org_name,
                                                  expected_response=expected_response,
                                                  appender=appender)
 
