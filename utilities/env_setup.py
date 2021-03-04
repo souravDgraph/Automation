@@ -22,7 +22,7 @@ def main(argv):
     :return:
     """
     try:
-        opts, args = getopt.getopt(argv, "hl:c:", ["lib=", "conf="])
+        opts, args = getopt.getopt(argv, "hl:c:z:a", ["lib=", "conf=", "zero=", "alpha"])
         logging.debug(args)
         if not opts:
             print('Usage: python/python3 env_setup.py -l <proj_name>'
@@ -35,6 +35,10 @@ def main(argv):
 
     dgraph_check = False
     conf_check = False
+    lib_name = ""
+    conf_value = ""
+    zero_port = 0
+    alpha_port = 0
     for opt, arg_value in opts:
         if opt == '-h':
             usage()
@@ -42,16 +46,33 @@ def main(argv):
         elif opt in ("-l", "--lib"):
             if arg_value.lower() == "dgraph" or arg_value.lower() == "all":
                 dgraph_check = True
-            setup_lib(arg_value)
+            lib_name = arg_value
         elif opt in ("-c", "--config"):
             if dgraph_check:
                 conf_check = True
-                generate_config(arg_value)
+                conf_value = arg_value
+        elif opt in ("-z", "--zero"):
+            if dgraph_check:
+                conf_check = True
+                zero_port = arg_value
+
+    # Config Check for Dgraph library
     if dgraph_check:
-        if not conf_check:
+        if conf_check:
+            if zero_port != 0:
+                generate_config(conf_value, zero_addr=zero_port)
+            elif alpha_port != 0:
+                generate_config(conf_value, alpha_addr=alpha_port)
+            elif zero_port != 0 and alpha_port != 0:
+                generate_config(conf_value, alpha_addr=alpha_port, zero_addr=zero_port)
+            else:
+                generate_config(conf_value)
+        else:
             usage()
             raise (Exception("invalid argument for the setup process "
                              "Dgraph please also add the configuration argument."))
+    # Setting up the libraries
+    setup_lib(lib_name)
 
 
 def usage():
@@ -80,16 +101,29 @@ def usage():
           + '\n proj_name = CustomTestRailListener')
 
 
-def generate_config(arg_value):
+def generate_config(conf_check, zero_addr=5080, alpha_addr=9080,
+                    zero_server="localhost", alpha_server="localhost"):
     """
-    Method to generate the config file based on requirement.
-    :param arg_value:
+    Method to generate config file based on configurations
+    :param conf_check:
+    :param zero_addr:
+    :param alpha_addr:
+    :param zero_server:
+    :param alpha_server:
     :return:
     """
-    if arg_value not in ['enabled', 'disabled']:
+    if conf_check not in ['enabled', 'disabled']:
         raise Exception("Configuration not enabled check if there is a typo\n"
-                        " input for configuration: " + arg_value)
+                        " input for configuration: " + conf_check)
     conf = {
+        "zero": {
+            "addr": zero_addr,
+            "server": zero_server
+        },
+        "alpha": {
+            "addr": alpha_addr,
+            "server": alpha_server
+        },
         "acl": {
             "is_enabled": True,
             "location": "conf/dgraph/acl/hmac_secret_file"
@@ -112,10 +146,10 @@ def generate_config(arg_value):
             "location": "conf/dgraph/mTLS/tls"
         }
     }
-    if arg_value == "enabled":
+    if conf_check == "enabled":
         with open('../conf/dgraph/conf_dgraph.json', 'w') as outfile:
             json.dump(conf, outfile, indent=4)
-    elif arg_value == "disabled":
+    elif conf_check == "disabled":
         conf["acl"]["is_enabled"] = False
         conf["enc"]["is_enabled"] = False
         conf["tls"]["is_enabled"] = False

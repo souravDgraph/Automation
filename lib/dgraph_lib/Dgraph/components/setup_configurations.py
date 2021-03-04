@@ -13,6 +13,7 @@ class DgraphCLI:
     """
 
     def __init__(self):
+        # declaring variables
         self.cfg = {}
         self.acl = False
         self.enc = False
@@ -21,11 +22,20 @@ class DgraphCLI:
         self.tls_mutual = False
         self.tls_mutual_flags = []
         self.details = {}
+        self.alpha_addr = 0
+        self.zero_addr = 0
+        self.alpha_server_name = ""
+        self.zero_server_name = ""
+
+        # Configuring path to read from config
         self.curr_path = str(pathlib.PurePath(pathlib.Path().absolute()))
         curr_dir = str(pathlib.Path.cwd())
         self.curr_path = curr_dir + "/"
         DgraphCLI.read_config(self)
+
+        # Checking for dgraph version for execution
         self.store_dgraph_details()
+
         logger.info("Dgraph Configurations are ready to load.")
 
     def get_test_data_location(self):
@@ -94,12 +104,14 @@ class DgraphCLI:
         pem_file = "/tls_certs.pem" if self.tls else "/mtls_certs.pem"
         return f"{tls_location}{pem_file}"
 
-    def get_tls_certs(self, cli):
+    def get_tls_certs(self, cli, location=None):
         """
         Method to enabled certificates for tls or mtls configuration
         :return:<mtls_certificates>
         """
-        tls_location = self.curr_path + self.cfg['tls']['location']
+        tls_location = f"{self.curr_path}{self.cfg['tls']['location']}"
+        if location:
+            tls_location = f"{location}{self.cfg['tls']['location']}"
         tls_cert = ""
         mtls = {}
         if self.tls or self.tls_mutual:
@@ -131,36 +143,39 @@ class DgraphCLI:
         logger.debug(tls_cert)
         return tls_cert
 
-    def get_tls_certs_latest(self, cli):
+    def get_tls_certs_latest(self, cli, location=None):
         """
         Method to enabled mtls or tls certs for latest build 21'
         """
-        tls_location = self.curr_path + self.cfg['tls']['location']
+        tls_location = f"{self.curr_path}{self.cfg['tls']['location']}"
+        if location:
+            tls_location = f"{location}{self.cfg['tls']['location']}"
+
         tls_cert = ""
         mtls = {}
         if self.tls or self.tls_mutual:
             logger.debug("Appending Latest conf for TLS and mTLS certificates.")
             if self.tls_mutual:
                 mtls = {
-                    "cacert": tls_location + "/ca.crt",
-                    "cert": tls_location + "/client.groot.crt",
-                    "key": tls_location + "/client.groot.key"
+                    "ca-cert": tls_location + "/ca.crt",
+                    "client-cert": tls_location + "/client.groot.crt",
+                    "client-key": tls_location + "/client.groot.key"
                 }
                 if cli == "zero" or cli == "alpha":
                     mtls.update({
-                        "node-cert": tls_location + "/node.crt",
-                        "node-key": tls_location + "/node.key"
+                        "server-cert": tls_location + "/node.crt",
+                        "server-key": tls_location + "/node.key"
                     })
                     verification_type = self.get_mtls_verification_type()
-                    tls_cert = tls_cert + f"client-auth={verification_type};"
+                    tls_cert = tls_cert + f"client-auth-type={verification_type};"
             elif self.tls:
                 mtls = {
-                    "cacert": tls_location + "/ca.crt",
+                    "ca-cert": tls_location + "/ca.crt",
                 }
             for key in mtls:
                 tls_cert = tls_cert + f"{key}={str(mtls[key])};"
             if self.tls_mutual:
-                tls_cert = f"{tls_cert}internal-port-enabled=true"
+                tls_cert = f"{tls_cert}internal-port=true"
             if cli == "live":
                 tls_cert = tls_cert + f";server-name=\"localhost\""
             tls_cert = f" --tls \"{tls_cert}\""
@@ -230,6 +245,10 @@ class DgraphCLI:
         logger.info("configuration path: " + conf_path)
         with open(conf_path) as conf_file:
             self.cfg = json.load(conf_file)
+        self.alpha_addr = self.cfg['alpha']['addr']
+        self.alpha_server_name = self.cfg['alpha']['server']
+        self.zero_addr = self.cfg['zero']['addr']
+        self.zero_server_name = self.cfg['zero']['server']
         if self.cfg['acl']['is_enabled']:
             self.acl = True
         if self.cfg['enc']['is_enabled']:
@@ -269,10 +288,9 @@ class DgraphCLI:
         """
 
         cli_name = "alpha"
-        cli_command = "dgraph " + cli_name + " "
         appender = ""
-        cli_command = cli_command + "--cache_mb=6000" \
-                                    " -v=2 --zero=localhost:5080"
+        cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
+                      f"--zero={self.zero_server_name}:{self.zero_addr}"
 
         is_latest = self.set_dgraph_version()
         cli_command = cli_command + self.get_security_command(is_latest)
@@ -361,11 +379,10 @@ class DgraphCLI:
             logger.debug("Dgraph docker setup is executed.")
             is_latest = True if self.check_version(version) == "latest" or branch == "master" \
                 else False
-        logger.debug(is_latest)
+        logger.debug(f"check version if latest: {is_latest}")
         return is_latest
 
-    @staticmethod
-    def get_creds_command_for_acl_login(is_latest, operation="default", username="groot", password="password"):
+    def get_creds_command_for_acl_login(self, is_latest, operation="default", username="groot", password="password"):
         """
         Method to get command for Acl login
         :param is_latest: <dgraph_version>
@@ -373,86 +390,117 @@ class DgraphCLI:
         :param username: <acl_username>
         :param password: <acl_password>
         """
-        logger.debug(f"is latest: {is_latest}")
-
-        if is_latest:
-            cli_live_acl = f" --creds 'user={username};password={password}' "
-        else:
-            cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
-                                                                                        f" --password {password} "
-
+        logger.debug(f"ACL: is latest-> {is_latest}")
+        cli_live_acl = ""
+        if self.acl:
+            if is_latest:
+                cli_live_acl = f" --creds 'user={username};password={password}' "
+            else:
+                cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
+                                                                                            f" --password {password} "
         return cli_live_acl
 
-    def build_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version=None, docker_string=None):
+    def build_loader_command(self, rdf_file, schema_file, loader_type, latest_version_check=None, docker_string=None):
         """
         Method to build bulk/live loader cli command
+        :param rdf_file: <rdf_data_file>
+        :param schema_file: <schema_file>
+        :param loader_type: <live\bulk>
+        :param docker_string: <docker exec string>
+        :param latest_version_check: <True || False>
         :return: live loader cli command
         """
+        logger.debug(f"Externally passed version check: {latest_version_check}")
 
-        if is_latest_version:
-            is_latest = is_latest_version
-        else:
-            is_latest = self.set_dgraph_version()
+        # Checking the dgraph version locally..
+        is_latest_version = self.set_dgraph_version()
 
+        # Updating dgraph version check if passed from external command
+        if latest_version_check is not None:
+            is_latest_version = latest_version_check
+
+        logger.debug(f"Is dgraph latest version? {is_latest_version}")
+
+        # Loader CLI command generation
+        cli_command = " dgraph"
         cli_bulk_encryption = ""
 
-        cli_live_acl = self.get_creds_command_for_acl_login(is_latest)
-
         loader_type = loader_type.lower()
-
-        cli_command = " dgraph"
+        docker_location = None
         if docker_string:
             cli_command = docker_string + cli_command
+            self.zero_server_name = "zero0"
+            docker_location = "/Automation/"
 
+        # Building command for live loader
         if loader_type == "live":
             cli_command = f"{cli_command} {loader_type} -s {schema_file} " \
-                          f"-f " + rdf_file + " -a localhost:9080 -z localhost:5080 "
+                          f"-f {rdf_file} -a {self.alpha_server_name}:{self.alpha_addr} " \
+                          f"-z {self.zero_server_name}:{self.zero_addr} "
+
+        # Building command for bulk loader
         elif loader_type == "bulk":
-            cli_command = "dgraph " + loader_type + " -s " + schema_file + " -f " + \
-                          rdf_file + " --map_shards=2 --reduce_shards=1 --http " \
-                                     "localhost:8000 --zero=localhost:5080 "
+            cli_command = f"dgraph {loader_type} -s {schema_file} -f {rdf_file} " \
+                          f"--map_shards=2 --reduce_shards=1 " \
+                          f"--http localhost:8000 --zero={self.zero_server_name}:{self.zero_addr} "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']
                 cli_command = cli_command + cli_bulk_encryption + \
                               " --encrypted_out=True --encrypted=False" \
                               " --encryption_key_file " + enc_path
+
+        # Fetch ACL args based on configuration
         if self.acl and loader_type != "bulk":
+            cli_live_acl = self.get_creds_command_for_acl_login(is_latest_version)
             cli_command = cli_command + cli_live_acl
 
-        if is_latest:
-            mtls_certs = self.get_tls_certs_latest("live")
-        else:
-            mtls_certs = self.get_tls_certs("live")
+        # Fetching tls certs based on configuration
+        mtls_certs = self.get_tls_certs("live", location=docker_location)
+
+        # Fetching latest tls args based on configuration
+        if is_latest_version:
+            mtls_certs = self.get_tls_certs_latest("live", location=docker_location)
 
         cli_command = cli_command + mtls_certs
         return cli_command
 
-    def build_increment_cli_command(self, is_latest_version=None, docker_string=None, alpha_offset: int = 0):
+    def build_increment_cli_command(self, latest_version_check=None, docker_string=None, alpha_offset: int = 0):
         """
         Method to generate command for increment operation.
         :param alpha_offset: <offset value set for alpha> | default=0
-        :param docker_string:
-        :param is_latest_version:
+        :param docker_string: <docker exec string>
+        :param latest_version_check: <True || False>
         """
+        logger.debug(f"Externally passed version check: {latest_version_check}")
 
-        if is_latest_version:
-            is_latest = is_latest_version
-        else:
-            is_latest = self.set_dgraph_version()
+        # Checking the dgraph version locally..
+        is_latest_version = self.set_dgraph_version()
 
-        cli_creds_acl = self.get_creds_command_for_acl_login(is_latest, operation="inc")
+        # Updating dgraph version check if passed from external command
+        if latest_version_check is not None:
+            is_latest_version = latest_version_check
 
+        logger.debug(f"dgraph is latest version: {is_latest_version}")
+
+        # Increment CLI command generation
+        cli_creds_acl = self.get_creds_command_for_acl_login(is_latest_version, operation="inc")
+
+        docker_location = None
         if docker_string:
             cli_command = docker_string + " dgraph"
+            docker_location = "/Automation/"
         else:
             cli_command = "dgraph"
-        cli_command = f"{cli_command} increment  --alpha localhost:{9080 + alpha_offset} " \
+        cli_command = f"{cli_command} increment  --alpha {self.alpha_server_name}:{self.alpha_addr + alpha_offset} " \
                       f" {cli_creds_acl}"
 
-        if is_latest:
-            mtls_certs = self.get_tls_certs_latest("live")
-        else:
-            mtls_certs = self.get_tls_certs("live")
+        # Fetching tls certs based on configuration
+        mtls_certs = self.get_tls_certs("live", location=docker_location)
+
+        # Fetching latest tls args based on configuration
+        if is_latest_version:
+            mtls_certs = self.get_tls_certs_latest("live", location=docker_location)
+
         cli_command = cli_command + mtls_certs
 
         return cli_command

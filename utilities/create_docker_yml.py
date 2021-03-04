@@ -73,18 +73,12 @@ def usage():
 
 
 def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: bool = False, version="master"):
+    # Creating Zero container
     services = {}
     zero_services = {}
     zero_command = 'dgraph zero --my=zero0:5080 --logtostderr -v=2  '
-    zero_configs = []
     dgraph_version = f"dgraph/dgraph:{version}"
     if is_configured:
-        zero_configs = [{
-            "type": "bind",
-            "source": "../dgraph/mTLS/tls/",
-            "target": "/dgraph-tls/",
-            "read_only": True
-        }]
         zero_command = zero_command + ' --bindall '
 
         tls_command = build_tls_command('/dgraph-tls/') + ' --tls_client_auth VERIFYIFGIVEN' \
@@ -92,7 +86,30 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
         zero_command = zero_command + " " + tls_command
 
     for zero_count in range(zeros):
+        zero_configs = []
         zero_name = 'zero' + str(zero_count)
+        if is_configured:
+            zero_configs = [{
+                "type": "bind",
+                "source": "../../../Automation",
+                "target": "/Automation",
+                "read_only": True
+            },
+                {
+                    "type": "bind",
+                    "source": "../dgraph/mTLS/tls/",
+                    "target": "/dgraph-tls/",
+                    "read_only": True
+                }]
+        else:
+            zero_configs = [
+                {
+                    "type": "bind",
+                    "source": "../../../Automation",
+                    "target": "/Automation",
+                    "read_only": True
+                }
+            ]
         zero_services = {zero_name:
                              {'image': dgraph_version, 'working_dir': '/data/' + zero_name,
                               'ports': ["5080:5080", "6080:6080"],
@@ -101,28 +118,11 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                                          'service': 'zero'},
                               'command': zero_command}}
     services.update(zero_services)
+
+    # Creating Alpha container
     alpha_command = 'dgraph alpha  --logtostderr -v=2 ' \
                     '--whitelist=0.0.0.0/0'
     if is_configured:
-        alpha_configs = [{
-            "type": "bind",
-            "source": "../dgraph/acl",
-            "target": "/dgraph-acl/",
-            "read_only": True
-        },
-            {
-                "type": "bind",
-                "source": "../dgraph/encryption/",
-                "target": "/dgraph-enc/",
-                "read_only": True
-            },
-            {
-                "type": "bind",
-                "source": "../dgraph/mTLS/tls/",
-                "target": "/dgraph-tls/",
-                "read_only": True
-            }
-        ]
         enc_command = ' --encryption_key_file /dgraph-enc/enc_key_file '
         alc_command = ' --acl_secret_file /dgraph-acl/hmac_secret_file '
         tls_command = build_tls_command('/dgraph-tls/') + ' --tls_client_auth VERIFYIFGIVEN' \
@@ -151,12 +151,18 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
             alpha_command = alpha_command + " -o " + str(off_set_value)
         final_alpha_command = alpha_command + ' --my=' + alpha_name + ':' + str(port) + ' --zero=zero0:5080'
         if is_configured:
-            alpha_volumes = [{
-                "type": "bind",
-                "source": "../dgraph/acl",
-                "target": "/dgraph-acl/",
-                "read_only": True
-            },
+            alpha_volumes = [
+                {
+                    "type": "bind",
+                    "source": "../../../Automation",
+                    "target": "/Automation",
+                    "read_only": True
+                }, {
+                    "type": "bind",
+                    "source": "../dgraph/acl",
+                    "target": "/dgraph-acl/",
+                    "read_only": True
+                },
                 {
                     "type": "bind",
                     "source": "../dgraph/encryption/",
@@ -167,6 +173,15 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                     "type": "bind",
                     "source": "../dgraph/mTLS/tls/",
                     "target": "/dgraph-tls/",
+                    "read_only": True
+                }
+            ]
+        else:
+            alpha_volumes = [
+                {
+                    "type": "bind",
+                    "source": "../../../Automation",
+                    "target": "/Automation",
                     "read_only": True
                 }
             ]
@@ -183,6 +198,7 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
         }}
         services.update(alpha_services)
 
+    # Appending zero and alpha containers
     dict_file = {'version': '3.2', 'services': services}
     if alphas == 1:
         dir_name = 2
@@ -193,7 +209,7 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
         print("Successfully generated YAML file for docker")
 
 
-def build_tls_command(tls_location, sec=None):
+def build_tls_command(tls_location):
     certs = {
         "--tls_cacert": tls_location + "ca.crt",
         "--tls_cert": tls_location + "client.groot.crt",
