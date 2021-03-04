@@ -7,3 +7,6 @@ HA_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for Dgraph HA 
 JAEGER_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for Jaeger for Slash"
 DELETE_DEPLOYMENT = "Deleted"
 EXISTING_USER_ERROR = "The user is already a part of the organization."
+UPDATE_DEPLOYMENT = "Deployment has been patched."
+NO_USER_EXIST_ERROR = "No User Found"
+USER_NOT_PRESENT_ERROR = "No such member exists."

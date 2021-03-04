@@ -21,39 +21,21 @@ class OrganizationKeywords:
         return organizations
 
     @staticmethod
-<<<<<<< HEAD
     def create_organization(environment, org_name, expected_output_text=None, expected_return_code=0):
         logger.info("Creating Organization")
         organization = Organizations.create_organization(environment,
                                                             org_name,
                                                             expected_output_text,
-=======
-    def create_organization(environment, org_name, expected_return_code=0):
-        logger.info("Creating Organization")
-        organization = Organizations.create_organization(environment,
-                                                            org_name,
-<<<<<<< HEAD
->>>>>>> Added Test Cases For Slash CLI
-=======
->>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
->>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
                                                             expected_return_code)
         return organization
 
     @staticmethod
-<<<<<<< HEAD
     def add_member_to_organization(environment, org_uid, member_email, expected_output_text=None, expected_return_code=0):
-=======
-    def add_member_to_organization(environment, org_uid, member_email, expected_return_code=0):
-<<<<<<< HEAD
->>>>>>> Added Test Cases For Slash CLI
-=======
->>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
->>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         logger.info("Adding a member to an organization")
         org_member = Organizations.add_member_to_organization(environment,
                                                                 org_uid,
                                                                 member_email,
+                                                                expected_output_text,
                                                                 expected_return_code)
         return  org_member
 
@@ -66,18 +48,11 @@ class OrganizationKeywords:
         return org_uid
 
     @staticmethod
-<<<<<<< HEAD
     def remove_member_from_organization(environment, org_uid, member_email, expected_output_text=None, expected_return_code=0):
-=======
-    def remove_member_from_organization(environment, org_uid, member_email, expected_return_code=0):
-<<<<<<< HEAD
->>>>>>> Added Test Cases For Slash CLI
-=======
->>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
->>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         logger.info("Removing a member from an organization")
         Organizations.remove_member_from_organization(environment, 
                                                         org_uid,
                                                         member_email,
+                                                        expected_output_text,
                                                         expected_return_code)
                                 
