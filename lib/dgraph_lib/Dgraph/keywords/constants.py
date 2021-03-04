@@ -30,4 +30,13 @@ EXPORT_QUERY = """mutation {
   }
 }"""
 
+EXPORT_NFS_QUERY = """mutation RestoreReq($data_format: String!, $destination: String){
+  export(input: {format: $data_format, destination: $destination}) {
+    response {
+      message
+      code
+    }
+  }
+}"""
+
 
