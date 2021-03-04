@@ -5,13 +5,20 @@ Suite Teardown
 Test Setup
 Test Teardown
 Library             Collections
+<<<<<<< HEAD
 Variables           ../../../conf/slash/slash_cli/variables.py
+=======
+Variables           ../../../conf/slash/slash_api/variables.py
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
 Library             SlashCLI
 
 *** Variables ***
 ${Environment}    Prod
 ${org_name}       test6
+<<<<<<< HEAD
 ${Backend_name}    test
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
 ${member_email}   krishna@dgraph.io
 
 *** Test Cases ***
@@ -48,7 +55,11 @@ Update Backend With Existing Organization
     ...     Create a deployment with organization
     ...     Create another organization
     ...     Update deployment with organization name
+<<<<<<< HEAD
     ${endpoint}=    SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    ap-south-1    ${org_uid}
+=======
+    ${endpoint}=    SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    ${BACKEND_ZONE}    ${org_uid}
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
     ${deployment_id}=    Get Deployment Id With Endpoint    ${Environment}    ${endpoint}
     SlashCLI.Create Organization     ${Environment}    test20
     ${org_uid}=     Get Organization Id     ${Environment}      test20
