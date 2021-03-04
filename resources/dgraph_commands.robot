@@ -281,7 +281,7 @@ Execute Increment Command
 
 Create NFS Backup
     [Arguments]    ${is_clear_folder}
-    [Documentation]    Accepts params: "{URL}","{appenders}" & "{is_clear_folder}"
+    [Documentation]    Accepts params: "{is_clear_folder}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
@@ -290,6 +290,18 @@ Create NFS Backup
     ${res}=    Backup Using Admin    ${backup_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${backup_path}
+
+Export NFS data using admin endpoint
+    [Arguments]    ${data_type}     ${is_clear_folder}
+    [Documentation]    Accepts params: "{is_clear_folder}", "{data_type}"
+    ...    Keyword to export dgraph data to either json/rdf format in local
+    ${root_path}=    normalize path    ${CURDIR}/..
+    ${export_path}=    Join Path    ${root_path}/export
+    Run Keyword If    '${is_clear_folder}' == 'true'    clear all the folder in a directory    ${export_path}
+    connect request server
+    ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
+    log    ${res.text}
+    Verify file exists in a directory with parent folder name    ${export_path}
 
 
 Perform a restore on backup

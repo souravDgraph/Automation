@@ -135,6 +135,10 @@ results/**
 backup/*
 !backup/.gitkeep
 
+# export folder
+export/*
+!export/.gitkeep
+
 #other files
 .DS_Store
 .idea/
