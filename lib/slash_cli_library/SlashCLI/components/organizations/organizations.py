@@ -27,7 +27,11 @@ class Organizations:
                 logger.info(type(key))
                 logger.info(properties[key])
                 logger.info(type(options))
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
                 options += " --" + key + "=" + properties[key]
 
         logger.info(base_command)
@@ -59,7 +63,11 @@ class Organizations:
     def create_organization(environment, org_name, expected_return_code=0):
         properties = locals()
         properties_to_exclude = ["org_name","expected_return_code"]
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         base_command = "create-organization "
         options = org_name
         for key in properties.keys():
@@ -70,7 +78,11 @@ class Organizations:
                 logger.info(type(key))
                 logger.info(properties[key])
                 logger.info(type(options))
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
                 options += " --" + key + "=" + properties[key]
 
         logger.info(base_command)
@@ -82,7 +94,11 @@ class Organizations:
         if expected_output_text not in str(output) and expected_return_code==0:
             raise Exception("Unble to create organization")
 =======
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         logger.info(error)
         return output
 
@@ -95,7 +111,11 @@ class Organizations:
     def add_member_to_organization(environment, org_uid, member_email, expected_return_code=0):
         properties = locals()
         properties_to_exclude = ["org_uid", "member_email", "expected_return_code"]
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         base_command = "add-member-to-organization "
         options = org_uid + " " + member_email
         for key in properties.keys():
@@ -106,7 +126,11 @@ class Organizations:
                 logger.info(type(key))
                 logger.info(properties[key])
                 logger.info(type(options))
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
                 options += " --" + key + "=" + properties[key]
 
         logger.info(base_command)
@@ -120,7 +144,11 @@ class Organizations:
         elif expected_output_text not in str(error) and expected_return_code!=0:
             raise Exception("Expected error message is not found")
 =======
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         logger.info(error)
         return output
 
@@ -133,7 +161,11 @@ class Organizations:
     def remove_member_from_organization(environment, org_uid, member_email, expected_return_code=0):
         properties = locals()
         properties_to_exclude = ["org_uid", "member_email", "expected_return_code"]
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         base_command = "remove-member-from-organization "
         options = org_uid + " " + member_email
         for key in properties.keys():
@@ -144,7 +176,11 @@ class Organizations:
                 logger.info(type(key))
                 logger.info(properties[key])
                 logger.info(type(options))
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
                 options += " --" + key + "=" + properties[key]
 
         logger.info(base_command)
@@ -158,6 +194,10 @@ class Organizations:
         elif expected_output_text not in str(error) and expected_return_code!=0:
             raise Exception("Expected error message is not found")
 =======
+<<<<<<< HEAD
 >>>>>>> Added Test Cases For Slash CLI
+=======
+>>>>>>> 9d18ce9bb68a318b7a0d1a8ac9e6e8d441614002
+>>>>>>> 2a0a8c46e13b376d3eaee408bc1f6de8612b22d5
         logger.info(error)
         return output
