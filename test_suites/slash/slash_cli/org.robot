@@ -69,6 +69,27 @@ Add Already Present Member To An Organization
     ...     Add already present member to an organization
     SlashCLI.Add Member To Organization     ${Environment}     ${org_uid}      santhosh@dgraph.io      ${EXISTING_USER_ERROR}     2
 
+Create Deployment With Non-Existing Organization
+   [Documentation]
+    ...     List of Tests Covered
+    ...
+    ...     Create a deployment with non-existing organization
+    SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    region=ap-south-1    organizationId=0x20000      expected_output_text=${NON_EXISTING_ORGANIZATION_ERROR}      expected_return_code=2
+
+Add Member To Non-Existing Organization
+    [Documentation]
+    ...    List of Tests Covered
+    ...
+    ...    Add member to non-existing organization
+    SlashCLI.Add Member To Organization     ${Environment}     0x20000      ${member_email}       ${NO_ORGANIZATION_ERROR}      expected_return_code=2
+
+Remove Member To Non-Existing Organization
+    [Documentation]
+    ...    List of Tests Covered
+    ...
+    ...    Remove member from non-existing organization
+    SlashCLI.Remove Member From Organization     ${Environment}    0x20000      ${member_email}      ${NO_ORGANIZATION_ERROR}      expected_return_code=2
+
 *** Keywords ***
 Create Organization And Set Organization Id
     SlashCLI.Create Organization     ${Environment}    ${org_name}      Organization ${org_name} created successfully.
