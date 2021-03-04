@@ -1,10 +1,18 @@
 {
+    "zero": {
+        "addr": 5080,
+        "server": "localhost"
+    },
+    "alpha": {
+        "addr": 9080,
+        "server": "localhost"
+    },
     "acl": {
         "is_enabled": true,
         "location": "conf/dgraph/acl/hmac_secret_file"
     },
     "enc": {
-        "is_enabled": false,
+        "is_enabled": true,
         "location": "conf/dgraph/encryption/enc_key_file"
     },
     "tls": {

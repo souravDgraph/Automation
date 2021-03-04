@@ -1,0 +1,33 @@
+services:
+  alpha0:
+    command: dgraph alpha  --logtostderr -v=2 --whitelist=0.0.0.0/0 --my=alpha0:7080
+      --zero=zero0:5080
+    image: dgraph/dgraph:v20.11.2
+    labels:
+      cluster: test
+      service: alpha
+    ports:
+    - 8080:8080
+    - 9080:9080
+    volumes:
+    - read_only: true
+      source: ../../../Automation
+      target: /Automation
+      type: bind
+    working_dir: /data/alpha0
+  zero0:
+    command: 'dgraph zero --my=zero0:5080 --logtostderr -v=2  '
+    image: dgraph/dgraph:v20.11.2
+    labels:
+      cluster: test
+      service: zero
+    ports:
+    - 5080:5080
+    - 6080:6080
+    volumes:
+    - read_only: true
+      source: ../../../Automation
+      target: /Automation
+      type: bind
+    working_dir: /data/zero0
+version: '3.2'

@@ -10,18 +10,7 @@ Library           Collections
 Variables         ../../../conf/slash/slash_api/variables.py
 
 *** Variables ***
-${deployment_id}    ${EMPTY}
 ${Session_alias}    Session1
-${deployment_endpoint}    ${EMPTY}
-${deployemnt_jwt_token}    ${EMPTY}
-${deployment_auth}    ${EMPTY}
-${api_key_uid}    ${EMPTY}
-${Schema}         type Task { \ \ id: ID! \ \ title: String! @search(by: [fulltext]) \ \ completed: Boolean! @search \ \ user: User! } \ type User { \ \ username: String! @id @search(by: [hash]) \ \ name: String @search(by: [exact]) \ \ tasks: [Task] @hasInverse(field: user) }
-${mutation_query_1}    {\"query\":\"mutation AddTasks {\\n \ addTask(input: [\\n \ \ \ {title: \\\"Create a database\\\", completed: false, user: {username: \\\"your-email@example.com\\\"}}]) {\\n \ \ \ numUids\\n \ \ \ task {\\n \ \ \ \ \ title\\n \ \ \ \ \ user {\\n \ \ \ \ \ \ \ username\\n \ \ \ \ \ }\\n \ \ \ }\\n \ }\\n}\"}
-${query_1}        {\"query\":\"query {\\n \ __schema {\\n \ \ \ __typename\\n \ }\\n}\"}
-${introspection_query}    {"query":"query {__schema { __typename }}"}
-${No_schema_error}    Not resolving __schema. There's no GraphQL schema in Dgraph. \ Use the /admin API to add a GraphQL schema
-${Backend_creation_timeout}    1
 
 *** Test Cases ***
 Create Deployment
@@ -61,13 +50,13 @@ Introspection API without Schema
     Should Contain    ${message}    ${No_schema_error}
 
 Add schema and perform queries and mutation
-    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
+    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${SCHEMA}
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Run Keyword If    '${schema}'=='${EMPTY}'    Fail
     Log    Add data to database - Mutation
-    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${mutation_query_1}
+    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${MUTATION_QUERY_1}
     Log    Fetch data from database - Query
-    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${query_1}
+    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${QUERY}
     Log    Drop data from database
     Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
     Log    Drop data and schema from database
@@ -110,6 +99,43 @@ create , get and delete API key
 freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
 
+Create and use Multiple API Keys
+    [Documentation]
+    ...     List of Tests Covered
+    ...
+    ...     Create 6 API keys
+    ...     Update Schema with API key1
+    ...     Get Schema with API key2
+    ...     Add mutation with API key3
+    ...     Drop data from database with API key4
+    ...     Drop schema with API key5
+    ...     Get Schema with API key6
+    @{api_keys_uid}=    Create List
+    &{api_keys}=  Create Dictionary
+    FOR   ${i}  IN RANGE  1   7
+        ${api_key_uid}     ${api_key}      Create API Keys      ${deployment_id}      test${i}
+        Append To List      ${api_keys_uid}     ${api_key_uid}
+        Set To Dictionary      ${api_keys}      test${i}      ${api_key}
+        log     ${api_key_uid}
+        log     ${api_key}
+    END
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test1]    Content-Type=application/json
+    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test2]    Content-Type=application/json
+    ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
+    Run Keyword If    '${schema}'=='${EMPTY}'    Fail
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test3]    Content-Type=application/json
+    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${mutation_query_1}
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test4]    Content-Type=application/json
+    Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test5]    Content-Type=application/json
+    Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${True}
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test6]    Content-Type=application/json
+    ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
+    FOR   ${api_key_uid}  IN   @{api_keys_uid}
+        Delete API Keys    ${api_key_uid}
+    END
+
 *** Keywords ***
 Create Backend
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
@@ -125,3 +151,16 @@ Create Backend
     Set Suite Variable    ${deployemnt_jwt_token}
     ${deployment_auth}=    Create Dictionary    x-auth-token=${deployemnt_jwt_token}    Content-Type=application/json
     Set Suite Variable    ${deployment_auth}
+
+Create API Keys
+    [Arguments]     ${deployment_id}      ${api_name}
+    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_name}
+    ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
+    ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
+    ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
+    ${api_key}=    Collections.Get From Dictionary    ${api_key_details}    key
+    [Return]     ${api_key_uid}     ${api_key}
+
+Delete API Keys
+    [Arguments]     ${api_key_uid}
+    Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.

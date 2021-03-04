@@ -15,11 +15,10 @@ BACKUP_QUERY = """mutation BackupReq ($path: String!) {
     }
   }
 }"""
-RESTORE_QUERY = """mutation RestoreReq($path: String!){
-  restore(input: {location: $path}){
+RESTORE_QUERY = """mutation RestoreReq($path: String!, $enc_file: String){
+  restore(input: {location: $path, encryptionKeyFile: $enc_file}){
     message
     code 
-    restoreId
   }
 }"""
 EXPORT_QUERY = """mutation {

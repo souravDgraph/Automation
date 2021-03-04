@@ -1,9 +1,9 @@
---outputdir ./results/dgraph_results
+--outputdir ./results/docker_exe_res
 #--timestampoutput
 --console verbose
 --consolemarkers on
 --loglevel TRACE:INFO
-test_suites/dgraph/Linux/dgraph_suite_01.robot
+test_suites/dgraph/docker/dgraph_docker_suite.robot
 
 #Additional arguments
 #--tagdoc *:See *README.md*

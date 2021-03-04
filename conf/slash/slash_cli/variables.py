@@ -1,0 +1,8 @@
+MAX_DEPLOYMENT_ERROR = "Unable to create backend. Maximum deployments reached for the user"
+DEPLOYMENT_LAUNCH_MESSAGE = "Deployment Launched at"
+NO_SCHEMA_ERROR = "Cannot read property 'schema' of null"
+NO_BACKEND_ERROR = "Cannot find backend"
+ACL_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for ACL for Slash backends."
+HA_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for Dgraph HA for Slash"
+JAEGER_INVALID_INPUT_ERROR = "Unable to create backend. Invalid input for Jaeger for Slash"
+DELETE_DEPLOYMENT = "Deleted"
