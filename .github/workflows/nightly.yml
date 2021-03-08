@@ -141,6 +141,7 @@ jobs:
           name: resultAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
           path: |
             ${{ github.workspace }}/Automation_workspace/results/
+            !${{ github.workspace }}/Automation_workspace/results/output.xml
             !${{ github.workspace }}/Automation_workspace/results/p
             !${{ github.workspace }}/Automation_workspace/results/w
             !${{ github.workspace }}/Automation_workspace/results/zw
