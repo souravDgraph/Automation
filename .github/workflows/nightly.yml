@@ -45,6 +45,8 @@ jobs:
       # Navigating to the directory and installing the requiremenets file
       - name: Install requirements for Dgraph and Slash
         run: |
+          hostname
+          hostname -I
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
