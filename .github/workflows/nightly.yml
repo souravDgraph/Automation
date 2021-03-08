@@ -125,9 +125,18 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always()
         with: 
-          name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
+          name: fullAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
           path: |
             ${{ github.workspace }}/Automation_workspace/
             !${{ github.workspace }}/Automation_workspace/test_data
             !${{ github.workspace }}/Automation_workspace/doc
+            
+      # Publish Artifacts
+      - name: Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v2
+        if: always()
+        with: 
+          name: resultAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
+          path: |
+            ${{ github.workspace }}/Automation_workspace/results
         
