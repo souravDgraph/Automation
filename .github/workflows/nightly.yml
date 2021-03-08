@@ -138,5 +138,10 @@ jobs:
         with: 
           name: resultAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
           path: |
-            ${{ github.workspace }}/Automation_workspace/results
+            ${{ github.workspace }}/Automation_workspace/results/
+            !${{ github.workspace }}/Automation_workspace/results/p
+            !${{ github.workspace }}/Automation_workspace/results/w
+            !${{ github.workspace }}/Automation_workspace/results/zw
+            !${{ github.workspace }}/Automation_workspace/results/t
+            
         
