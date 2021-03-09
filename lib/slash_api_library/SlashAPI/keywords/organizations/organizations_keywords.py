@@ -81,7 +81,7 @@ class OrganizationsKeywords:
         if appender is None:
             response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, expected_response)
         else:
-            response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, appender=appender)
+            response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, expected_response, appender=appender)
 
         return response
 

@@ -181,6 +181,8 @@ class OrganizationsHandler:
         response = self.connection.post_on_session(self.session_alias, appender,
                                                     json=add_mem_payload,
                                                     headers=self.headers, expected_status=str(expected_response))
+        self.connection.request_should_be_successful(response)
+        logger.debug(response.json())
         if "errors" in response.json():
             if response.json()["errors"][0]["message"] == expected_response_text:
                 logger.info("Organization is not found")
@@ -272,11 +274,7 @@ class OrganizationsHandler:
                                                         organizationId="empty", auth=self.headers, expected_response=str(expected_response))
         return response
 
-<<<<<<< HEAD
-    def add_org_from_deployment(self, deployment_name, org_uid, expected_response=200):
-=======
-    def add_organization_to_deployment(self, deployment_name, org_name, expected_response=200):
->>>>>>> Added changes
+    def add_organization_to_deployment(self, deployment_name, org_uid, expected_response=200):
         """
         Method to add organization to deployment
         :param expected_response:
@@ -301,5 +299,4 @@ class OrganizationsHandler:
         response = deployment_handler.update_deployment(session_alias, self.url+"/deployment/" + dep_uid,
                                                         organizationId=org_uid, auth=self.headers, expected_response=str(expected_response))
         logger.debug(response.json())
-        response.json()["org_uid"] = org_uid
         return response.json()
