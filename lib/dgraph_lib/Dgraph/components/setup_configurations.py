@@ -371,11 +371,12 @@ class DgraphCLI:
         """
         if version is None:
             logger.info("dgraph local setup is executed.")
-            version = self.get_dgraph_version_details("Dgraph version")
             branch = self.get_dgraph_version_details("Branch")
             if "release" in branch:
                 branch = branch.split("/")[1]
                 version = branch
+            else:
+                version = self.get_dgraph_version_details("Dgraph version")
             is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
                 else False
         else:
