@@ -76,24 +76,22 @@ class OrganizationsKeywords:
         logger.info("Getting lis of organizations for the client.")
         return self.org_handler.get_organizations()
 
-    def add_new_member_to_existing_organization(self, org_uid, member_email, appender=None):
-        """
-        Method to add a member to existing organization
-        \n:param org_uid:<existing_organization_uid>
-        \n:param member_email:<new_member_email-id>
-        \n:param appender:
-        \n:return: <response>
-
-        Example:
-        | add new member to existing organization |  org_uid | member_email
-        | add new member to existing organization |  0x201ef | tester@gmail.com
-        """
+    def get_members_from_organization(self, org_uid, expected_response_text="OK", appender=None, expected_response=200):
+        # Method to get the members from organization with organization uid
         if appender is None:
-            response = self.org_handler.add_member_to_organization(org_uid, member_email)
+            response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, expected_response)
         else:
-            response = self.org_handler.add_member_to_organization(org_uid,
-                                                                   member_email,
-                                                                   appender=appender)
+            response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, expected_response, appender=appender)
+
+        return response
+
+    def add_new_member_to_existing_organization(self, org_uid, member_email, expected_response_text="OK", appender=None):
+        # Method to add a member to an organization with organization uid and member email id
+        if appender is None:
+            response = self.org_handler.add_member_to_organization(org_uid, member_email, expected_response_text)
+        else:
+            response = self.org_handler.add_member_to_organization(org_uid, member_email, expected_response_text,
+                                                            appender=appender)
         return response
 
     def check_if_member_is_already_existing_in_organization(self, org_uid, member_email):
@@ -151,4 +149,4 @@ class OrganizationsKeywords:
         | add org to deployment |  deployment_name | org_uid |
         | add org to deployment |  Pokemon | 0x201ef |
         """
-        return self.org_handler.add_org_from_deployment(deployment_name, org_uid)
+        return self.org_handler.add_organization_to_deployment(deployment_name, org_name)

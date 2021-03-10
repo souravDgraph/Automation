@@ -94,6 +94,14 @@ class DeploymentKeywords():
         return deployments
 
     @staticmethod
+    def get_deployment(session_alias, base_url, auth, deployment_id, expected_response_text="OK", expected_response=200):
+        logger.info("Get Deployment")
+        url = base_url + "graphql"
+        deployment = Deployments.get_deployment_with_deployment_id(session_alias, url, auth, deployment_id, expected_response_text, expected_response)
+
+        return deployment
+
+    @staticmethod
     def get_deployment_health(session_alias,
                               base_url,
                               auth,
@@ -128,6 +136,7 @@ class DeploymentKeywords():
                           isProtected=None,
                           size=None,
                           organizationId=None,
+                          expected_response_text="Deployment has been patched.",
                           expected_response=200):
         logger.info("Updating a Deployment of Name : %s" % deployment_id)
         url = base_url + "deployment/" + str(deployment_id)
@@ -146,6 +155,7 @@ class DeploymentKeywords():
                                                  isProtected,
                                                  size,
                                                  organizationId,
+                                                 expected_response_text,
                                                  expected_response)
         return response
 
