@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph
-Suite Teardown     End All Process    true
+Suite Teardown     End All Process    false
 Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process
 Resource          ../../../resources/dgraph_commands.robot
