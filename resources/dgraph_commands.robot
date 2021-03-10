@@ -163,6 +163,7 @@ Set Dgraph Version from docker
     ${docker_process}=     Run Process   docker       exec    ${folder_name}_zero0_1   dgraph  version     alias=version   stdout=dgraph_version.txt    shell=True    cwd=results
     ${version}=     Get Dgraph Docker Version Details
     ${branch}=      Get Dgraph Docker Branch Details
+    ${version}=  Set Variable If      'release' in  '${branch}'    Replace String     ${branch}      release/    ${EMPTY}
     ${check}=   Set Execution To Docker     ${version}      ${branch}
     Set Suite Variable      ${is_latest}        ${check}
     Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
