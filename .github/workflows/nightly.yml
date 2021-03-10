@@ -61,9 +61,10 @@ jobs:
         
       # Download Dgraph Repo
       - name: Check out Dgraph repo
-        uses: actions/checkout@release\/v21.03
+        uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
+          ref: release/21.03
           clean: false  
           path: dgraph_workspace  
         
