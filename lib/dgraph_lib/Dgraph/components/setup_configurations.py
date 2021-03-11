@@ -22,10 +22,11 @@ class DgraphCLI:
         self.tls_mutual = False
         self.tls_mutual_flags = []
         self.details = {}
+        self.offset = 0
         self.alpha_addr = 0
         self.zero_addr = 0
-        self.alpha_server_name = ""
-        self.zero_server_name = ""
+        self.alpha_server_name = "localhost"
+        self.zero_server_name = "localhost"
 
         # Configuring path to read from config
         self.curr_path = str(pathlib.PurePath(pathlib.Path().absolute()))
@@ -245,6 +246,7 @@ class DgraphCLI:
         logger.info("configuration path: " + conf_path)
         with open(conf_path) as conf_file:
             self.cfg = json.load(conf_file)
+        self.offset = self.cfg['offset']
         self.alpha_addr = self.cfg['alpha']['addr']
         self.alpha_server_name = self.cfg['alpha']['server']
         self.zero_addr = self.cfg['zero']['addr']
@@ -273,9 +275,7 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
-        for key, value in kwargs.items():
-            if key == "offset":
-                args_appender = args_appender + f" -o {value}"
+        args_appender = args_appender + f" -o {self.offset}"
 
         # Configure tls and mtls
         if is_latest:
@@ -302,9 +302,8 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        args_appender = args_appender + f" -o {self.offset}"
         for key, value in kwargs.items():
-            if key == "offset":
-                args_appender = args_appender + f" -o {value}"
             if key == "ludicrous_mode" and value == "enabled":
                 args_appender = args_appender + self.get_ludicrous_command(is_latest)
 
@@ -420,10 +419,9 @@ class DgraphCLI:
         return cli_live_acl
 
     def build_loader_command(self, rdf_file, schema_file, loader_type,
-                             latest_version_check=None, docker_string=None, offset=0):
+                             latest_version_check=None, docker_string=None):
         """
         Method to build bulk/live loader cli command
-        :param offset: <offset value set for alpha and zero>
         :param rdf_file: <rdf_data_file>
         :param schema_file: <schema_file>
         :param loader_type: <live\bulk>
@@ -463,7 +461,7 @@ class DgraphCLI:
         elif loader_type == "bulk":
             cli_command = f"dgraph {loader_type} -s {schema_file} -f {rdf_file} " \
                           f"--map_shards=2 --reduce_shards=1 " \
-                          f"--http localhost:{8000 + offset}" \
+                          f"--http localhost:{8000 + self.offset}" \
                           f" --zero={self.zero_server_name}:{self.zero_addr} "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']

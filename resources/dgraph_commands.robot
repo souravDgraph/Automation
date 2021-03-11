@@ -9,18 +9,16 @@ Library           Collections
 *** Variables ***
 ${is_latest}
 ${docker_exe_string}
-${global_offset_value}
 
 *** Keywords ***
 Start Dgraph
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
-    [Arguments]  ${offset_value}
     # Dgraph alpha and zero command
-    ${zero_command}    Generate Dgraph Zero Cli Command     offset=${offset_value}
+    ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${alpha_command}    Generate Dgraph Alpha Cli Command       offset=${offset_value}
+    ${alpha_command}    Generate Dgraph Alpha Cli Command       
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
@@ -29,27 +27,24 @@ Start Dgraph
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ${check}=   check dgraph version    ${version}
     Set Suite Variable      ${is_latest}    ${check}
-    Set Suite Variable      ${global_offset_value}    ${offset_value}
 
 Start Dgraph Ludicrous Mode
-    [Arguments]  ${offset_value}
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
-    ${zero_command}    Generate Dgraph Zero Cli Command     offset=${offset_value}
+    ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${alpha_command}    Generate Dgraph Alpha Cli Command       offset=${offset_value}   ludicrous_mode=enabled
+    ${alpha_command}    Generate Dgraph Alpha Cli Command          ludicrous_mode=enabled
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
     ${version}=     Get Dgraph Version Details
     ${check}=   check dgraph version    ${version}
     Set Suite Variable      ${is_latest}    ${check}
-    Set Suite Variable      ${global_offset_value}    ${offset_value}
 
 Start Dgraph In Docker
-    [Arguments]     ${folder_name}  ${offset_value}
+    [Arguments]     ${folder_name}
     [Documentation]    Start Dgraph alpha and Zero process in Helm with cwd pointing to results folder.
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
@@ -77,7 +72,7 @@ Start Dgraph Zero
     [Arguments]    ${platform}
     [Documentation]    Start Dgraph Zero process
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
-    ${zero_command}    Generate Dgraph Zero Cli Command     offset=${offset_value}
+    ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt    stderr=zero_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
@@ -87,7 +82,7 @@ Start Dgraph Alpha
     [Documentation]    Start Dgraph alpha process.
     # Dgraph alpha and zero command
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
-    ${alpha_command}    Generate Dgraph Alpha Cli Command    alpha      offset=${offset_value}
+    ${alpha_command}    Generate Dgraph Alpha Cli Command    alpha      
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
@@ -96,7 +91,7 @@ Start Dgraph Alpha for bulk loader
     [Arguments]    ${path}
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
-    ${alpha_command}    Generate Dgraph Alpha Cli Command    ${path}     offset=${offset_value}
+    ${alpha_command}    Generate Dgraph Alpha Cli Command    ${path}     
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
@@ -206,7 +201,7 @@ Trigger Loader Process
     ${dir_path}=    normalize path    ${CURDIR}/..
     log     ${docker_exe_string}
     ${path}=    Set Variable If      '${docker_exe_string}' != ''   /Automation     ${dir_path}
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}      offset=${global_offset_value}
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}      
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Verify Bulk Process
@@ -289,16 +284,26 @@ Execute Increment Command
     END
 
 Create NFS Backup
-    [Arguments]    ${is_clear_folder}
+    [Arguments]    ${no_of_backups}
     [Documentation]    Accepts params: "{is_clear_folder}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
-    Run Keyword If    '${is_clear_folder}' == 'full'    clear all the folder in a directory    ${backup_path}
-    connect request server      offset=${global_offset_value}
-    ${res}=    Backup Using Admin    ${backup_path}
-    log    ${res.text}
-    Verify file exists in a directory with parent folder name    ${backup_path}
+    FOR    ${i}    IN RANGE    ${no_of_backups}
+        connect request server      
+        ${res}=    Backup Using Admin    ${backup_path}
+        log    ${res.text}
+        Verify file exists in a directory with parent folder name    ${backup_path}
+    END
+    @{dirs_backup}=    List Directories In Directory    ${backup_path}
+    log     ${dirs_backup}
+
+Clear Backup Folders
+    [Documentation]  Keyword to clear backup folders
+    [Arguments]  ${is_clear_folder}
+    ${root_path}=    normalize path    ${CURDIR}/..
+    ${backup_path}=    Join Path    ${root_path}/backup
+    Run Keyword If    '${is_clear_folder}' == 'true'    clear all the folder in a directory    ${backup_path}
 
 Export NFS data using admin endpoint
     [Arguments]    ${data_type}     ${is_clear_folder}
@@ -307,46 +312,53 @@ Export NFS data using admin endpoint
     ${root_path}=    normalize path    ${CURDIR}/..
     ${export_path}=    Join Path    ${root_path}/export
     Run Keyword If    '${is_clear_folder}' == 'true'    clear all the folder in a directory    ${export_path}
-    connect request server      offset=${global_offset_value}
+    connect request server      
     ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${export_path}
 
 
 Perform a restore on backup
+    [Arguments]  ${increment_size}
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
-    Connect request server      offset=${global_offset_value}
+    Connect request server
+    @{inc_list}     Create List     full
+    FOR    ${i}    IN RANGE    ${increment_size}
+        Append To List  ${inc_list}     incremental
+    END
     ${root_dir}=    normalize path    ${CURDIR}/..
-    ${path}=    Join Path    ${root_dir}/backup
-    @{dirs_backup}=    List Directories In Directory    ${path}
-    ${restore_dir}=    Set Variable    ${dirs_backup}[0]
-    ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
+    ${backup_path}=    Join Path    ${root_dir}/backup
+    ${json_file}    Load JSON From File    ${backup_path}/manifest.json
+    ${type}     Get Value From Json     ${json_file}    $..type
+    ${enc}     Get Value From Json     ${json_file}    $..encrypted
+    Lists Should Be Equal   ${inc_list}     ${type}
     ${tls_check}=    Get Tls Value
-    ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${restore_dir}
-    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
+    ${enc_check}=    Get Enc Value
+    Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
+    ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${backup_path}
+    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${backup_path}    -l    ${backup_path}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
     ...    AND    Process Should Be Running    zero
     ...    AND    Process Should Be Running    alpha
     ...    AND    Process Should Be Running    restore
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}
 
 Perform a restore on backup present at other location
-    [Arguments]    ${url}    ${path}
+    [Arguments]   ${backup_path}     ${is_increment}
     [Documentation]    Performs an restore operation on the other location i.e "{path}" dir.
-    @{dirs_backup}=    List Directories In Directory    ${path}
-    ${restore_dir}=    Set Variable    ${dirs_backup}[0]
-    ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
-    ${result_restore}=    Run Keyword If    "https" in "${url}"    Restore Using Admin    ${restore_dir}
-    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
+    ${json_file}    Load JSON From File    ${backup_path}/manifest.json
+    Run Keyword If     '${is_increment}'=='true'    List Should Contain Value   ${type}     incremental
+    ${result_restore}=    Run Keyword If    "https" in "${url}"    Restore Using Admin    ${backup_path}
+    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${backup_path}    -l    ${backup_path}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
     ...    AND    Process Should Be Running    zero
     ...    AND    Process Should Be Running    alpha
     ...    AND    Process Should Be Running    restore
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
-    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
+    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}
     # Validations:
 
 Verify restore file Content in results folder
@@ -447,7 +459,7 @@ Monitor health and state check
 
 Monitor health check
     [Documentation]   Keyword to check the health of the connection.
-    connect request server      offset=${global_offset_value}
+    connect request server      
     ${appender}=    Set Variable      /health
     ${response}=    Health Check    ${appender}
     log     ${response}
@@ -455,7 +467,7 @@ Monitor health check
 
 Monitor State Check
     [Documentation]  Keyword to check the state of the process.
-    connect request server      offset=${global_offset_value}
+    connect request server      
     ${state_resposne}=  State Check     /state
     ${leader}=    Get Value From Json   ${state_resposne}   $..members..leader
     ${am_dead}=    Get Value From Json   ${state_resposne}   $..members..amDead

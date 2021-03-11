@@ -115,6 +115,7 @@ def generate_config(conf_check, offset: int = 0, zero_addr: int = 5080, alpha_ad
         raise Exception("Configuration not enabled check if there is a typo\n"
                         " input for configuration: " + conf_check)
     conf = {
+        "offset": offset,
         "zero": {
             "addr": zero_addr,
             "server": zero_server

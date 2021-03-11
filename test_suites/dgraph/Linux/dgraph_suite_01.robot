@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
-Suite Setup        Start Dgraph     ${offset_value}
+Suite Setup        Start Dgraph
 Suite Teardown     End All Process    false
 Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process
@@ -11,7 +11,6 @@ Library           String
 *** Variables ***
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema
-${offset_value}     0
 
 *** Test Cases ***
 TC_01 Perform live load data.
@@ -36,8 +35,9 @@ TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700
-     Create NFS Backup      full
-     perform a restore on backup
+     Create NFS Backup      1
+     perform a restore on backup    0
+     Clear Backup Folders   true
 
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
@@ -49,9 +49,9 @@ TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression
-     Create NFS Backup    full
-     Create NFS Backup    increment
-     perform a restore on backup
+     Create NFS Backup    2
+     perform a restore on backup    1
+     Clear Backup Folders   true
 
 TC_07 Perform parallel live loads.
      [Documentation]    Perform live load data.

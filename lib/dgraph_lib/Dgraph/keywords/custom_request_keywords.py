@@ -42,9 +42,9 @@ class CustomRequestKeywords:
             self.req_handler = RequestHandler(url)
         else:
             if self.dgraph_cli.get_tls():
-                url = f"https://localhost:{8080+offset}"
+                url = f"https://localhost:{8080 + self.dgraph_cli.offset}"
             else:
-                url = f"http://localhost:{8080+offset}"
+                url = f"http://localhost:{8080+ self.dgraph_cli.offset}"
             self.req_handler = RequestHandler(url)
 
         logger.info("Requested URL: " + url)
