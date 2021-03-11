@@ -31,10 +31,22 @@ class Deployments():
                           auth,
                           deployment_name,
                           deployment_zone,
+                          deploymentType="free",
+                          dgraphHA='false',
+                          size="medium",
+                          alphaStorage='40',
                           deployment_subdomain=None,
                           organization=None,
+                          deploymentMode="graphql",
                           expected_response=200):
-        properties = {"name": deployment_name, "zone": deployment_zone}
+        properties = {"name": deployment_name, "zone": deployment_zone, "deploymentType" : deploymentType}
+        logger.info(deploymentType)
+        if deploymentType == "dedicated":
+            ha_properties = {"size" : size, "alphaStorage" : alphaStorage, "dgraphHA" : dgraphHA}
+            properties.update(ha_properties)
+        else:
+            size = "small"
+            alphaStorage = "10Gi"
         if deployment_subdomain:
             properties["subdomain"] = deployment_subdomain
         if organization:
@@ -55,7 +67,14 @@ class Deployments():
         deployment_details = response.json()['data']['createDeployment']
         Deployments.validate_deployment_details(deployment_details,
                                                 deployment_name,
-                                                deployment_zone)
+                                                deployment_zone,
+                                                deployment_subdomain,
+                                                organization,
+                                                deploymentMode,
+                                                deploymentType,
+                                                size,
+                                                alphaStorage,
+                                                dgraphHA)
         logger.info(deployment_details)
         return deployment_details
 
@@ -75,33 +94,36 @@ class Deployments():
     def update_deployment(session_alias,
                           url,
                           auth,
+                          uid,
                           name=None,
                           zone=None,
                           subdomain=None,
-                          organization=None,
                           deploymentMode=None,
                           dgraphHA=None,
                           doNotFreeze=None,
-                          enterprise=None,
+                          jaegerEnabled=None,
                           isProtected=None,
                           size=None,
                           organizationId=None,
-                          expected_response_text="Deployment has been patched.",
+                          backupInterval=None,
+                          backupBucketFormat=None,
+                          aclEnabled=None,
+                          expected_response_text="Successfully Updated the backend",
                           expected_response=None):
         properties = locals()
+        logger.info(properties)
         properties_to_delete = ['session_alias', 'url', 'auth', 'expected_response', 'expected_response_text']
         for property_name in properties_to_delete:
             del properties[property_name]
         logger.debug(properties)
-        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
+        data = Utils.render_data_from_template(DeploymentModels.update_deployment,
                                                properties)
         logger.debug(data)
-
         connection = Connection()
         connection.create_session(session_alias,
                                   url,
                                   auth)
-        response = connection.patch_on_session(session_alias,
+        response = connection.post_on_session(session_alias,
                                                '',
                                                json=data,
                                                headers=auth,
@@ -110,7 +132,7 @@ class Deployments():
         logger.debug(response.text)
         if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
             raise Exception("Expected error not found")
-        elif expected_response_text not in response.text:
+        elif expected_response_text not in str(response.text):
             raise Exception("Expected response body is not found")
         return response
 
@@ -175,10 +197,12 @@ class Deployments():
                                     subdomain=None,
                                     organization=None,
                                     deploymentMode='graphql',
-                                    dgraphHA='false',
-                                    enterprise='false',
-                                    size='small'):
+                                    deploymentType="free",
+                                    size="small",
+                                    alphaStorage="10",
+                                    dgraphHA="false"):
         properties = locals()
+        logger.info(properties)
         del properties["response_data"]
         data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
                                                 properties)
@@ -212,10 +236,11 @@ class Deployments():
                                                 json=data,
                                                 headers=auth,
                                                 expected_status=str(expected_response))
+
         logger.info(response.text)
         if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
             raise Exception("Expected error not found")
-        elif "errors" not in response.json() and expected_response_text not in response.reason :
+        elif "errors" not in response.json() and expected_response_text not in response.reason:
             raise Exception("Expected Body Response is not Found")
         logger.info(response.json())
         return response.json()

@@ -40,7 +40,7 @@ class Utils():
             logger.info("--.--." * 40)
             logger.info("primary dict - %s : %s " % (key, primary_dict[key]))
             logger.info("secondary dict - %s : %s " % (key, secondary_dict[key]))
-            if primary_dict[key] != secondary_dict[key]:
+            if primary_dict[key] != secondary_dict[key] and primary_dict[key] not in secondary_dict[key]:
                 status = False
                 logger.info("Expected data dint match")
         if not status:

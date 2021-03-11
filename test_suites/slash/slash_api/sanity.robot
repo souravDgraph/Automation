@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     This is a simple test with Robot Framework
 Suite Setup       Create Backend
-Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+Suite Teardown
 Test Setup
 Test Teardown
 Default Tags      Sanity
@@ -100,24 +100,23 @@ freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
 
 Create and use Multiple API Keys
-    [Documentation]
-    ...     List of Tests Covered
+    [Documentation]    List of Tests Covered
     ...
-    ...     Create 6 API keys
-    ...     Update Schema with API key1
-    ...     Get Schema with API key2
-    ...     Add mutation with API key3
-    ...     Drop data from database with API key4
-    ...     Drop schema with API key5
-    ...     Get Schema with API key6
+    ...    Create 6 API keys
+    ...    Update Schema with API key1
+    ...    Get Schema with API key2
+    ...    Add mutation with API key3
+    ...    Drop data from database with API key4
+    ...    Drop schema with API key5
+    ...    Get Schema with API key6
     @{api_keys_uid}=    Create List
-    &{api_keys}=  Create Dictionary
-    FOR   ${i}  IN RANGE  1   7
-        ${api_key_uid}     ${api_key}      Create API Keys      ${deployment_id}      test${i}
-        Append To List      ${api_keys_uid}     ${api_key_uid}
-        Set To Dictionary      ${api_keys}      test${i}      ${api_key}
-        log     ${api_key_uid}
-        log     ${api_key}
+    &{api_keys}=    Create Dictionary
+    FOR    ${i}    IN RANGE    1    7
+        ${api_key_uid}    ${api_key}    Create API Keys    ${deployment_id}    test${i}
+        Append To List    ${api_keys_uid}    ${api_key_uid}
+        Set To Dictionary    ${api_keys}    test${i}    ${api_key}
+        log    ${api_key_uid}
+        log    ${api_key}
     END
     ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test1]    Content-Type=application/json
     Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
@@ -132,13 +131,101 @@ Create and use Multiple API Keys
     Drop Data From Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${True}
     ${deployment_auth}=    Create Dictionary    x-auth-token=${api_keys}[test6]    Content-Type=application/json
     ${schema}=    Get Schema From Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}
-    FOR   ${api_key_uid}  IN   @{api_keys_uid}
+    FOR    ${api_key_uid}    IN    @{api_keys_uid}
         Delete API Keys    ${api_key_uid}
     END
 
+update Deployment name
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update deployment name
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    updated
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${deployment_name}=    get deployment attribute data    ${deployment_details}=    name
+    Should Be Equal    ${deployment_name}    updated
+    [Teardown]
+
+update Deployment HA
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update dgraph cloud deployment HA
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}    dgraphHA=true
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
+    ${deployment_HA}=    get deployment attribute data    ${deployment_details}    dgraphHA
+    Should Be Equal    ${deployment_HA}    true
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
+    [Teardown]
+
+Update deployment backup interval
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update deployment name
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    backupInterval=8h
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${backup_interval}=    get deployment attribute data    ${deployment_details}    backupInterval
+    Should Be Equal    ${backup_interval}    8h
+    [Teardown]
+
+Update deployment backup bucket format
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update deployment name
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    backupBucketFormat=%Y-%U-%D
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${backup_interval}=    get deployment attribute data    ${deployment_details}    backupBucketFormat
+    Should Be Equal    ${backup_interval}    %Y-%U-%D
+    [Teardown]
+
+Update deployment jaeger
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update deployment jaeger
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    jaegerEnabled=true
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${backup_interval}=    get deployment attribute data    ${deployment_details}    jaegerEnabled
+    Should Be Equal    ${backup_interval}    true
+    [Teardown]
+
+Update deployment ACL
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update deployment jaeger
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    aclEnabled=true
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${backup_interval}=    get deployment attribute data    ${deployment_details}    aclEnabled
+    Should Be Equal    ${backup_interval}    true
+    [Teardown]
+
 *** Keywords ***
 Create Backend
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
@@ -153,14 +240,21 @@ Create Backend
     Set Suite Variable    ${deployment_auth}
 
 Create API Keys
-    [Arguments]     ${deployment_id}      ${api_name}
+    [Arguments]    ${deployment_id}    ${api_name}
     ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_name}
     ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
     ${api_key}=    Collections.Get From Dictionary    ${api_key_details}    key
-    [Return]     ${api_key_uid}     ${api_key}
+    [Return]    ${api_key_uid}    ${api_key}
 
 Delete API Keys
-    [Arguments]     ${api_key_uid}
+    [Arguments]    ${api_key_uid}
     Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
+
+get deployment attribute data
+    [Arguments]    ${deployment_details}    ${attribute}
+    ${data}=    Collections.Get From Dictionary    ${deployment_details}    data
+    ${deployments}=    Collections.Get From Dictionary    ${data}    getDeploymentByID
+    ${attribute_data}=    Collections.Get From Dictionary    ${deployments}    ${attribute}
+    [Return]    ${attribute_data}

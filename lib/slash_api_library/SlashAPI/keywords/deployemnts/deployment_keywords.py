@@ -29,8 +29,13 @@ class DeploymentKeywords():
                           auth,
                           deployment_name,
                           deployment_zone,
+                          deploymentType="free",
+                          dgraphHA='false',
+                          size="medium",
+                          alphaStorage='40',
                           deployment_subdomain=None,
                           organization=None,
+                          deploymentMode="graphql",
                           expected_response=200):
         logger.info("Creating a Deployment of Name : %s" % deployment_name)
         url = base_url + "graphql"
@@ -39,8 +44,13 @@ class DeploymentKeywords():
                                                  auth,
                                                  deployment_name,
                                                  deployment_zone,
+                                                 deploymentType,
+                                                 dgraphHA,
+                                                 size,
+                                                 alphaStorage,
                                                  deployment_subdomain,
                                                  organization,
+                                                 deploymentMode,
                                                  expected_response)
         return response
 
@@ -116,9 +126,26 @@ class DeploymentKeywords():
     @staticmethod
     def validate_created_deployment(response,
                                     deployment_name,
-                                    deployment_zone):
+                                    deployment_zone,
+                                    subdomain=None,
+                                    organization=None,
+                                    deploymentMode='graphql',
+                                    deploymentType="free",
+                                    size="small",
+                                    alphaStorage="10",
+                                    dgraphHA="false"
+                                    ):
         logger.info("validating deployment")
-        Deployments.validate_deployment_details(response, deployment_name, deployment_zone)
+        Deployments.validate_deployment_details(response,
+                                                deployment_name,
+                                                deployment_zone,
+                                                subdomain,
+                                                organization,
+                                                deploymentMode,
+                                                deploymentType,
+                                                size,
+                                                alphaStorage,
+                                                dgraphHA)
 
     @staticmethod
     def update_deployment(session_alias,
@@ -128,33 +155,38 @@ class DeploymentKeywords():
                           deployment_name=None,
                           deployment_zone=None,
                           deployment_subdomain=None,
-                          organization=None,
+                          organizationId=None,
                           deploymentMode=None,
                           dgraphHA=None,
                           doNotFreeze=None,
-                          enterprise=None,
+                          jaegerEnabled=None,
                           isProtected=None,
                           size=None,
-                          organizationId=None,
-                          expected_response_text="Deployment has been patched.",
+                          backupInterval=None,
+                          backupBucketFormat=None,
+                          aclEnabled=None,
+                          expected_response_text="Successfully Updated the backend",
                           expected_response=200):
         logger.info("Updating a Deployment of Name : %s" % deployment_id)
-        url = base_url + "deployment/" + str(deployment_id)
+        url = base_url + "graphql"
         logger.info(url)
         response = Deployments.update_deployment(session_alias,
                                                  url,
                                                  auth,
+                                                 deployment_id,
                                                  deployment_name,
                                                  deployment_zone,
                                                  deployment_subdomain,
-                                                 organization,
                                                  deploymentMode,
                                                  dgraphHA,
                                                  doNotFreeze,
-                                                 enterprise,
+                                                 jaegerEnabled,
                                                  isProtected,
                                                  size,
                                                  organizationId,
+                                                 backupInterval,
+                                                 backupBucketFormat,
+                                                 aclEnabled,
                                                  expected_response_text,
                                                  expected_response)
         return response
