@@ -22,7 +22,7 @@ def main(argv):
     :return:
     """
     try:
-        opts, args = getopt.getopt(argv, "hl:c:z:a", ["lib=", "conf=", "zero=", "alpha"])
+        opts, args = getopt.getopt(argv, "hl:c:o:", ["lib=", "conf=", "offset="])
         logging.debug(args)
         if not opts:
             print('Usage: python/python3 env_setup.py -l <proj_name>'
@@ -37,8 +37,7 @@ def main(argv):
     conf_check = False
     lib_name = ""
     conf_value = ""
-    zero_port = 0
-    alpha_port = 0
+    offset = 0
     for opt, arg_value in opts:
         if opt == '-h':
             usage()
@@ -51,20 +50,16 @@ def main(argv):
             if dgraph_check:
                 conf_check = True
                 conf_value = arg_value
-        elif opt in ("-z", "--zero"):
+        elif opt in ("-o", "--offset"):
             if dgraph_check:
                 conf_check = True
-                zero_port = arg_value
+                offset = int(arg_value)
 
     # Config Check for Dgraph library
     if dgraph_check:
         if conf_check:
-            if zero_port != 0:
-                generate_config(conf_value, zero_addr=zero_port)
-            elif alpha_port != 0:
-                generate_config(conf_value, alpha_addr=alpha_port)
-            elif zero_port != 0 and alpha_port != 0:
-                generate_config(conf_value, alpha_addr=alpha_port, zero_addr=zero_port)
+            if offset != 0:
+                generate_config(conf_value, offset=offset)
             else:
                 generate_config(conf_value)
         else:
@@ -101,10 +96,11 @@ def usage():
           + '\n proj_name = CustomTestRailListener')
 
 
-def generate_config(conf_check, zero_addr=5080, alpha_addr=9080,
+def generate_config(conf_check, offset: int = 0, zero_addr: int = 5080, alpha_addr: int = 9080,
                     zero_server="localhost", alpha_server="localhost"):
     """
     Method to generate config file based on configurations
+    :param offset:
     :param conf_check:
     :param zero_addr:
     :param alpha_addr:
@@ -112,10 +108,14 @@ def generate_config(conf_check, zero_addr=5080, alpha_addr=9080,
     :param alpha_server:
     :return:
     """
+    zero_addr = zero_addr + offset
+    alpha_addr = alpha_addr + offset
+
     if conf_check not in ['enabled', 'disabled']:
         raise Exception("Configuration not enabled check if there is a typo\n"
                         " input for configuration: " + conf_check)
     conf = {
+        "offset": offset,
         "zero": {
             "addr": zero_addr,
             "server": zero_server
