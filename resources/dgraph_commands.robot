@@ -22,7 +22,9 @@ Start Dgraph
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${version}=     Get Dgraph Version Details
+    ${version}=     Get Dgraph Details      Dgraph version
+    ${branch}=     Get Dgraph Details      Branch
+    ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ${check}=   check dgraph version    ${version}
     Set Suite Variable      ${is_latest}    ${check}
 
@@ -131,12 +133,13 @@ End Aplha Process
     @{dir}    Create List    p    t    w    out    alpha
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
-Get Dgraph Version Details
-    [Documentation]  Keyword to get dgraph version details
+Get Dgraph Details
+    [Documentation]  Keyword to get dgraph details from dgraph version
+    [Arguments]     ${key}
     Start Process   dgraph  version     alias=version    stdout=dgraph_version.txt    stderr=dgraph_version_err.txt    shell=True    cwd=results
     Wait For Process    timeout=30 s
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${dgraph_Text_File_Content}=    Grep File    ${dir_path}/results/dgraph_version.txt     Dgraph version*
+    ${dgraph_Text_File_Content}=    Grep File    ${dir_path}/results/dgraph_version.txt     ${key}*
     ${key}     ${value}=    Split String    ${dgraph_Text_File_Content}     :
     ${value}=   Replace String  ${value}    ${space}     ${empty}
     [Return]    ${value}
@@ -163,6 +166,7 @@ Set Dgraph Version from docker
     ${docker_process}=     Run Process   docker       exec    ${folder_name}_zero0_1   dgraph  version     alias=version   stdout=dgraph_version.txt    shell=True    cwd=results
     ${version}=     Get Dgraph Docker Version Details
     ${branch}=      Get Dgraph Docker Branch Details
+    ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ${check}=   Set Execution To Docker     ${version}      ${branch}
     Set Suite Variable      ${is_latest}        ${check}
     Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
