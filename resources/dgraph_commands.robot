@@ -209,7 +209,7 @@ Monitor Live loader Process
     [Documentation]  Keyword to monitor if live loader is triggered properly
     Verify process to be stopped    ${loader_alias}
     ${passed}=  Run Keyword And Return Status   Grep and Verify file Content in results folder    ${loader_alias}    Pending transactions found. Please retry operation
-    Run Keyword If  Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${loader_name}
+    Run Keyword If  ${passed}  Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${loader_name}
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
