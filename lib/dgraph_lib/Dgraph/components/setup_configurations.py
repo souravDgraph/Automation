@@ -262,6 +262,8 @@ class DgraphCLI:
     def build_zero_cli(self, **kwargs):
         """
         Method to generate zero commands based on conf.
+        :param kwargs:
+            offset: offset value to initialize dgraph
         :return:
         """
         cli_name = "zero"
@@ -269,12 +271,20 @@ class DgraphCLI:
         appender = ""
 
         is_latest = self.set_dgraph_version()
+
+        args_appender = ""
+        for key, value in kwargs.items():
+            if key == "offset":
+                args_appender = args_appender + f" -o {value}"
+
         # Configure tls and mtls
         if is_latest:
             tls_str = self.get_tls_certs_latest("zero")
         else:
             tls_str = self.get_tls_certs("zero")
         appender = appender + tls_str
+
+        appender = appender + args_appender
 
         cli_command = cli_command + appender + " 2>&1"
         return cli_command
@@ -289,10 +299,18 @@ class DgraphCLI:
 
         cli_name = "alpha"
         appender = ""
+        is_latest = self.set_dgraph_version()
+
+        args_appender = ""
+        for key, value in kwargs.items():
+            if key == "offset":
+                args_appender = args_appender + f" -o {value}"
+            if key == "ludicrous_mode" and value == "enabled":
+                args_appender = args_appender + self.get_ludicrous_command(is_latest)
+
         cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
                       f"--zero={self.zero_server_name}:{self.zero_addr}"
 
-        is_latest = self.set_dgraph_version()
         cli_command = cli_command + self.get_security_command(is_latest)
 
         if bulk_path:
@@ -311,10 +329,7 @@ class DgraphCLI:
 
         appender = appender + tls_str
 
-        # Enabling ludicrous_mode
-        for name, value in kwargs.items():
-            if name == "ludicrous_mode" and value == "enabled":
-                appender = appender + self.get_ludicrous_command(is_latest)
+        appender = appender + args_appender
 
         cli_command = cli_command + appender + " 2>&1"
         return cli_command
@@ -404,9 +419,11 @@ class DgraphCLI:
                                                                                             f" --password {password} "
         return cli_live_acl
 
-    def build_loader_command(self, rdf_file, schema_file, loader_type, latest_version_check=None, docker_string=None):
+    def build_loader_command(self, rdf_file, schema_file, loader_type,
+                             latest_version_check=None, docker_string=None, offset=0):
         """
         Method to build bulk/live loader cli command
+        :param offset: <offset value set for alpha and zero>
         :param rdf_file: <rdf_data_file>
         :param schema_file: <schema_file>
         :param loader_type: <live\bulk>
@@ -446,7 +463,8 @@ class DgraphCLI:
         elif loader_type == "bulk":
             cli_command = f"dgraph {loader_type} -s {schema_file} -f {rdf_file} " \
                           f"--map_shards=2 --reduce_shards=1 " \
-                          f"--http localhost:8000 --zero={self.zero_server_name}:{self.zero_addr} "
+                          f"--http localhost:{8000 + offset}" \
+                          f" --zero={self.zero_server_name}:{self.zero_addr} "
             if self.enc:
                 enc_path = self.curr_path + self.cfg['enc']['location']
                 cli_command = cli_command + cli_bulk_encryption + \

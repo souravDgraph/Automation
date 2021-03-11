@@ -12,6 +12,7 @@ ${schema_file}    1million.schema
 ${appenders}      /admin
 ${prev_version}    v20.07.3-rc1
 ${current_version}    v20.11.1-rc2
+${offset_value}     0
 
 *** Test Cases ***
 TC_01 Perform cross version backup and restore.

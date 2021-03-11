@@ -53,7 +53,7 @@ class SetupDgraphKeywords:
         return cli_command
 
     def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version: None,
-                                  docker_string=None):
+                                  docker_string=None, offset=0):
         """
         Method to build CLI command for live | bulk loading
         \nTo set the configurations head to-> conf/dgraph/conf_dgraph.json
@@ -62,6 +62,7 @@ class SetupDgraphKeywords:
         \n:param loader_type: <live | bulk>
         \n:param is_latest_version:
         \n:param docker_string: <if executing on docker>
+        \n:param offset: <offset value set for alpha and zero>
         \n:return: loader_command <returns live loader command>
 
         Example:
@@ -69,7 +70,7 @@ class SetupDgraphKeywords:
 
         """
         loader_command = self.dgraph_cli.build_loader_command(rdf_file, schema_file, loader_type, is_latest_version,
-                                                              docker_string)
+                                                              docker_string, offset=offset)
         return loader_command
 
     def get_dgraph_increment_command(self, is_latest_version: None, docker_string=None, alpha_offset: int = 0):

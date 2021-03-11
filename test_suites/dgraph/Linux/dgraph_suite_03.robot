@@ -12,6 +12,7 @@ Library           String
 *** Variables ***
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema
+${offset_value}     40
 
 *** Test Cases ***
 TC_01 Perform live load data.

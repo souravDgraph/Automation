@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
-Suite Setup        Start Dgraph
+Suite Setup        Start Dgraph     ${offset_value}
 Suite Teardown     End All Process    false
 Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process
@@ -11,6 +11,7 @@ Library           String
 *** Variables ***
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema
+${offset_value}     0
 
 *** Test Cases ***
 TC_01 Perform live load data.

@@ -24,9 +24,10 @@ class CustomRequestKeywords:
     Custom Request Keywords Class.
     """
 
-    def connect_request_server(self, url=None):
+    def connect_request_server(self, url=None, offset=0):
         """
         Method to connect to url to perform backup.
+        :param offset:
         :param url:
         :return: the instance of RequestHandler object
 
@@ -41,9 +42,9 @@ class CustomRequestKeywords:
             self.req_handler = RequestHandler(url)
         else:
             if self.dgraph_cli.get_tls():
-                url = "https://localhost:8080"
+                url = f"https://localhost:{8080+offset}"
             else:
-                url = "http://localhost:8080"
+                url = f"http://localhost:{8080+offset}"
             self.req_handler = RequestHandler(url)
 
         logger.info("Requested URL: " + url)
