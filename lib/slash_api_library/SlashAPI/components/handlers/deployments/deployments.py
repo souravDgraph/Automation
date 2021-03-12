@@ -96,6 +96,7 @@ class Deployments():
                           uid,
                           name=None,
                           zone=None,
+                          deploymentType=None,
                           subdomain=None,
                           deploymentMode=None,
                           dgraphHA=None,
@@ -103,7 +104,7 @@ class Deployments():
                           jaegerEnabled=None,
                           isProtected=None,
                           size=None,
-                          organizationId=None,
+                          organizationUID=None,
                           backupInterval=None,
                           backupBucketFormat=None,
                           aclEnabled=None,
@@ -131,7 +132,7 @@ class Deployments():
         logger.debug(response.text)
         if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
             raise Exception("Expected error not found")
-        elif expected_response_text not in str(response.text):
+        elif response.json()["data"] and expected_response_text not in str(response.text):
             raise Exception("Expected response body is not found")
         return response
 
