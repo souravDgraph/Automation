@@ -40,7 +40,6 @@ class Deployments():
                           deploymentMode="graphql",
                           expected_response=200):
         properties = {"name": deployment_name, "zone": deployment_zone, "deploymentType" : deploymentType}
-        logger.info(deploymentType)
         if deploymentType == "dedicated":
             ha_properties = {"size" : size, "alphaStorage" : alphaStorage, "dgraphHA" : dgraphHA}
             properties.update(ha_properties)
