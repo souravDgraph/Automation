@@ -10,7 +10,7 @@
 #   5. Deactivate the virtualenv.
 
 usage() {
-    echo "Usage: $0 [-l <Dgraph|Slash>] [-c <disabled|enabled>] [-t <absolute path of test suite>]"
+    echo "Usage: $0 [-l <Dgraph|Slash|All>] [-c <disabled|enabled>] [-t <absolute path of test suite>]"
 }
 
 # Getting all the required options
@@ -18,7 +18,7 @@ while getopts ":l:c:t:" o; do
     case "${o}" in
         l)
             l=${OPTARG}
-            if [[ ${l} == "Dgraph" || ${l} == "Slash" ]]; then 
+            if [[ ${l} == "Dgraph" || ${l} == "Slash" || ${l} == "All" ]]; then
             args="-l "${l} 
             else
                 usage
@@ -60,6 +60,8 @@ pwd
 echo "Virtual environment used: $VIRTUAL_ENV" 
 echo "Args been set: ${args}"
 python3 env_setup.py -l ${l} -c ${c}
+echo "------------ Setting up docker-compose file --------------"
+python3 create_docker_yml.py -c ${c}
 echo "------------ Running Test ${t} --------------"
 cd ..
 echo "Current directory: " $PWD 

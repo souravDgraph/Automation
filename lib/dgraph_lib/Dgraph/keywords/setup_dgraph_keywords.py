@@ -62,6 +62,7 @@ class SetupDgraphKeywords:
         \n:param loader_type: <live | bulk>
         \n:param is_latest_version:
         \n:param docker_string: <if executing on docker>
+        \n:param offset: <offset value set for alpha and zero>
         \n:return: loader_command <returns live loader command>
 
         Example:

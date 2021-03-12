@@ -67,6 +67,11 @@ class DeploymentModels:
     "query": "mutation { freeze(deepFreeze: {{properties['deep_freeze']}}, backup: {{properties['backup']}}) }"
     }"""
 
+    get_deployment = """{
+        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain } }",
+        "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
+        }"""
+
     deployment_attributes = """
     {
         {% if properties['name'] and properties['name'] != "" %}
@@ -96,13 +101,13 @@ class DeploymentModels:
         {% if properties['size'] and properties['size'] != "" %}
         ,"size": {{ '"' + properties['size'] + '"' }}
         {% endif %}
-        
+    
         {% if properties['organizationId'] and properties['organizationId'] == "empty" %}
         "organizationId": null
         {% elif properties['organizationId'] and properties['organizationId'] != "" %}
-        "organizationId": {{'"' + properties['organizationId'] + '"' }}
+        ,"organizationId": {{'"' + properties['organizationId'] + '"' }}
         {% endif %}
-    
+        
         {% if properties['enterprise'] and properties['enterprise'] != "" %}
         ,"enterprise": {{ '"' + properties['enterprise'] + '"' }}
         {% endif %}

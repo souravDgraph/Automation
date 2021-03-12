@@ -43,7 +43,7 @@ class OrganizationsKeywords:
             res = self.org_handler.create_session(headers=headers, url=url)
         return res
 
-    def create_organization(self, org_name, expected_response: int, appender=None):
+    def create_organization(self, org_name, expected_response=200, appender=None):
         """
         Method to create organization.
         \n:param org_name: <organization_name>
@@ -57,10 +57,10 @@ class OrganizationsKeywords:
         """
         logger.info("Creating organization for: " + org_name)
         if appender is None:
-            self.org_handler.create_organization(organization_name=org_name,
+            return self.org_handler.create_organization(organization_name=org_name,
                                                  expected_response=expected_response)
         else:
-            self.org_handler.create_organization(organization_name=org_name,
+            return self.org_handler.create_organization(organization_name=org_name,
                                                  expected_response=expected_response,
                                                  appender=appender)
 
@@ -76,55 +76,53 @@ class OrganizationsKeywords:
         logger.info("Getting lis of organizations for the client.")
         return self.org_handler.get_organizations()
 
-    def add_new_member_to_existing_organization(self, org_name, member_email, appender=None):
-        """
-        Method to add a member to existing organization
-        \n:param org_name:<existing_organization_name>
-        \n:param member_email:<new_member_email-id>
-        \n:param appender:
-        \n:return: <response>
-
-        Example:
-        | add new member to existing organization |  org_name | member_email
-        | add new member to existing organization |  test_org | tester@gmail.com
-        """
+    def get_members_from_organization(self, org_uid, expected_response_text="OK", appender=None, expected_response=200):
+        # Method to get the members from organization with organization uid
         if appender is None:
-            response = self.org_handler.add_member_to_organization(org_name, member_email)
+            response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, expected_response)
         else:
-            response = self.org_handler.add_member_to_organization(org_name,
-                                                                   member_email,
-                                                                   appender=appender)
+            response = self.org_handler.get_members_from_organization(org_uid, expected_response_text, expected_response, appender=appender)
+
         return response
 
-    def check_if_member_is_already_existing_in_organization(self, org_name, member_email):
+    def add_new_member_to_existing_organization(self, org_uid, member_email, expected_response_text="OK", appender=None):
+        # Method to add a member to an organization with organization uid and member email id
+        if appender is None:
+            response = self.org_handler.add_member_to_organization(org_uid, member_email, expected_response_text)
+        else:
+            response = self.org_handler.add_member_to_organization(org_uid, member_email, expected_response_text,
+                                                            appender=appender)
+        return response
+
+    def check_if_member_is_already_existing_in_organization(self, org_uid, member_email):
         """
         Method to check a member to existing organization
-        \n:param org_name:<existing_organization_name>
+        \n:param org_uid:<existing_organization_uid>
         \n:param member_email:<new_member_email-id>
         \n:return: isExisting <boolean>
 
         Example:
-        | add new member to existing organization |  org_name | member_email
-        | add new member to existing organization |  test_org | tester@gmail.com
+        | add new member to existing organization |  org_uid | member_email
+        | add new member to existing organization |  0x202ef | tester@gmail.com
         """
-        return self.org_handler.check_member_in_organization(org_name, member_email)
+        return self.org_handler.check_member_in_organization(org_uid, member_email)
 
-    def remove_member_from_existing_organization(self, org_name, member_email, appender=None):
+    def remove_member_from_existing_organization(self, org_uid, member_email, appender=None):
         """
         Method to remove a member from organization
         :param appender: <if needed for url>
-        :param org_name: <organization_name>
+        :param org_uid: <organization_uid>
         :param member_email: <email_id>
         :return: <json_response>
 
         Example:
-        | remove member from existing organization |  org_name | member_email | appender <optional>
-        | remove member from existing organization |  Memo Group | tester@gmail.com |
+        | remove member from existing organization |  org_uid | member_email | appender <optional>
+        | remove member from existing organization |  0x201ef | tester@gmail.com |
         """
         if appender:
-            response = self.org_handler.remove_member_from_organization(org_name, member_email, appender)
+            response = self.org_handler.remove_member_from_organization(org_uid, member_email, appender)
         else:
-            response = self.org_handler.remove_member_from_organization(org_name, member_email)
+            response = self.org_handler.remove_member_from_organization(org_uid, member_email)
         return response
 
     def remove_org_from_deployment(self, deployment_name):
@@ -140,15 +138,15 @@ class OrganizationsKeywords:
         """
         return self.org_handler.remove_org_from_deployment(deployment_name)
 
-    def add_org_to_deployment(self, deployment_name, org_name):
+    def add_org_to_deployment(self, deployment_name, org_uid):
         """
         Method to remove organization from deployment
         :param deployment_name: <deployment_name>
-        :param org_name: <organization_name>
+        :param org_uid: <organization_uid>
         :return: response
 
         Example:
-        | add org to deployment |  deployment_name | org_name |
-        | add org to deployment |  Pokemon | Test Organization |
+        | add org to deployment |  deployment_name | org_uid |
+        | add org to deployment |  Pokemon | 0x201ef |
         """
-        return self.org_handler.add_org_from_deployment(deployment_name, org_name)
+        return self.org_handler.add_organization_to_deployment(deployment_name, org_name)
