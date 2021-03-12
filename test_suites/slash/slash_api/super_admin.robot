@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation     This is a simple test with Robot Framework
+Documentation     This Suite covers the Update deployemnt tests of a super admin user
 Suite Setup       Create Backend
 Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
 Test Setup
@@ -13,10 +13,6 @@ Variables         ../../../conf/slash/slash_api/variables.py
 ${Session_alias}    Session1
 
 *** Test Cases ***
-Update Deployment mode
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test-edit    deployment_mode=flexible
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
-
 update Deployment name
     [Documentation]    List of tests covered
     ...
@@ -24,8 +20,8 @@ update Deployment name
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    updated
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
     ${deployment_name}=    get deployment attribute data    ${deployment_details}    name
+    Should Be Equal    ${deployment_name}    updated
     Should Be Equal    ${deployment_name}    updated
     [Teardown]
 
