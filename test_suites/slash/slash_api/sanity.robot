@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     This is a simple test with Robot Framework
 Suite Setup       Create Backend
-Suite Teardown
+Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
 Test Setup
 Test Teardown
 Default Tags      Sanity
@@ -143,84 +143,8 @@ update Deployment name
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    updated
     ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    ${deployment_name}=    get deployment attribute data    ${deployment_details}=    name
+    ${deployment_name}=    get deployment attribute data    ${deployment_details}    name
     Should Be Equal    ${deployment_name}    updated
-    [Teardown]
-
-update Deployment HA
-    [Documentation]    List of tests covered
-    ...
-    ...    - Update dgraph cloud deployment HA
-    [Tags]    C236    Sanity
-    [Template]
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated
-    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40
-    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}    dgraphHA=true
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
-    ${deployment_HA}=    get deployment attribute data    ${deployment_details}    dgraphHA
-    Should Be Equal    ${deployment_HA}    true
-    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
-    [Teardown]
-
-create Dgraph cloud deployment
-    [Documentation]    List of tests covered
-    ...
-    ...    - Create Dgraph cloud Deployment
-    [Tags]    C236    Sanity
-    [Template]
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated
-    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40
-    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
-    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
-    [Teardown]
-
-Update deployment backup interval
-    [Documentation]    List of tests covered
-    ...
-    ...    - Update deployment name
-    [Tags]    C236    Sanity
-    [Template]
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    backupInterval=8h
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    ${backup_interval}=    get deployment attribute data    ${deployment_details}    backupInterval
-    Should Be Equal    ${backup_interval}    8h
-    [Teardown]
-
-Update deployment backup bucket format
-    [Documentation]    List of tests covered
-    ...
-    ...    - Update deployment name
-    [Tags]    C236    Sanity
-    [Template]
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    backupBucketFormat=%Y-%U-%D
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    ${backup_interval}=    get deployment attribute data    ${deployment_details}    backupBucketFormat
-    Should Be Equal    ${backup_interval}    %Y-%U-%D
-    [Teardown]
-
-Update deployment jaeger
-    [Documentation]    List of tests covered
-    ...
-    ...    - Update deployment jaeger
-    [Tags]    C236    Sanity
-    [Template]
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    jaegerEnabled=true
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    ${backup_interval}=    get deployment attribute data    ${deployment_details}    jaegerEnabled
-    Should Be Equal    ${backup_interval}    true
-    [Teardown]
-
-Update deployment ACL
-    [Documentation]    List of tests covered
-    ...
-    ...    - Update deployment jaeger
-    [Tags]    C236    Sanity
-    [Template]
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    aclEnabled=true
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    ${backup_interval}=    get deployment attribute data    ${deployment_details}    aclEnabled
-    Should Be Equal    ${backup_interval}    true
     [Teardown]
 
 *** Keywords ***

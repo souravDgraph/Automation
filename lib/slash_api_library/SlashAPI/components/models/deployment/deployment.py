@@ -68,7 +68,7 @@ class DeploymentModels:
     }"""
 
     get_deployment = """{
-        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled dgraphHA backupInterval backupBucketFormat aclEnabled} }",
+        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled} }",
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
 
