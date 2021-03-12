@@ -33,15 +33,16 @@ class Organizations:
         return output
     
     @staticmethod
-    def get_organization_id(environment, org_name, expected_return_code=0):
+    def get_organization_id(environment, organization_list, expected_return_code=0):
         organization_details = Organizations.get_organizations(environment, expected_return_code)
-        organizations = organization_details.split("\\n")
-        for organization in organizations:
-            if org_name in organization:
+        organization_details = organization_details.split("\\n")
+        organization_list = organization_list.split("\\n")
+        for organization in organization_details:
+            if organization not in organization_list:
                 logger.info(organization)
-                organization_details = organization.split(" ")
-                org_uid = organization_details[0]
+                org_uid = organization.split(" ")[0]
                 logger.info(org_uid)
+                break
         return org_uid
 
     @staticmethod

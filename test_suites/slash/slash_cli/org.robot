@@ -50,8 +50,9 @@ Update Backend With Existing Organization
     ...     Update deployment with organization name
     ${endpoint}=    SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    region=ap-south-1    organizationId=${org_uid}      expected_output_text=${DEPLOYMENT_LAUNCH_MESSAGE}
     ${deployment_id}=    Get Deployment Id With Endpoint    ${Environment}    ${endpoint}
-    SlashCLI.Create Organization     ${Environment}    test20     Organization test20 created successfully.
-    ${org_uid}=     Get Organization Id     ${Environment}      test20
+    ${organization_list}=     SlashCLI.Get Organizations      ${Environment}
+    SlashCLI.Create Organization     ${Environment}    ${org_name}      Organization ${org_name} created successfully.
+    ${org_uid}=      Get Organization Id     ${Environment}     ${organization_list}
     SlashCLI.Update Deployment   ${Environment}     ${endpoint}     ${Backend_name}     organizationId=${org_uid}      expected_output_text=${UPDATE_DEPLOYMENT}
     SlashCLI.Delete Deployment    ${Environment}    ${deployment_id}       expected_output_text=${DELETE_DEPLOYMENT}
 
@@ -92,6 +93,7 @@ Remove Member To Non-Existing Organization
 
 *** Keywords ***
 Create Organization And Set Organization Id
+    ${organization_list}=     SlashCLI.Get Organizations      ${Environment}
     SlashCLI.Create Organization     ${Environment}    ${org_name}      Organization ${org_name} created successfully.
-    ${org_uid}=     Get Organization Id     ${Environment}      ${org_name}
+    ${org_uid}=      Get Organization Id     ${Environment}     ${organization_list}
     Set Suite Variable    ${org_uid}

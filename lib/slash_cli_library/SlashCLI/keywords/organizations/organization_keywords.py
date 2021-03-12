@@ -40,10 +40,10 @@ class OrganizationKeywords:
         return  org_member
 
     @staticmethod
-    def get_organization_id(environment, organization, expected_return_code=0):
+    def get_organization_id(environment, organization_list, expected_return_code=0):
         logger.info("Getting Organization ID")
         org_uid = Organizations.get_organization_id(environment,
-                                                        organization,
+                                                        organization_list,
                                                         expected_return_code)
         return org_uid
 
