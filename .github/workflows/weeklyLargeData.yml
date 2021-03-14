@@ -59,7 +59,8 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
-          clean: false  
+          ref: release/v21.03
+          clean: false   
           path: dgraph_workspace_weeklyLargeData 
         
           
