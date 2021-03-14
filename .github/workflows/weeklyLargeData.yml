@@ -19,8 +19,8 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: [self-hosted, dgin-delta]
-    timeout-minutes: 4320
+    runs-on: [self-hosted, dgus-bravo]
+    timeout-minutes: 5320
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -110,7 +110,10 @@ jobs:
         with: 
           name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
           path: |
-            ${{ github.workspace }}/Automation_workspace_weeklyLargeData/
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/test_data
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/doc
+            ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/output.xml
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/p
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/w
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/zw
+            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/t
         
