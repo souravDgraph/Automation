@@ -42,7 +42,7 @@ TC_04 Perform NFS backup and restore data
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression   CI
      Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_06 Perform Increment backup and restore data
