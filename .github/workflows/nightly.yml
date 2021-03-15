@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
-          ref: release/v20.11.2
+          ref: v20.11.2
           clean: false  
           path: dgraph_workspace  
         
