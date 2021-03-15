@@ -25,6 +25,8 @@ Start Dgraph
     ${version}=     Get Dgraph Details      Dgraph version
     ${branch}=     Get Dgraph Details      Branch
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
+    ...  ELSE
+    ...  Set variable       ${version}
     ${check}=   check dgraph version    ${version}
     Set Suite Variable      ${is_latest}    ${check}
 
@@ -41,6 +43,9 @@ Start Dgraph Ludicrous Mode
     Wait For Process    timeout=10 s    on_timeout=continue
     ${version}=     Get Dgraph Version Details
     ${check}=   check dgraph version    ${version}
+    ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
+    ...  ELSE
+    ...  Set variable       ${version}
     Set Suite Variable      ${is_latest}    ${check}
 
 Start Dgraph In Docker
