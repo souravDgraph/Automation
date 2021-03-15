@@ -68,7 +68,7 @@ class DeploymentModels:
     }"""
 
     get_deployment = """{
-        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain } }",
+        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled} }",
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
 
@@ -108,23 +108,28 @@ class DeploymentModels:
         ,"organizationId": {{'"' + properties['organizationId'] + '"' }}
         {% endif %}
         
-        {% if properties['enterprise'] and properties['enterprise'] != "" %}
-        ,"enterprise": {{ '"' + properties['enterprise'] + '"' }}
+        {% if properties['deploymentType'] and properties['deploymentType'] != "" %}
+        ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}
         {% endif %}
-        
-         {% if properties['storage'] and properties['storage'] != "" %}
-        ,"storage": {{ '"' + properties['storage'] + '"' }}
+        {% if properties['alphaStorage'] and properties['alphaStorage'] != "" %}
+        ,"alphaStorage": {{ '"' + properties['alphaStorage'] + '"' }}
         {% endif %}
     
     }"""
 
     create_deployment = """
     {
-    "query":"mutation CreateDeployment($input: NewDeployment!) {createDeployment(input: $input) {enterprise size uid url name zone subdomain charts{compact full} jwtToken organization {uid name createdBy {accountType}} owner deletedAt frontendUrl frontendRepo deploymentMode lambdaScript dgraphHA}}",
+    "query":"mutation CreateDeployment($input: NewDeployment!) {createDeployment(input: $input) {enterprise size uid url name zone deploymentType alphaStorage subdomain charts{compact full} jwtToken organization {uid name createdBy {accountType}} owner deletedAt frontendUrl frontendRepo deploymentMode lambdaScript dgraphHA}}",
     "variables":{
         "input":{
-             {% if properties['name'] and properties['name'] != "" %}
+            {% if properties['name'] and properties['name'] != "" %}
             "name": {{ '"' + properties['name'] + '"' }}
+            {% endif %}
+            {% if properties['deploymentType'] and properties['deploymentType'] != "" %}
+            ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}
+            {% endif %}
+            {% if properties['alphaStorage'] and properties['alphaStorage'] != "" %}
+            ,"alphaStorage": {{ '"' + properties['alphaStorage'] + '"' }}
             {% endif %}
             
             {% if properties['zone'] and properties['zone'] != "" %}
@@ -149,4 +154,62 @@ class DeploymentModels:
             }
             }
     }
+    """
+
+    update_deployment = """
+    {"query": "mutation UpdateDeployment($input: UpdateDeploymentInput!) {updateDeployment(input: $input)}",
+     "variables": {"input": {
+        "uid": {{ '"' + properties['uid'] + '"' }}
+        {% if properties['name'] and properties['name'] != "" %}
+        ,"name": {{ '"' + properties['name'] + '"' }}
+        {% endif %}
+    
+        {% if properties['zone'] and properties['zone'] != "" %}
+        ,"zone": {{ '"' + properties['zone'] + '"' }}
+        {% endif %}
+    
+        {% if properties['subdomain'] and properties['subdomain'] != "" %}
+        ,"subdomain": {{ '"' + properties['subdomain'] + '"' }}
+        {% endif %}
+    
+        {% if properties['organization'] and properties['organization'] != "" %}
+        ,"organization": {{ '"' + properties['organization'] + '"' }}
+        {% endif %}
+    
+        {% if properties['deploymentMode'] and properties['deploymentMode'] != "" %}
+        ,"deploymentMode": {{ '"' + properties['deploymentMode'] + '"' }}
+        {% endif %}
+    
+        {% if properties['dgraphHA'] and properties['dgraphHA'] != "" %}
+        ,"dgraphHA": {{ '"' + properties['dgraphHA'] + '"' }}
+        {% endif %}
+    
+        {% if properties['size'] and properties['size'] != "" %}
+        ,"size": {{ '"' + properties['size'] + '"' }}
+        {% endif %}
+    
+        {% if properties['organizationId'] and properties['organizationId'] == "empty" %}
+        "organizationId": null
+        {% elif properties['organizationId'] and properties['organizationId'] != "" %}
+        ,"organizationId": {{'"' + properties['organizationId'] + '"' }}
+        {% endif %}
+        
+        {% if properties['jaegerEnabled'] and properties['jaegerEnabled'] != "" %}
+        ,"jaegerEnabled": {{ '"' + properties['jaegerEnabled'] + '"' }}
+        {% endif %}
+        
+         {% if properties['storage'] and properties['storage'] != "" %}
+        ,"storage": {{ '"' + properties['storage'] + '"' }}
+        {% endif %}
+        {% if properties['backupInterval'] and properties['backupInterval'] != "" %}
+        ,"backupInterval": {{ '"' + properties['backupInterval'] + '"' }}
+        {% endif %}
+        {% if properties['backupBucketFormat'] and properties['backupBucketFormat'] != "" %}
+        ,"backupBucketFormat": {{ '"' + properties['backupBucketFormat'] + '"' }}
+        {% endif %}
+        {% if properties['aclEnabled'] and properties['aclEnabled'] != "" %}
+        ,"aclEnabled": {{ '"' + properties['aclEnabled'] + '"' }}
+        {% endif %}
+        }
+     }}
     """
