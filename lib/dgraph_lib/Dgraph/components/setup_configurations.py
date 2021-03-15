@@ -377,7 +377,7 @@ class DgraphCLI:
         else:
             logger.debug("Version is empty so considering it as latest dgraph"
                          " from master branch.")
-            return True
+            return "latest"
 
     def set_dgraph_version(self, version=None, branch=None):
         """

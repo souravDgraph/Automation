@@ -145,7 +145,7 @@ class SetupDgraphKeywords:
         :param version:
         :return:
         """
-        DgraphCLI.check_version(version)
+        return DgraphCLI.check_version(version)
 
     def get_dgraph_details(self, dgraph_details_key):
         """
