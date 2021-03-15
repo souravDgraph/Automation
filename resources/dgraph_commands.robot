@@ -87,7 +87,7 @@ Start Dgraph Alpha
     [Documentation]    Start Dgraph alpha process.
     # Dgraph alpha and zero command
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
-    ${alpha_command}    Generate Dgraph Alpha Cli Command    alpha      
+    ${alpha_command}    Generate Dgraph Alpha Cli Command
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
@@ -96,7 +96,7 @@ Start Dgraph Alpha for bulk loader
     [Arguments]    ${path}
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
-    ${alpha_command}    Generate Dgraph Alpha Cli Command    ${path}     
+    ${alpha_command}    Generate Dgraph Alpha Cli Command    bulk_path=${path}
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
