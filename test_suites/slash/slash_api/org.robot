@@ -59,7 +59,7 @@ Organization Member Trying to Modify Backend
     ...    Modify deployment with organization member auth
     Add New Member To Existing Organization    ${org_uid}    ${user_email}
     Add Org To Deployment   ${BACKEND_NAME}     ${org_uid}
-    Update Deployment    ${Session_alias}    ${URL}    ${USER2_HEADER}    ${deployment_id}     deploymentType=free    expected_response_text=Not Authorized to update the Deployment: ${deployment_id}
+    Update Deployment    ${Session_alias}    ${URL}    ${USER2_HEADER}    ${deployment_id}    expected_response_text=Not Authorized to update the Deployment: ${deployment_id}
     Remove Member From Existing Organization    ${org_uid}    ${user_email}
     Remove Org From Deployment   ${BACKEND_NAME}
 
