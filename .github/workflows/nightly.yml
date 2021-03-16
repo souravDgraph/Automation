@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
-          ref: ${{ dgraphBranch }} 
+          ref: ${{ github.event.inputs.dgraphBranch }} 
           clean: false  
           path: dgraph_workspace  
           
