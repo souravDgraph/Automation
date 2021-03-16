@@ -6,14 +6,17 @@ name: nightly
 on:
   # Triggers the workflow
   schedule:
-     # * is a special character in YAML so you have to quote this string
      - cron:  '0 1 * * *'
-     
-     - cron:  '0 13 * * *'
+     - cron:  '0 13 * * *' 
      
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+        dgraphBranch:
+          description: 'Dgraph Branch'     
+          required: true
+          default: 'release/v21.03'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -58,17 +61,25 @@ jobs:
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 create_docker_yml.py -v master -c enabled
-        
-      # Download Dgraph Repo
+      
       - name: Check out Dgraph repo
         uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
-          ref: release/v21.03
+          ref: ${{ github.event.inputs.dgraphBranch }} 
           clean: false  
           path: dgraph_workspace  
-        
           
+#       - name: checkout branch for schedule event
+#         if: (github.event_name == 'schedule') #for schedule event, checkout matrix branches seperately.
+#         uses: actions/checkout@master
+#         with:
+#           repository: dgraph-io/dgraph
+#           ref: 'release/v21.03'
+#           clean: false  
+#           path: dgraph_workspace  
+                    
+        
       # Build Dgraph
       -  name: Build Dgraph on GitAction Runner
          run: |
