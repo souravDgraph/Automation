@@ -123,10 +123,11 @@ End Zero Process
     Terminate Process    handle=zero
     Sleep    5s
     @{zero_context}    Create List    All done. Goodbye!
+    @{dir}    Create List    w  zw
     Verify file Content in results folder    zero    @{zero_context}
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
-End Aplha Process
+End Alpha Process
     [Arguments]    ${is_clear_folder}
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
@@ -135,7 +136,7 @@ End Aplha Process
     Sleep    5s
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify file Content in results folder    alpha    @{alpha_context}
-    @{dir}    Create List    p    t    w    out    alpha
+    @{dir}    Create List    p    t
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
     Sleep    10s
 
@@ -400,6 +401,15 @@ clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
     @{dir}    Create List    p    t    w    zw    out    alpha
+    FOR    ${foldername}    IN    @{dir}
+        Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
+    END
+    Log    "All the folders created by alpha and zero were deleted."
+
+clean up bulk folders
+    [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
+    ${curr_dir}=    Normalize Path    ${CURDIR}/..
+    @{dir}    Create List    out    alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
