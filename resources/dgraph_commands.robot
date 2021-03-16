@@ -195,7 +195,7 @@ Execute Bulk Loader with rdf and schema parameters
     ...    rdf_filename, schema_filename"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${alpha_process_check}=    Is Process Running    alpha
-    Run Keyword If    "${alpha_process_check}"=="True"    End Aplha Process    false
+    Run Keyword If    "${alpha_process_check}"=="True"    End Alpha Process    false
     Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk
     Verify process to be stopped    bulk
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    100.00%
@@ -225,9 +225,9 @@ Verify Bulk Process
     Should Contain    ${loader_Text_File_Content}    100.00%
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     END ZERO PROCESS     true
-    End Aplha Process     true
+    End Alpha Process     true
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
-    End Aplha Process    true
+    End Alpha Process    true
     Clean up bulk folders   true
     Start Dgraph Alpha    local
 
@@ -240,7 +240,7 @@ Execute Parallel Loader with rdf and schema parameters
     @{loader_type}=    Create List    live    bulk
     FOR    ${i}    IN    @{loader_type}
         ${alpha_process_check}=    Is Process Running    alpha
-        Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Aplha Process    false
+        Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Alpha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}
         Wait For Process    timeout=30 s
