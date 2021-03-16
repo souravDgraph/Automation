@@ -137,6 +137,7 @@ End Aplha Process
     Verify file Content in results folder    alpha    @{alpha_context}
     @{dir}    Create List    p    t    w    out    alpha
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
+    Sleep    10s
 
 Get Dgraph Details
     [Documentation]  Keyword to get dgraph details from dgraph version
