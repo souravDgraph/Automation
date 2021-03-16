@@ -5,7 +5,7 @@ Author: vivetha@dgraph.io
 """
 
 from SlashCLI.keywords.deployemnts.deployment_keywords import DeploymentKeywords
-
+from SlashCLI.keywords.organizations.organization_keywords import OrganizationKeywords
 
 
 # pylint: disable=too-many-ancestors
@@ -20,7 +20,7 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class SlashCLI(DeploymentKeywords):
+class SlashCLI(DeploymentKeywords, OrganizationKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
 
     All the keywords pertaining to slash cli are
