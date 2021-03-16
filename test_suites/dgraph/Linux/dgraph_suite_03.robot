@@ -28,26 +28,26 @@ TC_02 Perform bulk load data.
 
 TC_03 Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.
-    [Tags]      regression
+    [Tags]      regression   WEEKLY
     Export NFS data using admin endpoint    rdf    true
 
 TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   C702    C700
+     [Tags]    regression   C702    C700   WEEKLY
      Create NFS Backup      full
      perform a restore on backup
 
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression   WEEKLY
      Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression   WEEKLY
      Create NFS Backup    full
      Create NFS Backup    increment
      perform a restore on backup
@@ -55,5 +55,5 @@ TC_06 Perform Increment backup and restore data
 TC_07 Perform parallel live loads.
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression   WEEKLY
      Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2

@@ -16,44 +16,45 @@ ${schema_file}    1million.schema
 TC_01 Perform live load data.
      [Documentation]    Perform live load operation on dataset.
      ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   CI   C698
+     [Tags]    regression   C698
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_02 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
-     [Tags]    regression   CI
+     [Tags]    regression
      Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_03 Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.
     ...    *Author*: Krishna, Sourav and Sankalan
-    [Tags]      regression
+    [Tags]      regression   WEEKLY
     Export NFS data using admin endpoint    json    true
 
 TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
-     [Tags]    regression   C702    C700
-     Create NFS Backup      full
-     perform a restore on backup
+     [Tags]    regression   C702    C700   WEEKLY
+     Create NFS Backup      1
+     perform a restore on backup    0
+     Clear Backup Folders   true
 
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression   CI   WEEKLY
      Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
-     [Tags]    regression
-     Create NFS Backup    full
-     Create NFS Backup    increment
-     perform a restore on backup
+     [Tags]    regression   WEEKLY
+     Create NFS Backup    2
+     perform a restore on backup    1
+     Clear Backup Folders   true
 
 TC_07 Perform parallel live loads.
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression   WEEKLY
      Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2

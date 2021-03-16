@@ -7,7 +7,6 @@ Author: vivetha@dgraph.io
 
 from robot.api import logger
 from SlashCLI.components.utils.utils import Utils
-from SlashCLI.components.deployments.constants import DeploymentConstants
 
 __all__ = ['Deployments']
 __author__ = "Vivetha Madesh"
@@ -89,17 +88,18 @@ class Deployments:
     @staticmethod
     def update_deployment(environment,
                           endpoint,
-                          deployment_name=None,
+                          name=None,
                           mode="graphql",
                           acl=None,
                           organizationId=None,
                           token=None,
                           skip_confirmation=True,
+                          expected_output_text=None,
                           expected_return_code=0):
         properties = locals()
-        properties_to_exclude = ['deployment_name', "expected_return_code"]
-        base_command = "deploy-backend "
-        options = deployment_name
+        properties_to_exclude = ["skip_confirmation", "expected_output_text", "expected_return_code"]
+        base_command = "update-backend "
+        options = ""
         if skip_confirmation:
             options += " --confirm"
         for key in properties.keys():
@@ -109,6 +109,8 @@ class Deployments:
         output, error = Utils.execute_slash_graphql_command(base_command,
                                                             options,
                                                             expected_return_code)
+        if expected_output_text not in str(output) and expected_return_code==0:
+            raise Exception("Unable to Update Deployment")
 
     @staticmethod
     def get_deployment_id_with_endpoint(environment,
