@@ -121,6 +121,35 @@ update Deployment mode
     Should Be Equal    ${deployment_mode}    readonly
     [Teardown]
 
+protect and un protect Deployment
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update dgraph cloud deployment name
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment Protection    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    protect
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${deployment_mode}=    get deployment attribute data    ${deployment_details}    isProtected
+    Should Be Equal    ${deployment_mode}    true
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    deploymentType=shared    expected_response_text=${PROTECT_MODE_ERROR}
+    Update Deployment Protection    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    unprotect
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${deployment_mode}=    get deployment attribute data    ${deployment_details}    isProtected
+    Should Be Equal    ${deployment_mode}    false
+    [Teardown]
+
+Update deployment type
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update dgraph cloud deployment jaeger
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    deploymentType=shared
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    ${type}=    get deployment attribute data    ${deployment_details}    deploymentType
+    Should Be Equal    ${type}    shared
+    [Teardown]
+
 *** Keywords ***
 Create Backend
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    shared
