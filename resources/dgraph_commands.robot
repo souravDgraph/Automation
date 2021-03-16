@@ -228,7 +228,7 @@ Verify Bulk Process
     End Alpha Process     true
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     End Alpha Process    true
-    Clean up bulk folders   true
+    Clean up bulk folders
     Start Dgraph Alpha    local
 
 
