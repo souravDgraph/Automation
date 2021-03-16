@@ -157,10 +157,10 @@ class DeploymentKeywords():
                           deployment_subdomain=None,
                           organizationId=None,
                           deploymentMode=None,
+                          deploymentType=None,
                           dgraphHA=None,
                           doNotFreeze=None,
                           jaegerEnabled=None,
-                          isProtected=None,
                           size=None,
                           backupInterval=None,
                           backupBucketFormat=None,
@@ -178,10 +178,10 @@ class DeploymentKeywords():
                                                  deployment_zone,
                                                  deployment_subdomain,
                                                  deploymentMode,
+                                                 deploymentType,
                                                  dgraphHA,
                                                  doNotFreeze,
                                                  jaegerEnabled,
-                                                 isProtected,
                                                  size,
                                                  organizationId,
                                                  backupInterval,
@@ -202,6 +202,23 @@ class DeploymentKeywords():
                                       url,
                                       auth,
                                       expected_response)
+
+    @staticmethod
+    def update_deployment_protection(session_alias,
+                                     base_url,
+                                     auth,
+                                     backend_uid,
+                                     operation,
+                                     expected_response=200):
+        logger.info("Update Deployment Protection")
+        url = base_url + "graphql"
+        response = Deployments.update_deployment_protection(session_alias,
+                                                            url,
+                                                            auth,
+                                                            backend_uid,
+                                                            operation,
+                                                            expected_response)
+        return response
 
     @staticmethod
     def backup_ops(session_alias,

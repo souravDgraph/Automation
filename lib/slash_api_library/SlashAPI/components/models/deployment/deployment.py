@@ -68,7 +68,7 @@ class DeploymentModels:
     }"""
 
     get_deployment = """{
-        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled} }",
+        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled isProtected deploymentType} }",
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
 
@@ -210,6 +210,18 @@ class DeploymentModels:
         {% if properties['aclEnabled'] and properties['aclEnabled'] != "" %}
         ,"aclEnabled": {{ '"' + properties['aclEnabled'] + '"' }}
         {% endif %}
+        {% if properties['deploymentType'] and properties['deploymentType'] != "" %}
+        ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}  
+        {% endif %}
         }
+        
      }}
+    """
+
+    protect_deployment = """
+       {"query": "mutation UpdateDeploymentProtection($input: UpdateDeploymentProtectionInput!){updateDeploymentProtection(input:$input){uid isProtected}}",
+       "variables": {"input": {
+        "uid": {{ '"' + properties['uid'] + '"' }},
+        "protect": ""
+        }}}
     """
