@@ -223,9 +223,13 @@ Verify Bulk Process
     Should Contain    ${loader_Text_File_Content}    100.00%
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     End Aplha Process    true
-    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
-    End Aplha Process    true
-    Start Dgraph Alpha    local
+    ${zero_process_check}=    Is Process Running    zero
+    Run Keyword If  ${zero_process_check}   Run Keywords
+    ...    AND     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
+    ...    AND     End Aplha Process    true
+    ...    AND     Start Dgraph Alpha    local
+    ...     ELSE
+    ...     Fail
 
 Execute Parallel Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
@@ -252,6 +256,7 @@ Execute Parallel Loader with rdf and schema parameters
         Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    ${grep_context}
         ...    ELSE     Verify Bulk Process     ${loader_Text_File_Content}
     END
+    ${zero_process_check}=    Is Process Running    zero
     ${alpha_process_check}=    Is Process Running    alpha
 
 Execute Multiple Parallel Live Loader with rdf and schema parameters
