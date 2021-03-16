@@ -224,8 +224,7 @@ Verify Bulk Process
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     End Aplha Process    true
     ${zero_process_check}=    Is Process Running    zero
-    Run Keyword If  ${zero_process_check}   Run Keywords
-    ...    AND     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
+    Run Keyword If  ${zero_process_check}   Run Keywords    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     ...    AND     End Aplha Process    true
     ...    AND     Start Dgraph Alpha    local
     ...     ELSE
