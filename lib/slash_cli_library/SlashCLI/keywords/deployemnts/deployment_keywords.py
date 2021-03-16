@@ -76,6 +76,7 @@ class DeploymentKeywords:
                           organizationId=None,
                           token=None,
                           skip_confirmation=True,
+                          expected_output_text=None,
                           expected_return_code=0):
         logger.info("Update deployment with Id : %s" % endpoint)
         deployments = Deployments.update_deployment(environment,
@@ -86,6 +87,7 @@ class DeploymentKeywords:
                                                     organizationId,
                                                     token,
                                                     skip_confirmation,
+                                                    expected_output_text,
                                                     expected_return_code)
         return deployments
 

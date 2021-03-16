@@ -92,32 +92,41 @@ List backups of a non existing backend
     List Backups    ${Environment}    ${deployment_id}    ${NO_BACKEND_ERROR}    2
     [Teardown]
 
-Create a shared backend with ACL oprtion
+Create a shared backend with ACL option
     [Documentation]    List of test cases covered
     ...    -> Create shared backend with ACL options (Negative case)
     [Setup]
     SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    slash-graphql    ap-south-1    acl=true    expected_output_text=${ACL_INVALID_INPUT_ERROR}    expected_return_code=2
     [Teardown]
 
-Create a shared backend with HA oprtion
+Create a shared backend with HA option
     [Documentation]    List of test cases covered
     ...    -> Create shared backend with HA options (Negative case)
     [Setup]
     SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    slash-graphql    ap-south-1    dgraphHA=true    expected_output_text=${HA_INVALID_INPUT_ERROR}    expected_return_code=2
     [Teardown]
 
-Create a shared backend with jaeger oprtion
+Create a shared backend with jaeger option
     [Documentation]    List of test cases covered
     ...    -> Create shared backend with jaeger options (Negative case)
     [Setup]
     SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    slash-graphql    ap-south-1    jaeger=true    expected_output_text=${JAEGER_INVALID_INPUT_ERROR}    expected_return_code=2
     [Teardown]
 
-Create a shared backend with size oprtion
+Create a shared backend with size option
     [Documentation]    List of test cases covered
     ...    -> Create shared backend with different size options (Negative case)
     [Setup]
     SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    slash-graphql    ap-south-1    size=large    expected_output_text=${SIZE_INVALID_INPUT_ERROR}    expected_return_code=2
+    [Teardown]
+
+Create Deployment With Non-Existing Zone
+    [Documentation]
+    ...     List of Tests Covered
+    ...
+    ...     Create a deployment with non-existing zone
+    [Setup]   
+    SlashCLI.Create Deployment    ${Environment}    ${Backend_name}    region=ap-south-3     expected_output_text=${NON_EXISTING_ZONE_ERROR}      expected_return_code=2
     [Teardown]
 
 *** Keywords ***
