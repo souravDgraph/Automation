@@ -6,10 +6,8 @@ name: nightly
 on:
   # Triggers the workflow
   schedule:
-     # * is a special character in YAML so you have to quote this string
      - cron:  '0 1 * * *'
-     
-     - cron:  '0 13 * * *'
+     - cron:  '0 13 * * *' 
      
 
   # Allows you to run this workflow manually from the Actions tab
@@ -63,7 +61,22 @@ jobs:
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 create_docker_yml.py -v master -c enabled
-        
+      
+      - name: setenv
+        if: github.event.schedule=='0 1 * * *'         # set-env value
+        run: |
+          echo "::set-env name=dgraphBranch::release/v21.03"
+          
+      - name: setenv2
+        if: github.event.schedule=='0 13 * * *'         # set-env value
+        run: |
+          echo "::set-env name=dgraphBranch::master"
+      
+      - name: check env value  # check env value
+        run: |
+          echo $dgraphBranch
+          exit 0
+          
       # Download Dgraph Repo
       - name: Check out Dgraph repo
         uses: actions/checkout@master
