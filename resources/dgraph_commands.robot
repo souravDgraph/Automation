@@ -78,7 +78,7 @@ Start Dgraph Zero
     [Documentation]    Start Dgraph Zero process
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt    stderr=zero_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results   shell=True    stdout=zero.txt    stderr=zero_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
 
@@ -467,8 +467,8 @@ Monitor zero and alpha process
     [Documentation]    Keyword to monitor zero and alpha process to run
     ${alpha_process_check}=    Is Process Running    alpha
     ${zero_process_check}=    Is Process Running    zero
-    Run Keyword If    "${alpha_process_check}"=="False"    Start Dgraph Alpha    false
-    Run Keyword If    "${zero_process_check}"=="False"    Start Dgraph Zero    false
+    End All Process     true
+    Start Dgraph
 
 Monitor health and state check
     [Documentation]   Keyword to check the health and state of the connection.
