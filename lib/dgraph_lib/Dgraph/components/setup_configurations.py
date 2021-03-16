@@ -286,7 +286,7 @@ class DgraphCLI:
 
         appender = appender + args_appender
 
-        cli_command = cli_command + appender + " 2>&1"
+        cli_command = cli_command + appender + " --raft idx=1 2>&1"
         return cli_command
 
     def build_alpha_cli(self, bulk_path=None, **kwargs):
