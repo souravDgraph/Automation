@@ -73,6 +73,13 @@ jobs:
            make install
            export PATH=~/go/bin/:$PATH
            dgraph version
+       
+     # Check Config File for Dgraph
+      -  name: Check dgraph execution configuration
+         run: |
+           echo ${{ github.workspace }}
+           cd ${{ github.workspace }}/Automation_workspace
+           cat conf/dgraph/conf_dgraph.json
          
       - name: Run Robot Framework Testcases
         run: |
