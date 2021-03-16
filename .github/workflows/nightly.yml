@@ -64,6 +64,7 @@ jobs:
       
       - name: Check out Dgraph repo
         if: (github.event_name != 'schedule')
+        uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
           ref: ${{ dgraphBranch }} 
