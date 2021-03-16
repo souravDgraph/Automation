@@ -228,7 +228,9 @@ Verify Bulk Process
     End Aplha Process     true
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     End Aplha Process    true
+    Clean up bulk folders   true
     Start Dgraph Alpha    local
+
 
 Execute Parallel Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
@@ -406,7 +408,7 @@ clean up dgraph folders
     END
     Log    "All the folders created by alpha and zero were deleted."
 
-clean up bulk folders
+Clean up bulk folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
     @{dir}    Create List    out    alpha
