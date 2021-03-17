@@ -12,6 +12,11 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+        dgraphBranch:
+          description: 'Dgraph Branch'     
+          required: true
+          default: 'release/v21.03'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -62,6 +67,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: dgraph-io/dgraph
+          ref: ${{ github.event.inputs.dgraphBranch }}
           clean: false  
           path: dgraph_workspace  
         
