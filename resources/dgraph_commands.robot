@@ -122,7 +122,7 @@ End All Process
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Terminate All Processes
-    Sleep    5s
+    Sleep    30s
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
@@ -141,6 +141,7 @@ End Zero Process
     @{dir}    Create List    alpha_zero_logs/w  alpha_zero_logs/zw
     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
+    Sleep    30s
 
 End Alpha Process
     [Arguments]    ${is_clear_folder}
@@ -153,7 +154,7 @@ End Alpha Process
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
-    Sleep    10s
+    Sleep    30s
 
 Get Dgraph Details
     [Documentation]  Keyword to get dgraph details from dgraph version
