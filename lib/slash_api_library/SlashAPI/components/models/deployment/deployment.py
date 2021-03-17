@@ -68,7 +68,7 @@ class DeploymentModels:
     }"""
 
     get_deployment = """{
-        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled} }",
+        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled isProtected deploymentType} }",
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
 
@@ -111,6 +111,7 @@ class DeploymentModels:
         {% if properties['deploymentType'] and properties['deploymentType'] != "" %}
         ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}
         {% endif %}
+        
         {% if properties['alphaStorage'] and properties['alphaStorage'] != "" %}
         ,"alphaStorage": {{ '"' + properties['alphaStorage'] + '"' }}
         {% endif %}
@@ -188,28 +189,44 @@ class DeploymentModels:
         ,"size": {{ '"' + properties['size'] + '"' }}
         {% endif %}
     
-        {% if properties['organizationId'] and properties['organizationId'] == "empty" %}
-        "organizationId": null
-        {% elif properties['organizationId'] and properties['organizationId'] != "" %}
-        ,"organizationId": {{'"' + properties['organizationId'] + '"' }}
+        {% if properties['organizationUID'] and properties['organizationUID'] == "empty" %}
+        ,"organizationUID": null
+        {% elif properties['organizationUID'] and properties['organizationUID'] != "" %}
+        ,"organizationUID": {{'"' + properties['organizationUID'] + '"' }}
         {% endif %}
         
         {% if properties['jaegerEnabled'] and properties['jaegerEnabled'] != "" %}
         ,"jaegerEnabled": {{ '"' + properties['jaegerEnabled'] + '"' }}
         {% endif %}
         
-         {% if properties['storage'] and properties['storage'] != "" %}
+        {% if properties['storage'] and properties['storage'] != "" %}
         ,"storage": {{ '"' + properties['storage'] + '"' }}
         {% endif %}
+
         {% if properties['backupInterval'] and properties['backupInterval'] != "" %}
         ,"backupInterval": {{ '"' + properties['backupInterval'] + '"' }}
         {% endif %}
+
         {% if properties['backupBucketFormat'] and properties['backupBucketFormat'] != "" %}
         ,"backupBucketFormat": {{ '"' + properties['backupBucketFormat'] + '"' }}
         {% endif %}
+
         {% if properties['aclEnabled'] and properties['aclEnabled'] != "" %}
         ,"aclEnabled": {{ '"' + properties['aclEnabled'] + '"' }}
         {% endif %}
+
+        {% if properties['deploymentType'] and properties['deploymentType'] != "" %}
+        ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}  
+        {% endif %}
         }
+        
      }}
+    """
+
+    protect_deployment = """
+       {"query": "mutation UpdateDeploymentProtection($input: UpdateDeploymentProtectionInput!){updateDeploymentProtection(input:$input){uid isProtected}}",
+       "variables": {"input": {
+        "uid": {{ '"' + properties['uid'] + '"' }},
+        "protect": ""
+        }}}
     """

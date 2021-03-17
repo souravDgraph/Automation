@@ -154,13 +154,14 @@ class DeploymentKeywords():
                           deployment_id,
                           deployment_name=None,
                           deployment_zone=None,
+                          deploymentType="free",
                           deployment_subdomain=None,
-                          organizationId=None,
+                          organizationUID=None,
                           deploymentMode=None,
+                          deploymentType=None,
                           dgraphHA=None,
                           doNotFreeze=None,
                           jaegerEnabled=None,
-                          isProtected=None,
                           size=None,
                           backupInterval=None,
                           backupBucketFormat=None,
@@ -176,14 +177,15 @@ class DeploymentKeywords():
                                                  deployment_id,
                                                  deployment_name,
                                                  deployment_zone,
+                                                 deploymentType,
                                                  deployment_subdomain,
                                                  deploymentMode,
+                                                 deploymentType,
                                                  dgraphHA,
                                                  doNotFreeze,
                                                  jaegerEnabled,
-                                                 isProtected,
                                                  size,
-                                                 organizationId,
+                                                 organizationUID,
                                                  backupInterval,
                                                  backupBucketFormat,
                                                  aclEnabled,
@@ -202,6 +204,23 @@ class DeploymentKeywords():
                                       url,
                                       auth,
                                       expected_response)
+
+    @staticmethod
+    def update_deployment_protection(session_alias,
+                                     base_url,
+                                     auth,
+                                     backend_uid,
+                                     operation,
+                                     expected_response=200):
+        logger.info("Update Deployment Protection")
+        url = base_url + "graphql"
+        response = Deployments.update_deployment_protection(session_alias,
+                                                            url,
+                                                            auth,
+                                                            backend_uid,
+                                                            operation,
+                                                            expected_response)
+        return response
 
     @staticmethod
     def backup_ops(session_alias,
@@ -344,5 +363,7 @@ class DeploymentKeywords():
                                                           url,
                                                           auth,
                                                           expected_response)
-        logger.info(response["data"]["getGQLSchema"]["schema"])
-        return response["data"]["getGQLSchema"]["schema"]
+        if response["data"]:
+            logger.info(response["data"]["getGQLSchema"]["schema"])
+            return response["data"]["getGQLSchema"]["schema"]
+        return response

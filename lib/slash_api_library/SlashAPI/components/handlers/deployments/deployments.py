@@ -96,14 +96,15 @@ class Deployments():
                           uid,
                           name=None,
                           zone=None,
+                          deploymentType=None,
                           subdomain=None,
                           deploymentMode=None,
+                          deploymentType="free",
                           dgraphHA=None,
                           doNotFreeze=None,
                           jaegerEnabled=None,
-                          isProtected=None,
                           size=None,
-                          organizationId=None,
+                          organizationUID=None,
                           backupInterval=None,
                           backupBucketFormat=None,
                           aclEnabled=None,
@@ -117,7 +118,6 @@ class Deployments():
         logger.debug(properties)
         data = Utils.render_data_from_template(DeploymentModels.update_deployment,
                                                properties)
-        logger.debug(data)
         connection = Connection()
         connection.create_session(session_alias,
                                   url,
@@ -131,9 +131,36 @@ class Deployments():
         logger.debug(response.text)
         if "errors" in response.json() and response.json()["errors"][0]["message"] != expected_response_text:
             raise Exception("Expected error not found")
-        elif expected_response_text not in str(response.text):
+        elif response.json()["data"] and expected_response_text not in str(response.text):
             raise Exception("Expected response body is not found")
         return response
+
+    @staticmethod
+    def update_deployment_protection(session_alias,
+                                     url,
+                                     auth,
+                                     backend_uid,
+                                     operation,
+                                     expected_response=None):
+        properties = {"uid": backend_uid}
+        data = Utils.render_data_from_template(DeploymentModels.protect_deployment,
+                                               properties)
+        if operation.lower() == "protect":
+            data["variables"]["input"]["protect"] = True
+        elif operation.lower() == "unprotect":
+            data["variables"]["input"]["protect"] = False
+        else:
+            raise Exception("Not supported operation")
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                              '',
+                                              json=data,
+                                              headers=auth,
+                                              expected_status=str(expected_response))
+        logger.info(response.json())
+        logger.info(response.text)
+        return response.json()
 
     @staticmethod
     def backup_ops(session_alias,
