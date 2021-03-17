@@ -42,17 +42,25 @@ jobs:
           # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
           token: ${{ github.token }} # optional, default is ${{ github.token }}
           
-      # Navigating to the directory and installing the requiremenets file
+      # Navigating to the directory and installing the requirements file
+#       - name: Install requirements for Dgraph and Slash
+#         run: |
+#           echo ${{ github.workspace }}
+#           cd ${{ github.workspace }}/Automation_workspace/utilities
+#           ls -alh
+#           random_port=$(( ((RANDOM<<15)|RANDOM) % 49152 + 10000 ))
+#           status="$(nc -z 127.0.0.1 $random_port < /dev/null &>/dev/null; echo $?)"
+#           if [ "${status}" != "0" ]; then
+#               echo "$random_port is free to use";
+#           fi
+#           python3 env_setup.py -l All -c enabled -o $random_port
+      
       - name: Install requirements for Dgraph and Slash
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          random_port=$(( ((RANDOM<<15)|RANDOM) % 49152 + 10000 ))
-          status="$(nc -z 127.0.0.1 $random_port < /dev/null &>/dev/null; echo $?)"
-          if [ "${status}" != "0" ]; then
-              echo "$random_port is free to use";
-          fi
+          random_port=$((1 + $RANDOM % 3))
           python3 env_setup.py -l All -c enabled -o $random_port
         
       - name: Configuring docker-compose file
