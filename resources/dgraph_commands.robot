@@ -148,7 +148,7 @@ End Alpha Process
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Switch Process    alpha
     Terminate Process    handle=alpha
-    Sleep   30s
+    Sleep   60s
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t
