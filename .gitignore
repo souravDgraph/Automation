@@ -129,6 +129,8 @@ dmypy.json
 
 # results folder
 results/**
+results/alpha_zero_logs/**
+results/inc_logs/**
 !results/inc_logs/.gitkeep
 !results/alpha_zero_logs/.gitkeep
 
