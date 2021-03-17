@@ -139,7 +139,7 @@ backup/*
 !backup/.gitkeep
 
 # export folder
-export/*
+export/**
 !export/.gitkeep
 
 #other files
