@@ -275,6 +275,7 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
 
         # Configure tls and mtls
@@ -302,6 +303,7 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
         for key, value in kwargs.items():
             if key == "ludicrous_mode" and value == "enabled":
@@ -313,7 +315,7 @@ class DgraphCLI:
         cli_command = cli_command + self.get_security_command(is_latest)
 
         if bulk_path:
-            appender = appender + " -p " + bulk_path
+            appender = appender + f' --postings "{bulk_path}" '
         if self.acl:
             appender = appender + self.get_acl_command(is_latest)
         if self.enc:
@@ -443,7 +445,7 @@ class DgraphCLI:
         # Loader CLI command generation
         cli_command = " dgraph"
         cli_bulk_encryption = ""
-
+        logger.debug(f"offset value: {self.offset}")
         loader_type = loader_type.lower()
         docker_location = None
         if docker_string:

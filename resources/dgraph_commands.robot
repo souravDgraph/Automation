@@ -194,8 +194,6 @@ Execute Bulk Loader with rdf and schema parameters
     [Documentation]    Keyword to accept two params "rdf_filename","schema_filename" perform bulk loader.
     ...    rdf_filename, schema_filename"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${alpha_process_check}=    Is Process Running    alpha
-    Run Keyword If    "${alpha_process_check}"=="True"    End Alpha Process    false
     Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk
     Verify process to be stopped    bulk
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    100.00%
@@ -220,12 +218,14 @@ Monitor Live loader Process
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
-    [Documentation]     Keyword to verify bulk loader output
+    [Documentation]     Keyword to verify bulk loader output files generated along with
+     ...    altering zero and alpha instances.
     ${dir_path}=    normalize path    ${CURDIR}/..
     Should Contain    ${loader_Text_File_Content}    100.00%
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     END ZERO PROCESS     true
     End Alpha Process     true
+    Start Dgraph Zero   local
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     End Alpha Process    true
     Clean up bulk folders
@@ -515,6 +515,7 @@ Verify process to be stopped
         ${process_check}=    Is Process Running    ${process_alias}
         Exit For Loop If    '${process_check}'=='False'
     END
+    Sleep   30s
     Log    ${process_alias} Process is stopped
     Comment    Wait Until Keyword Succeeds    600x    5minute    Process Should Be Stopped    handle=${process_alias}    error_message=${error_message} is still running
 
