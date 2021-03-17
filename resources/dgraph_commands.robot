@@ -9,17 +9,19 @@ Library           Collections
 *** Variables ***
 ${is_latest}
 ${docker_exe_string}
+${zero_count}   0
+${alpha_count}  0
 
 *** Keywords ***
 Start Dgraph
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/alpha_zero_logs    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command       
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/alpha_zero_logs    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
     ${version}=     Get Dgraph Details      Dgraph version
@@ -29,16 +31,20 @@ Start Dgraph
     ...  Set variable       ${version}
     ${check}=   check dgraph version    ${version}
     Set Suite Variable      ${is_latest}    ${check}
+    ${zero_count}   Evaluate        ${zero_count} + 1
+    ${alpha_count}  Evaluate        ${alpha_count} + 1
+    Set Suite Variable      ${zero_count}    ${zero_count}
+    Set Suite Variable      ${alpha_count}    ${alpha_count}
 
 Start Dgraph Ludicrous Mode
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/alpha_zero_logs    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command          ludicrous_mode=enabled
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/alpha_zero_logs    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
     ${version}=     Get Dgraph Version Details
@@ -47,6 +53,10 @@ Start Dgraph Ludicrous Mode
     ...  ELSE
     ...  Set variable       ${version}
     Set Suite Variable      ${is_latest}    ${check}
+    ${zero_count}   Evaluate        ${zero_count} + 1
+    ${alpha_count}  Evaluate        ${alpha_count} + 1
+    Set Suite Variable      ${zero_count}    ${zero_count}
+    Set Suite Variable      ${alpha_count}    ${alpha_count}
 
 Start Dgraph In Docker
     [Arguments]     ${folder_name}
@@ -78,9 +88,11 @@ Start Dgraph Zero
     [Documentation]    Start Dgraph Zero process
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results   shell=True    stdout=zero.txt    stderr=zero_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/alpha_zero_logs   shell=True    stdout=zero_${zero_count}.txt    stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
+    ${zero_count}   Evaluate        ${zero_count} + 1
+    Set Suite Variable      ${zero_count}    ${zero_count}
 
 Start Dgraph Alpha
     [Arguments]    ${platform}
@@ -88,18 +100,21 @@ Start Dgraph Alpha
     # Dgraph alpha and zero command
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${alpha_command}    Generate Dgraph Alpha Cli Command
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/alpha_zero_logs    shell=True    stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
+    ${alpha_count}  Evaluate        ${alpha_count} + 1
+    Set Suite Variable      ${alpha_count}    ${alpha_count}
 
 Start Dgraph Alpha for bulk loader
     [Arguments]    ${path}
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
     ${alpha_command}    Generate Dgraph Alpha Cli Command    bulk_path=${path}
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results/alpha_zero_logs
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
+    ${alpha_count}  Evaluate        ${alpha_count} + 1
     # End dgraph and zero process and clear the folders created in results
 
 End All Process
@@ -111,8 +126,8 @@ End All Process
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
-    Verify file Content in results folder    zero    @{zero_context}
-    Verify file Content in results folder    alpha    @{alpha_context}
+    Verify alpha and zero contents in results folder    zero    @{zero_context}
+    Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 End Zero Process
@@ -123,8 +138,8 @@ End Zero Process
     Terminate Process    handle=zero
     Sleep    5s
     @{zero_context}    Create List    All done. Goodbye!
-    @{dir}    Create List    w  zw
-    Verify file Content in results folder    zero    @{zero_context}
+    @{dir}    Create List    alpha_zero_logs/w  alpha_zero_logs/zw
+    Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 End Alpha Process
@@ -135,8 +150,8 @@ End Alpha Process
     Terminate Process    handle=alpha
     Sleep    5s
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
-    Verify file Content in results folder    alpha    @{alpha_context}
-    @{dir}    Create List    p    t
+    Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
     Sleep    10s
 
@@ -402,7 +417,7 @@ Verify Bulk Loader output generated
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    p    t    w    zw    out    alpha
+    @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t    alpha_zero_logs/w    alpha_zero_logs/zw    out    alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
@@ -455,6 +470,17 @@ Verify file exists in a directory with parent folder name
     @{dirs}=    List Directories In Directory    ${path}
     FOR    ${dir}    IN    @{dirs}
         directory should exist    ${folder_name.strip()}/${dir}
+    END
+
+Verify alpha and zero contents in results folder
+    [Arguments]    ${file_name}    @{context}
+    [Documentation]    Keyword for checking content in .txt files generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${count}=   Set Variable If     '${file_name}' == 'zero'   ${zero_count}   ${alpha_count}
+    FOR     ${i}  IN RANGE   ${count}
+        ${file_context}=    Get File    ${dir_path}/results/alpha_zero_logs/${file_name}_${i}.txt
+        Should Contain Any    ${file_context}    @{context}
     END
 
 Verify file Content in results folder
