@@ -154,8 +154,9 @@ class DeploymentKeywords():
                           deployment_id,
                           deployment_name=None,
                           deployment_zone=None,
+                          deploymentType="free",
                           deployment_subdomain=None,
-                          organizationId=None,
+                          organizationUID=None,
                           deploymentMode=None,
                           deploymentType=None,
                           dgraphHA=None,
@@ -176,6 +177,7 @@ class DeploymentKeywords():
                                                  deployment_id,
                                                  deployment_name,
                                                  deployment_zone,
+                                                 deploymentType,
                                                  deployment_subdomain,
                                                  deploymentMode,
                                                  deploymentType,
@@ -183,7 +185,7 @@ class DeploymentKeywords():
                                                  doNotFreeze,
                                                  jaegerEnabled,
                                                  size,
-                                                 organizationId,
+                                                 organizationUID,
                                                  backupInterval,
                                                  backupBucketFormat,
                                                  aclEnabled,
@@ -361,5 +363,7 @@ class DeploymentKeywords():
                                                           url,
                                                           auth,
                                                           expected_response)
-        logger.info(response["data"]["getGQLSchema"]["schema"])
-        return response["data"]["getGQLSchema"]["schema"]
+        if response["data"]:
+            logger.info(response["data"]["getGQLSchema"]["schema"])
+            return response["data"]["getGQLSchema"]["schema"]
+        return response
