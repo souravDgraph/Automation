@@ -17,10 +17,12 @@ Start Dgraph
     ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results    shell=True    stdout=zero.txt      stderr=zero_err.txt
     Process Should Be Running    zero
+    Sleep    100s
     Wait For Process    timeout=10 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command       
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha.txt    cwd=results    shell=True       stderr=alpha_err.txt
     Process Should Be Running    alpha
+    Sleep    100s
     Wait For Process    timeout=10 s    on_timeout=continue
     ${version}=     Get Dgraph Details      Dgraph version
     ${branch}=     Get Dgraph Details      Branch
