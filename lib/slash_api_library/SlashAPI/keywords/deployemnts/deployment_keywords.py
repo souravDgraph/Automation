@@ -324,6 +324,30 @@ class DeploymentKeywords():
         return response
 
     @staticmethod
+    def update_rules_to_deployment(session_alias, base_url, auth, deployment_id, rules, expected_response_text="Anon Access updated successfully.", expected_response=200):
+        logger.info("Updating rules to deployment id: %s" % deployment_id)
+        url = base_url + "graphql"
+        response = Deployments.update_rules_to_deployment(session_alias,
+                                                            url,
+                                                            auth,
+                                                            deployment_id,
+                                                            rules,
+                                                            expected_response_text,
+                                                            expected_response)
+        return response
+
+    @staticmethod
+    def get_existing_rules(session_alias, base_url, auth, deployment_id, expected_response=200):
+        logger.info("Get existing rules for the deployment id: %s" % deployment_id)
+        url = base_url + "graphql"
+        response = Deployments.get_existing_rules(session_alias,
+                                                    url,
+                                                    auth,
+                                                    deployment_id,
+                                                    expected_response)
+        return response
+
+    @staticmethod
     def perform_operation_to_database(session_alias,
                                       base_url,
                                       auth,

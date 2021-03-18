@@ -379,6 +379,42 @@ class Deployments():
         return response.json()
 
     @staticmethod
+    def update_rules_to_deployment(session_alias, url, auth, deployment_id, rules, expected_response_text, expected_response=None):
+        properties = {
+            "anonAccess" : rules,
+            "deploymentID" : deployment_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.update_rules, properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                                '',
+                                                json=data,
+                                                headers=auth,
+                                                expected_status=str(expected_response))
+
+        logger.info(response.json())
+        if expected_response_text != response.json()["data"]["updateDeploymentAnonAccess"]:
+            raise Exception("Expected response body not found")
+        return response.json()
+
+    @staticmethod
+    def get_existing_rules(session_alias, url, auth, deployment_id, expected_response=None):
+        properties = {
+            "deploymentID" : deployment_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.get_rules, properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                                '',
+                                                json=data,
+                                                headers=auth,
+                                                expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
+
+    @staticmethod
     def perform_operation_to_database(session_alias,
                                       url,
                                       auth,
