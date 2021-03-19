@@ -329,9 +329,23 @@ Create NFS Backup
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res.text}
         Verify file exists in a directory with parent folder name    ${backup_path}
+        Health Check for Backup Operation
     END
     @{dirs_backup}=    List Directories In Directory    ${backup_path}
     log     ${dirs_backup}
+
+Health Check for Backup Operation
+    [Documentation]  Keyword to verify if backup operation is completed successfully
+    Connect Request Server
+    Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
+
+Check if backup is completed
+    ${response}=    Health Check    /health
+    log     ${response}
+    ${on_going}     Get Value From Json     ${response}    [0].$..ongoing[0]
+    ${check}    Run Keyword And Return Status   Should Be Empty     ${on_going}
+    Return From Keyword If   ${check}    Pass
+    Run Keyword if  '${on_going}[0]'=='opBackup'    Fail
 
 Clear Backup Folders
     [Documentation]  Keyword to clear backup folders
@@ -379,6 +393,19 @@ Perform a restore on backup
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
     ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}
+    Health Check for Restore Operation
+
+Health Check for Restore Operation
+    [Documentation]  Keyword to verify if backup operation is completed successfully
+    Connect Request Server
+    Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
+
+Check if restore is completed
+    ${response}=    Health Check    /health
+    ${passed}    Run Keyword And Return Status   Should Be String    ${response}
+    Run Keyword If  ${passed}
+    ...     Evaluate    '${response}'=='the server is in draining mode and client requests will only be allowed after exiting the mode  by sending a GraphQL draining(enable: false) mutation to /admin'    Fail
+
 
 Perform a restore on backup present at other location
     [Arguments]   ${backup_path}     ${is_increment}
@@ -501,10 +528,12 @@ Grep and Verify file Content in results folder
     Should Contain    ${grep_file}    ${grep_text}
 
 Monitor zero and alpha process
+    [Arguments]  ${is_clear_folder}
     [Documentation]    Keyword to monitor zero and alpha process to run
     ${alpha_process_check}=    Is Process Running    alpha
     ${zero_process_check}=    Is Process Running    zero
-    End All Process     true
+    Run Keyword If      !${alpha_process_check}     End Zero Process    ${is_clear_folder}
+    Run Keyword If      !${zero_process_check}      End Alpha Process   ${is_clear_folder}
     Start Dgraph
 
 Monitor health and state check
@@ -514,9 +543,8 @@ Monitor health and state check
 
 Monitor health check
     [Documentation]   Keyword to check the health of the connection.
-    connect request server      
-    ${appender}=    Set Variable      /health
-    ${response}=    Health Check    ${appender}
+    connect request server
+    ${response}=    Health status Check    /health
     log     ${response}
     Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
 
