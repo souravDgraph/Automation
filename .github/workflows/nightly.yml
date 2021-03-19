@@ -127,6 +127,13 @@ jobs:
       
       # Getting Current time
       - name: Get current time
+        run: |
+            cd ${{ github.workspace }}/Automation_workspace
+            mv results/ results_nightly_${{ steps.current-time.outputs.formattedTime }}/
+            mkdir results
+          
+      # backup results:
+      - name: Backup Results Folder
         uses: 1466587594/get-current-time@v2
         if: always()
         id: current-time
