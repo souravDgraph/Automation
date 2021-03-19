@@ -79,6 +79,10 @@ class DeploymentModels:
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
 
+    read_rules_attributes = """{"rules":{"types": ["get{{ properties['type'] }}","query{{ properties['type'] }}","aggregate{{ properties['type'] }}"],"lambdas":[]}}"""
+
+    write_rules_attributes = """{"rules":{"types": ["update{{ properties['type'] }}","add{{ properties['type'] }}","delete{{ properties['type'] }}"],"lambdas":[]}}"""
+
     deployment_attributes = """
     {
         {% if properties['name'] and properties['name'] != "" %}
