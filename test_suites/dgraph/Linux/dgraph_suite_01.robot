@@ -3,7 +3,7 @@ Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph
 Suite Teardown     End All Process    false
 Test Setup      Monitor Health And State check
-Test Teardown   Monitor zero and alpha process
+Test Teardown   Monitor zero and alpha process  true
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
 Library           String
@@ -38,6 +38,7 @@ TC_04 Perform NFS backup and restore data
      Create NFS Backup      1
      perform a restore on backup    0
      Clear Backup Folders   true
+     [Teardown]    NONE
 
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
@@ -52,6 +53,7 @@ TC_06 Perform Increment backup and restore data
      Create NFS Backup    2
      perform a restore on backup    1
      Clear Backup Folders   true
+     [Teardown]    NONE
 
 TC_07 Perform parallel live loads.
      [Documentation]    Perform live load data.
