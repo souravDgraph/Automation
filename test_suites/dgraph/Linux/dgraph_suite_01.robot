@@ -16,7 +16,7 @@ ${schema_file}    1million.schema
 TC_01 Perform live load data.
      [Documentation]    Perform live load operation on dataset.
      ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   C698    CI
+     [Tags]    regression   C698
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_02 Perform bulk load data.
