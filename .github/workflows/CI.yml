@@ -61,7 +61,7 @@ jobs:
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
-          python3 env_setup.py -l All -c enabled -o 2
+          python3 env_setup.py -l All -c enabled
         
       - name: Configuring docker-compose file
         run: |
