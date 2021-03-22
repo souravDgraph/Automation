@@ -223,7 +223,7 @@ Trigger Loader Process
     log     ${docker_exe_string}
     ${path}=    Set Variable If      '${docker_exe_string}' != ''   /Automation     ${dir_path}
     ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}      
-    ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
+    ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results/alpha_zero_logs
 
 Monitor Live loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
@@ -445,7 +445,7 @@ Verify Bulk Loader output generated
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t    alpha_zero_logs/w    alpha_zero_logs/zw    out    alpha
+    @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t    alpha_zero_logs/w    alpha_zero_logs/zw    alpha_zero_logs/out    alpha_zero_logs/alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
@@ -454,7 +454,7 @@ clean up dgraph folders
 Clean up bulk folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    out    alpha
+    @{dir}    Create List    alpha_zero_logs/out    alpha_zero_logs/alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
