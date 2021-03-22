@@ -110,7 +110,7 @@ Only Owner Update the Organization for Deployment
 	...		- Get Deployment Name and Deployment uid
 	...		- Update Deployment with User 1
 	...		- Update Deployment with User 2
-	${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
+	${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
 	${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     ${deployment_name}=    Collections.Get From Dictionary    ${data}    name
@@ -120,7 +120,7 @@ Only Owner Update the Organization for Deployment
 
 *** Keywords ***
 Create Backend
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}     free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}

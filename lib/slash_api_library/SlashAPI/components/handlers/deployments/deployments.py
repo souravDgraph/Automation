@@ -9,7 +9,7 @@ from robot.api import logger
 from SlashAPI.components.client.client import Connection
 from SlashAPI.components.handlers.utils.utils import Utils
 from SlashAPI.components.models.deployment.deployment import DeploymentModels
-import requests, time
+import requests, time, json
 
 __all__ = ['Deployments']
 __author__ = "Vivetha Madesh"
@@ -96,7 +96,6 @@ class Deployments():
                           uid,
                           name=None,
                           zone=None,
-                          deploymentType=None,
                           subdomain=None,
                           deploymentMode=None,
                           deploymentType="free",
@@ -230,10 +229,8 @@ class Deployments():
         properties = locals()
         logger.info(properties)
         del properties["response_data"]
-        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes,
-                                                properties)
-        Utils.compare_dict_based_on_primary_dict_keys(data,
-                                                       response_data)
+        data = Utils.render_data_from_template(DeploymentModels.deployment_attributes, properties)
+        Utils.compare_dict_based_on_primary_dict_keys(data, response_data)
 
     @staticmethod
     def get_deployments(session_alias,
@@ -375,6 +372,55 @@ class Deployments():
                                               json=data,
                                               headers=auth,
                                               expected_status=str(expected_response))
+        logger.info(response.json())
+        return response.json()
+
+    @staticmethod
+    def update_rules_to_deployment(session_alias, url, auth, deployment_id, rules, expected_response_text, expected_response=None):
+        properties = {
+            "anonAccess" : rules,
+            "deploymentID" : deployment_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.update_rules, properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                                '',
+                                                json=data,
+                                                headers=auth,
+                                                expected_status=str(expected_response))
+
+        logger.info(response.json())
+        if expected_response_text != response.json()["data"]["updateDeploymentAnonAccess"]:
+            raise Exception("Expected response body not found")
+        return response.json()
+
+    @staticmethod
+    def validate_rules_for_deployment(existing_rules, type_name, rule_type):
+        properties = {
+            "type" : type_name
+        }
+        if(rule_type=="read"):
+            data = Utils.render_data_from_template(DeploymentModels.read_rules_attributes, properties)
+        elif(rule_type=="write"):
+            data = Utils.render_data_from_template(DeploymentModels.write_rules_attributes, properties)
+        logger.info(data)
+        if data != json.loads(existing_rules["data"]["getDeploymentByID"]["anonAccess"]):
+            raise Exception("Expected data not found")
+
+    @staticmethod
+    def get_existing_rules(session_alias, url, auth, deployment_id, expected_response=None):
+        properties = {
+            "deploymentID" : deployment_id
+        }
+        data = Utils.render_data_from_template(DeploymentModels.get_rules, properties)
+        connection = Connection()
+        connection.create_session(session_alias, url, auth)
+        response = connection.post_on_session(session_alias,
+                                                '',
+                                                json=data,
+                                                headers=auth,
+                                                expected_status=str(expected_response))
         logger.info(response.json())
         return response.json()
 
