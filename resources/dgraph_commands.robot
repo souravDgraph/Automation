@@ -142,7 +142,7 @@ End Zero Process
     Terminate Process    handle=zero
     Sleep   30s
     @{zero_context}    Create List    All done. Goodbye!
-    @{dir}    Create List    /w  /zw
+    @{dir}    Create List    w  zw
     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
@@ -155,7 +155,7 @@ End Alpha Process
     Sleep   40s
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
-    @{dir}    Create List    /p    /t
+    @{dir}    Create List    p    t
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Get Dgraph Details
@@ -446,7 +446,7 @@ Verify Bulk Loader output generated
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    /p    /t    /w    /zw    out    alpha
+    @{dir}    Create List    p    t    w    zw    out    alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
