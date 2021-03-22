@@ -158,7 +158,6 @@ class DeploymentKeywords():
                           deployment_subdomain=None,
                           organizationUID=None,
                           deploymentMode=None,
-                          deploymentType=None,
                           dgraphHA=None,
                           doNotFreeze=None,
                           jaegerEnabled=None,
@@ -180,7 +179,6 @@ class DeploymentKeywords():
                                                  deploymentType,
                                                  deployment_subdomain,
                                                  deploymentMode,
-                                                 deploymentType,
                                                  dgraphHA,
                                                  doNotFreeze,
                                                  jaegerEnabled,
@@ -321,6 +319,35 @@ class DeploymentKeywords():
                                                            auth,
                                                            schema,
                                                            expected_response)
+        return response
+
+    @staticmethod
+    def update_rules_to_deployment(session_alias, base_url, auth, deployment_id, rules, expected_response_text="Anon Access updated successfully.", expected_response=200):
+        logger.info("Updating rules to deployment id: %s" % deployment_id)
+        url = base_url + "graphql"
+        response = Deployments.update_rules_to_deployment(session_alias,
+                                                            url,
+                                                            auth,
+                                                            deployment_id,
+                                                            rules,
+                                                            expected_response_text,
+                                                            expected_response)
+        return response
+
+    @staticmethod
+    def validate_rules_for_deployment(existing_rules, type_name, rule_type="read"):
+        logger.info("Validating the existing rules")
+        Deployments.validate_rules_for_deployment(existing_rules, type_name, rule_type)
+
+    @staticmethod
+    def get_existing_rules(session_alias, base_url, auth, deployment_id, expected_response=200):
+        logger.info("Get existing rules for the deployment id: %s" % deployment_id)
+        url = base_url + "graphql"
+        response = Deployments.get_existing_rules(session_alias,
+                                                    url,
+                                                    auth,
+                                                    deployment_id,
+                                                    expected_response)
         return response
 
     @staticmethod
