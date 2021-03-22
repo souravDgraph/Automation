@@ -534,8 +534,8 @@ Monitor zero and alpha process
     [Documentation]    Keyword to monitor zero and alpha process to run
     ${alpha_process_check}=    Is Process Running    alpha
     ${zero_process_check}=    Is Process Running    zero
-    Run Keyword If      ${alpha_process_check} == ${TRUE}     End Zero Process    ${is_clear_folder}
-    Run Keyword If      ${zero_process_check} == ${TRUE}      End Alpha Process   ${is_clear_folder}
+    Run Keyword If      ${alpha_process_check}     End Alpha Process    ${is_clear_folder}
+    Run Keyword If      ${zero_process_check}      End Zero Process   ${is_clear_folder}
     Start Dgraph
 
 Monitor health and state check
