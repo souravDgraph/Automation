@@ -5,6 +5,7 @@ Library           Dgraph
 Library           JSONLibrary
 Library           String
 Library           Collections
+Library           DateTime
 
 *** Variables ***
 ${is_latest}
@@ -17,12 +18,12 @@ Start Dgraph
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/alpha_zero_logs    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Sleep    100s
     Wait For Process    timeout=10 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command       
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/alpha_zero_logs    shell=True       stderr=alpha_${alpha_count}_err.txt
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Sleep    100s
     Wait For Process    timeout=10 s    on_timeout=continue
@@ -42,11 +43,11 @@ Start Dgraph Ludicrous Mode
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/alpha_zero_logs    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command          ludicrous_mode=enabled
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/alpha_zero_logs    shell=True       stderr=alpha_${alpha_count}_err.txt
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
     ${version}=     Get Dgraph Version Details
@@ -90,7 +91,7 @@ Start Dgraph Zero
     [Documentation]    Start Dgraph Zero process
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/alpha_zero_logs   shell=True    stdout=zero_${zero_count}.txt    stderr=zero_${zero_count}_err.txt
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/   shell=True    stdout=zero_${zero_count}.txt    stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
     ${zero_count}   Evaluate        ${zero_count} + 1
@@ -102,7 +103,7 @@ Start Dgraph Alpha
     # Dgraph alpha and zero command
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${alpha_command}    Generate Dgraph Alpha Cli Command
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/alpha_zero_logs    shell=True    stderr=alpha_${alpha_count}_err.txt
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True    stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
     ${alpha_count}  Evaluate        ${alpha_count} + 1
@@ -113,7 +114,7 @@ Start Dgraph Alpha for bulk loader
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
     ${alpha_command}    Generate Dgraph Alpha Cli Command    bulk_path=${path}
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results/alpha_zero_logs
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results/
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
     ${alpha_count}  Evaluate        ${alpha_count} + 1
@@ -130,6 +131,7 @@ End All Process
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Backup alpha and zero logs
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 End Zero Process
@@ -140,7 +142,7 @@ End Zero Process
     Terminate Process    handle=zero
     Sleep   30s
     @{zero_context}    Create List    All done. Goodbye!
-    @{dir}    Create List    alpha_zero_logs/w  alpha_zero_logs/zw
+    @{dir}    Create List    /w  /zw
     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
@@ -153,7 +155,7 @@ End Alpha Process
     Sleep   40s
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
-    @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t
+    @{dir}    Create List    /p    /t
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Get Dgraph Details
@@ -245,7 +247,6 @@ Verify Bulk Process
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
     End Alpha Process    true
     Clean up bulk folders
-    Start Dgraph Alpha    local
 
 
 Execute Parallel Loader with rdf and schema parameters
@@ -445,7 +446,7 @@ Verify Bulk Loader output generated
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    alpha_zero_logs/p    alpha_zero_logs/t    alpha_zero_logs/w    alpha_zero_logs/zw    out    alpha
+    @{dir}    Create List    /p    /t    /w    /zw    out    alpha
     FOR    ${foldername}    IN    @{dir}
         Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
     END
@@ -507,7 +508,7 @@ Verify alpha and zero contents in results folder
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${count}=   Set Variable If     '${file_name}' == 'zero'   ${zero_count}   ${alpha_count}
     FOR     ${i}  IN RANGE   ${count}
-        ${file_context}=    Get File    ${dir_path}/results/alpha_zero_logs/${file_name}_${i}.txt
+        ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
         Should Contain Any    ${file_context}    @{context}
     END
 
@@ -602,3 +603,9 @@ Check if parallel process is triggered
     Run Keyword If  '${result_check}'=='True'  Run Keywords     Sleep   30s
     ...     AND     Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}   ${loader_name}
     ...     AND     Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}   ${loader_name}
+
+
+Backup alpha and zero logs
+    [Documentation]
+    ${datetime} =	Get Current Date      result_format=%d-%m-%Y-%H-%M-%S
+    Move Files      results/*.txt	   results/exe_logs_${datetime}
