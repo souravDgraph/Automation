@@ -37,8 +37,8 @@ class LoginKeywords():
             Login    Browser1    user    password
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.input_text(LoginLocators.username, username)
-        browser.input_text(LoginLocators.password, password)
+        browser.input_text(LoginLocators.username, username, timeout=LoginKeywords.timeout)
+        browser.input_text(LoginLocators.password, password, timeout=LoginKeywords.timeout)
         browser.click_element(LoginLocators.continue_button)
 
     @staticmethod
