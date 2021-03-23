@@ -473,7 +473,7 @@ clean up list of folders in results dir
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
     FOR    ${foldername}    IN    @{dir}
-        Remove Directory    ${curr_dir}/results/${foldername}    recursive=True
+        Run    rm -rf ${curr_dir}/results/${foldername}
     END
     Log    "All the folders were deleted."
 
@@ -481,8 +481,7 @@ clean up a perticular folders
     [Arguments]    ${folder_name}
     [Documentation]    Keyword to clear up a perticular folder created.
     ${curr_dir}=    Normalize Path    ${CURDIR}/..
-    @{dir}    Create List    p    t    w    zw    out    alpha
-    Remove Directory    ${curr_dir}/results/${folder_name}    recursive=True
+    Run    rm -rf ${curr_dir}/results/${folder_name}
     Log    " ${folder_name} folder is deleted."
 
 Clear all the folder in a directory
