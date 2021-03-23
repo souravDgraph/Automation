@@ -21,13 +21,11 @@ Start Dgraph
     ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
-    Sleep    100s
-    Wait For Process    timeout=10 s    on_timeout=continue
+    Wait For Process    timeout=20 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command       
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
-    Sleep    100s
-    Wait For Process    timeout=10 s    on_timeout=continue
+    Wait For Process    timeout=20 s    on_timeout=continue
     ${version}=     Get Dgraph Details      Dgraph version
     ${branch}=     Get Dgraph Details      Branch
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
@@ -97,7 +95,7 @@ Start Dgraph Zero
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/   shell=True    stdout=zero_${zero_count}.txt    stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
-    Wait For Process    timeout=10 s    on_timeout=continue
+    Wait For Process    timeout=20 s    on_timeout=continue
     ${zero_count}   Evaluate        ${zero_count} + 1
     Set Suite Variable      ${zero_count}    ${zero_count}
 
@@ -158,7 +156,7 @@ End Alpha Process
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Switch Process    alpha
     Terminate Process    handle=alpha
-    Sleep   60s
+    Sleep   80s
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     @{dir}    Create List    p    t
