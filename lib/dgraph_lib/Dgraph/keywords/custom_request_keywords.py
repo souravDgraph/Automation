@@ -208,10 +208,10 @@ class CustomRequestKeywords:
                                              variables=variables, cert=cert)
         except Exception as err:
             raise Exception(f"Something went wrong with the backup request.. {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
-        assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
-        logger.info('Backup successfully completed')
-        return response
+        # assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
+        # assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
+        logger.info('Backup successfully initiated')
+        return response.json()
 
     def restore_using_admin(self, path):
         """
