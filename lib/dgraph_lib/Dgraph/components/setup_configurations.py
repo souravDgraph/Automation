@@ -220,7 +220,7 @@ class DgraphCLI:
         """
         logger.debug("Enabling ludicrous mode in alpha")
         if is_latest:
-            ludicrous_mode = " --ludicrous enabled"
+            ludicrous_mode = ' --ludicrous "enabled=true"'
         else:
             ludicrous_mode = " --ludicrous_mode"
         return ludicrous_mode

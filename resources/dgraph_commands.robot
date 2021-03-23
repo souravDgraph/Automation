@@ -12,6 +12,7 @@ ${is_latest}
 ${docker_exe_string}
 ${zero_count}   0
 ${alpha_count}  0
+${global_is_ludicrous_mode}
 
 *** Keywords ***
 Start Dgraph
@@ -38,10 +39,12 @@ Start Dgraph
     ${alpha_count}  Evaluate        ${alpha_count} + 1
     Set Suite Variable      ${zero_count}    ${zero_count}
     Set Suite Variable      ${alpha_count}    ${alpha_count}
+    Set Suite Variable      ${global_is_ludicrous_mode}    False
 
 Start Dgraph Ludicrous Mode
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
+    Set Suite Variable      ${global_is_ludicrous_mode}    True
     ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
@@ -50,8 +53,9 @@ Start Dgraph Ludicrous Mode
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${version}=     Get Dgraph Version Details
+    ${version}=     Get Dgraph Details      Dgraph version
     ${check}=   check dgraph version    ${version}
+    ${branch}=     Get Dgraph Details      Branch
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ...  ELSE
     ...  Set variable       ${version}
@@ -90,7 +94,7 @@ Start Dgraph Zero
     [Arguments]    ${platform}
     [Documentation]    Start Dgraph Zero process
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
-    ${zero_command}    Generate Dgraph Zero Cli Command     
+    ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/   shell=True    stdout=zero_${zero_count}.txt    stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=10 s    on_timeout=continue
@@ -98,11 +102,11 @@ Start Dgraph Zero
     Set Suite Variable      ${zero_count}    ${zero_count}
 
 Start Dgraph Alpha
-    [Arguments]    ${platform}
+    [Arguments]    ${platform}  ${is_ludicrous_mode}
     [Documentation]    Start Dgraph alpha process.
     # Dgraph alpha and zero command
     Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
-    ${alpha_command}    Generate Dgraph Alpha Cli Command
+    ${alpha_command}    Set Variable If   ${is_ludicrous_mode}   Generate Dgraph Alpha Cli Command     ludicrous_mode=enabled       Generate Dgraph Alpha Cli Command
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True    stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
@@ -110,10 +114,12 @@ Start Dgraph Alpha
     Set Suite Variable      ${alpha_count}    ${alpha_count}
 
 Start Dgraph Alpha for bulk loader
-    [Arguments]    ${path}
+    [Arguments]    ${path}      ${is_ludicrous_mode}
     [Documentation]    Start Dgraph Alpha with bulk loader data
     ...    "path"- path of the backup file, "process_id" - process id trigged for this process.
-    ${alpha_command}    Generate Dgraph Alpha Cli Command    bulk_path=${path}
+    ${alpha_command}    Run Keyword If   ${is_ludicrous_mode}   Generate Dgraph Alpha Cli Command     bulk_path=${path}    ludicrous_mode=enabled
+    ...     ELSE
+    ...       Generate Dgraph Alpha Cli Command      bulk_path=${path}
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_bulk.txt    stderr=alpha_bulk_err.txt    shell=True    cwd=results/
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
@@ -244,7 +250,7 @@ Verify Bulk Process
     END ZERO PROCESS     true
     End Alpha Process     true
     Start Dgraph Zero   local
-    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p
+    Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p       ${global_is_ludicrous_mode}
     END ZERO PROCESS     true
     End Alpha Process     true
     Clean up bulk folders
@@ -536,7 +542,9 @@ Monitor zero and alpha process
     ${zero_process_check}=    Is Process Running    zero
     Run Keyword If      ${alpha_process_check}     End Alpha Process    ${is_clear_folder}
     Run Keyword If      ${zero_process_check}      End Zero Process   ${is_clear_folder}
-    Start Dgraph
+    Run Keyword If  ${global_is_ludicrous_mode}     Start Dgraph Ludicrous Mode
+    ...     ELSE
+    ...     Start Dgraph
 
 Monitor health and state check
     [Documentation]   Keyword to check the health and state of the connection.

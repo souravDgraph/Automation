@@ -1,9 +1,9 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite with ludicrous mode
 Suite Setup        Start Dgraph Ludicrous Mode
-Suite Teardown     End All Process    false
+Suite Teardown     End All Process    true
 Test Setup      Monitor Health And State check
-Test Teardown   Monitor zero and alpha process
+Test Teardown   Monitor zero and alpha process  true
 Default Tags    ludicrous
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
