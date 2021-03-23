@@ -25,7 +25,7 @@ jobs:
   build:
     # The type of runner that the job will run on
 #     runs-on: ubuntu-latest
-    runs-on: [self-hosted, dgin-delta]
+    runs-on: [self-hosted, dgus-bravo]
     timeout-minutes:  4000
     
     # Steps represent a sequence of tasks that will be executed as part of the job
