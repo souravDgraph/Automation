@@ -140,28 +140,26 @@ End All Process
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 End Zero Process
-    [Arguments]    ${is_clear_folder}
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
-    ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Switch Process    zero
     Terminate Process    handle=zero
+
+Post Execution of ending alpha and zero process
+    [Arguments]    ${is_clear_folder}
+    [Documentation]  Keyword to verify alpha and zero logs
+    ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Sleep   60s
     @{zero_context}    Create List    All done. Goodbye!
-    @{dir}    Create List    w  zw
+    @{dir}    Create List    w  zw  p   t
+    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
+    Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 End Alpha Process
-    [Arguments]    ${is_clear_folder}
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
-    ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Switch Process    alpha
     Terminate Process    handle=alpha
-    Sleep   80s
-    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
-    Verify alpha and zero contents in results folder    alpha    @{alpha_context}
-    @{dir}    Create List    p    t
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Get Dgraph Details
     [Documentation]  Keyword to get dgraph details from dgraph version
@@ -246,12 +244,14 @@ Verify Bulk Process
     ${dir_path}=    normalize path    ${CURDIR}/..
     Should Contain    ${loader_Text_File_Content}    100.00%
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
-    END ZERO PROCESS     true
-    End Alpha Process     true
+    END ZERO PROCESS
+    End Alpha Process
+    Post Execution of ending alpha and zero process     true
     Start Dgraph Zero   local
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p       ${global_is_ludicrous_mode}
-    END ZERO PROCESS     true
-    End Alpha Process     true
+    END ZERO PROCESS
+    End Alpha Process
+    Post Execution of ending alpha and zero process     true
     Clean up bulk folders
 
 
@@ -538,8 +538,9 @@ Monitor zero and alpha process
     [Documentation]    Keyword to monitor zero and alpha process to run
     ${alpha_process_check}=    Is Process Running    alpha
     ${zero_process_check}=    Is Process Running    zero
-    Run Keyword If      ${alpha_process_check}     End Alpha Process    ${is_clear_folder}
-    Run Keyword If      ${zero_process_check}      End Zero Process   ${is_clear_folder}
+    Run Keyword If      ${alpha_process_check}     End Alpha Process
+    Run Keyword If      ${zero_process_check}      End Zero Process
+    Run Keyword If      ${alpha_process_check} and ${zero_process_check}    Post Execution of ending alpha and zero process     ${is_clear_folder}
     Run Keyword If  ${global_is_ludicrous_mode}     Start Dgraph Ludicrous Mode
     ...     ELSE
     ...     Start Dgraph
