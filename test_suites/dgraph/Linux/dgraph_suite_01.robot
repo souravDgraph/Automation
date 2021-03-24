@@ -35,6 +35,7 @@ TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
+     Clear Backup Folders   true
      Create NFS Backup      1
      perform a restore on backup    0
      Clear Backup Folders   true
@@ -50,6 +51,7 @@ TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
+     Clear Backup Folders   true
      Create NFS Backup    2
      perform a restore on backup    1
      Clear Backup Folders   true
