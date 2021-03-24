@@ -87,6 +87,8 @@ jobs:
            make install
            export PATH=~/go/bin/:$PATH
            dgraph version
+           cp /home/dg/go/bin/dgraph /usr/bin/
+           sudo dgraph version
            
 #       -  name: Build Dgraph on Self-Hosted Runner
 #          run: |
@@ -118,22 +120,28 @@ jobs:
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           export PATH=~/go/bin/:$PATH
           echo " ---- Running Dgraph Testcases ----"
-          robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
+          sudo robot --splitlog --include NIGHTLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
+          sudo robot --splitlog --include NIGHTLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
           
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
           # robot test_suites/slash/slash_api/sanity.robot
       
       
-      # Getting Current time
-      - name: Get current time
+      # backup results
+      - name: Backup Results Folder
         run: |
             cd ${{ github.workspace }}/Automation_workspace
             mv results/ results_nightly_${{ steps.current-time.outputs.formattedTime }}/
             mkdir results
-          
-      # backup results:
+            
+      # delete dgraph from root:
       - name: Backup Results Folder
+        run: |
+            sudo rm -rf /usr/bin/dgraph
+          
+      # Getting Current time:
+      - name: Get current time
         uses: 1466587594/get-current-time@v2
         if: always()
         id: current-time
