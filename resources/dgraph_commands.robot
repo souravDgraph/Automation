@@ -144,16 +144,24 @@ End Zero Process
     Switch Process    zero
     Terminate Process    handle=zero
 
-Post Execution of ending alpha and zero process
+Post Execution Verify Zero contents
     [Arguments]    ${is_clear_folder}
     [Documentation]  Keyword to verify alpha and zero logs
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Sleep   60s
     @{zero_context}    Create List    All done. Goodbye!
-    @{dir}    Create List    w  zw  p   t
+    @{dir}    Create List    w  zw
+    Verify alpha and zero contents in results folder    zero    @{zero_context}
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
+
+Post Execution Verify Alpha contents
+    [Arguments]    ${is_clear_folder}
+    [Documentation]  Keyword to verify alpha and zero logs
+    ...    Accepts argument "is_clear_folder" as a check to clear the folder
+    Sleep   60s
+    @{dir}    Create List    p   t
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
-    Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 End Alpha Process
@@ -246,12 +254,14 @@ Verify Bulk Process
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     END ZERO PROCESS
     End Alpha Process
-    Post Execution of ending alpha and zero process     true
+    Post Execution Verify Zero contents     true
+    Post Execution Verify Alpha contents     true
     Start Dgraph Zero   local
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p       ${global_is_ludicrous_mode}
     END ZERO PROCESS
     End Alpha Process
-    Post Execution of ending alpha and zero process     true
+    Post Execution Verify Zero contents     true
+    Post Execution Verify Alpha contents     true
     Clean up bulk folders
 
 
@@ -540,7 +550,8 @@ Monitor zero and alpha process
     ${zero_process_check}=    Is Process Running    zero
     Run Keyword If      ${alpha_process_check}     End Alpha Process
     Run Keyword If      ${zero_process_check}      End Zero Process
-    Run Keyword If      ${alpha_process_check} and ${zero_process_check}    Post Execution of ending alpha and zero process     ${is_clear_folder}
+    Run Keyword If      ${alpha_process_check}     Post Execution Verify Alpha contents     ${is_clear_folder}
+    Run Keyword If      ${zero_process_check}     Post Execution Verify Zero contents     ${is_clear_folder}
     Run Keyword If  ${global_is_ludicrous_mode}     Start Dgraph Ludicrous Mode
     ...     ELSE
     ...     Start Dgraph
