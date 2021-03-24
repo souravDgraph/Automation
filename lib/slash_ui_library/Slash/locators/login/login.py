@@ -19,11 +19,11 @@ class LoginLocators:
     """
 
     # User name text box
-    username = "xpath = //input[@type='email']"
+    username = "xpath = //input[@placeholder='yours@example.com']"
     # password text box
     password = "xpath = //input[@type='password']"
     # continue button
-    continue_button = "xpath = //button[@name='submit']"
+    login_button = "xpath = //input/following::button[text()='Login']"
     logout = "xpath = //div[text()='Log out']"
     profile = "xpath = //div/img[@alt='avatar']"
     ok_button = "xpath = //button[text()='Okay']"

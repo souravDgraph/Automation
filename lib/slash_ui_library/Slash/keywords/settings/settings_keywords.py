@@ -100,13 +100,23 @@ class SettingsKeywords:
                            api_key_name,
                            timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.create_api_button, timeout=SettingsKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(SettingsLocators.okay_button, timeout=20)
-        browser.click_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
 
     @staticmethod
-    def delete_api_key(browser, api_key_name):
+    def click_general_tab(browser_alias):
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SettingsLocators.general_tab, timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def verify_api_key_generated(browser_alias, api_key_name): 
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=timeout.SettingsKeywords.timeout)
+        browser.click_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def delete_api_key(browser_alias, api_key_name):
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.delete_button, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.delete_api_key_confirm, timeout=timeout.SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
-        browser.wait_until_page_contain_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_does_not_contain_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)

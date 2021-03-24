@@ -78,20 +78,9 @@ class DashboardKeywords():
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(DashboardLocators.spinning_backend,
                                                  timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.spinning_backend,
+        browser.wait_until_page_does_not_contain_element(DashboardLocators.cluster_usage,
                                                          timeout=timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.backend_live,
-                                                 timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.create_schema_button,
-                                                 timeout=DashboardKeywords.timeout)
-
-    @staticmethod
-    def click_schema_in_backend_creation(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(DashboardLocators.create_schema_button, timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.graphql_schema_button,
-                                                            timeout=DashboardKeywords.timeout)
-
+                                                         
     @staticmethod
     @keyword
     def click_schema_in_menu(browser_alias):
@@ -159,3 +148,20 @@ class DashboardKeywords():
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.quick_start_video,
                                 timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def click_avatar(browser_alias):
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.avatar_button,
+                                timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def click_logout_button(browser_alias):
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.logout,
+                                    timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def check_starter_product_disabled(browser_alias):
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.element_should_be_disabled(DashboardLocators.starter_product_disabled)
