@@ -115,38 +115,15 @@ class DashboardKeywords():
                                 timeout=DashboardKeywords.timeout)
 
     @staticmethod
-    def click_usage_metrics_in_menu(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(DashboardLocators.usage_metrics,
-                                timeout=DashboardKeywords.timeout)
-
-    @staticmethod
     def view_graphql_endpoint(browser_alias, endpoint):
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.graphql_endpoint.replace("%s", endpoint), timeout=DashboardKeywords.timeout)
-
-    @staticmethod
-    def view_deployment_info(browser_alias, location):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.deployment_location.replace("%s", location), 
+        browser.wait_until_page_does_not_contain_element(DashboardLocators.graphql_endpoint.replace("%s", endpoint), 
                                                             timeout=DashboardKeywords.timeout)
 
     @staticmethod
     def click_documentation_in_menu(browser_alias):
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.documentation,
-                                timeout=DashboardKeywords.timeout)
-
-    @staticmethod
-    def view_graphql_guide(browser_alias, graphql_guide_link):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(DashboardLocators.graphql_guide.replace("%s", graphql_guide_link),
-                                timeout=DashboardKeywords.timeout)
-
-    @staticmethod
-    def view_quick_start_video(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(DashboardLocators.quick_start_video,
                                 timeout=DashboardKeywords.timeout)
 
     @staticmethod

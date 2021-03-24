@@ -36,9 +36,6 @@ class DashboardLocators:
     backend_listbox = "xpath =//button[@aria-haspopup='listbox']"
     graphql_schema_button = "xpath = //button[text()='GraphQL Schema']"
     graphql_endpoint = "xpath = //input[@value='%s']"
-    deployment_location = "xpath = //h3[text()=' Deployment Info']/following::div[text()='Location : %s']"
-    graphql_guide = "xpath = //a[@href='%s']"
-    quick_start_video = "xpath = //button//h3[text()='Quick Start Video']"
     avatar_button = "xpath =//button//img[@alt='avatar']"
     cluster_usage = "xpath =//div[text()='Cluster Usage']"
     logout = "xpath = //button[text()='Log out']"
@@ -49,7 +46,6 @@ class DashboardLocators:
     lambdas = "xpath = //a[@href='/_/lambdas']"
     api_explorer = "xpath = //a[@href='/_/explorer']"
     overview = "xpath = //a[@href='/_/dashboard']"
-    usage_metrics = "xpath = //a[@href='/_/usage']"
     documentation = "xpath = //a[@href='https://dgraph.io/docs/slash-graphql/slash-quick-start/']"
 
     backends_list = "xpath = //button[@aria-haspopup='listbox']"
