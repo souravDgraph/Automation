@@ -333,7 +333,7 @@ Create NFS Backup
     FOR    ${i}    IN RANGE    ${no_of_backups}
         connect request server      
         ${res}=    Backup Using Admin    ${backup_path}
-        log    ${res.text}
+        log    ${res}
         Verify file exists in a directory with parent folder name    ${backup_path}
         Health Check for Backup Operation
     END
