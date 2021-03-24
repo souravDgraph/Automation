@@ -144,7 +144,7 @@ End Zero Process
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Switch Process    zero
     Terminate Process    handle=zero
-    Sleep   30s
+    Sleep   60s
     @{zero_context}    Create List    All done. Goodbye!
     @{dir}    Create List    w  zw
     Verify alpha and zero contents in results folder    zero    @{zero_context}
