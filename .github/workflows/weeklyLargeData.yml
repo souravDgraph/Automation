@@ -97,6 +97,10 @@ jobs:
           # echo " ---- Running Slash Testcases ----"
           # robot test_suites/slash/slash_api/sanity.robot
       
+      # delete dgraph from root:
+      - name: Backup Results Folder
+        run: |
+            sudo rm -rf /usr/bin/dgraph
       
       # Getting Current time
       - name: Get current time
