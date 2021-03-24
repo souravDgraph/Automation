@@ -35,8 +35,11 @@ TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna, Sourav and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
-     Create NFS Backup      full
-     perform a restore on backup
+     Clear Backup Folders   true
+     Create NFS Backup      1
+     perform a restore on backup    0
+     Clear Backup Folders   true
+     [Teardown]    NONE
 
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
@@ -48,9 +51,11 @@ TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
-     Create NFS Backup    full
-     Create NFS Backup    increment
-     perform a restore on backup
+     Clear Backup Folders   true
+     Create NFS Backup    2
+     perform a restore on backup    1
+     Clear Backup Folders   true
+     [Teardown]    NONE
 
 TC_07 Perform parallel live loads.
      [Documentation]    Perform live load data.
