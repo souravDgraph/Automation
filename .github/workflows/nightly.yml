@@ -106,6 +106,7 @@ jobs:
           
           # ---- Preparing 21million dataset. ----
           sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
+          sed -i "s/1million/21million/g" test_suites/dgraph/Linux/dgraph_suite_03.robot
           cd ./test_data/datasets
           wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.rdf.gz
           wget -q https://github.com/dgraph-io/benchmarks/raw/master/data/21million.schema
@@ -115,11 +116,15 @@ jobs:
           # ----------------------------------------------------------------------------------------
           
           mkdir -p backup
-          tree
+          #tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           export PATH=~/go/bin/:$PATH
           echo " ---- Running Dgraph Testcases ----"
           robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
+          mv results results_01
+          mkdir results/
+          ls
+          robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
           
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
