@@ -18,6 +18,7 @@ ${global_is_ludicrous_mode}
 Start Dgraph
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
+    clean up dgraph folders
     ${zero_command}    Generate Dgraph Zero Cli Command     
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
