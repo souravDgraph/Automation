@@ -32,6 +32,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Cleanup workspace
+        continue-on-error: true
         run: |
           lsof +D ${{ github.workspace }}/Automation_workspace/ | awk '{print $2}' | grep -v PID | xargs kill -9
           sudo rm -rf ${{ github.workspace }}/Automation_workspace/
