@@ -33,6 +33,7 @@ jobs:
     steps:
       - name: Cleanup workspace
         run: |
+          lsof +D ${{ github.workspace }}/Automation_workspace/ | awk '{print $2}' | grep -v PID | xargs kill -9
           sudo rm -rf ${{ github.workspace }}/Automation_workspace/
           
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -181,5 +182,3 @@ jobs:
             !${{ github.workspace }}/Automation_workspace/results/w
             !${{ github.workspace }}/Automation_workspace/results/zw
             !${{ github.workspace }}/Automation_workspace/results/t
-            
-        
