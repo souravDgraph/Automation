@@ -84,7 +84,7 @@ jobs:
       -  name: Build Dgraph on GitAction Runner
          run: |
            cd dgraph_workspace/dgraph
-           git checkout/tags v20.11.3-rc1
+           git checkout tags/v20.11.3-rc1
            make install
            export PATH=~/go/bin/:$PATH
            dgraph version
