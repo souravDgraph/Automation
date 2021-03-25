@@ -99,7 +99,7 @@ jobs:
 #            # sudo mv ./dgraph /bin
 #            dgraph version
          
-      - name: Run Robot Framework Testcases
+      - name: Run Robot Framework Testcases 01
         continue-on-error: true
         run: |
           echo ${{ github.workspace }}
@@ -131,6 +131,19 @@ jobs:
           # echo " ---- Running Slash Testcases ----"
           # robot test_suites/slash/slash_api/sanity.robot
       
+      - name: Run Robot Framework Testcases 03
+        run: |
+          echo ${{ github.workspace }}
+          cd ${{ github.workspace }}/Automation_workspace
+          
+          cat test_suites/dgraph/Linux/dgraph_suite_03.robot
+          export PATH=~/go/bin/:$PATH
+          echo " ---- Running Dgraph Testcases ----" 
+          mv results results_01
+          mkdir results/
+          ls
+          robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
+          
       
       # Getting Current time
       - name: Get current time
