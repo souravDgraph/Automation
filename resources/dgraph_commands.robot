@@ -27,12 +27,7 @@ Start Dgraph
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
-    ${version}=     Get Dgraph Details      Dgraph version
-    ${branch}=     Get Dgraph Details      Branch
-    ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
-    ...  ELSE
-    ...  Set variable       ${version}
-    ${check}=   check dgraph version    ${version}
+    ${check}=   set dgraph version
     Set Suite Variable      ${is_latest_global_check}    ${check}
     ${zero_count}   Evaluate        ${zero_count} + 1
     ${alpha_count}  Evaluate        ${alpha_count} + 1
@@ -52,12 +47,7 @@ Start Dgraph Ludicrous Mode
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${version}=     Get Dgraph Details      Dgraph version
-    ${check}=   check dgraph version    ${version}
-    ${branch}=     Get Dgraph Details      Branch
-    ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
-    ...  ELSE
-    ...  Set variable       ${version}
+    ${check}=   set dgraph version
     Set Suite Variable      ${is_latest_global_check}    ${check}
     ${zero_count}   Evaluate        ${zero_count} + 1
     ${alpha_count}  Evaluate        ${alpha_count} + 1

@@ -147,6 +147,15 @@ class SetupDgraphKeywords:
         """
         return DgraphCLI.check_version(version)
 
+    def set_dgraph_version(self, version=None, branch=None):
+        """
+        Method to get dgraph local version
+        :param version:
+        :param branch:
+        :return:
+        """
+        return self.dgraph_cli.set_dgraph_version(version=version, branch=branch)
+
     def get_dgraph_details(self, dgraph_details_key):
         """
         Method to get the dgraph version details.
