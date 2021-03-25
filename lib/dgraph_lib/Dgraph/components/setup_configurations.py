@@ -441,7 +441,7 @@ class DgraphCLI:
             if type(latest_version_check) == bool:
                 is_latest_version = latest_version_check
             else:
-                is_latest_version = self.set_dgraph_version(latest_version_check)
+                is_latest_version = self.check_is_latest_version(latest_version_check)
 
         logger.debug(f"Is dgraph latest version? {is_latest_version}")
 
@@ -489,6 +489,14 @@ class DgraphCLI:
         cli_command = cli_command + mtls_certs
         return cli_command
 
+    @staticmethod
+    def check_is_latest_version(dgraph_branch):
+
+        if dgraph_branch == "release":
+            return False
+        else:
+            return True
+
     def build_increment_cli_command(self, latest_version_check=None, docker_string=None, alpha_offset: int = 0):
         """
         Method to generate command for increment operation.
@@ -504,9 +512,9 @@ class DgraphCLI:
         # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
             if type(latest_version_check) == bool:
-                is_latest_version = self.set_dgraph_version(latest_version_check)
-            else:
                 is_latest_version = latest_version_check
+            else:
+                is_latest_version = self.check_is_latest_version(latest_version_check)
 
         logger.debug(f"dgraph is latest version: {is_latest_version}")
 
