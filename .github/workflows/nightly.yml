@@ -52,6 +52,7 @@ jobs:
           hostname
           hostname -I
           echo ${{ github.workspace }}
+          sudo chmod 777 ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           sudo python3 env_setup.py -l All -c enabled -o 200
