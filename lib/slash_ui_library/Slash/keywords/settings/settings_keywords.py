@@ -61,20 +61,34 @@ class SettingsKeywords:
     @staticmethod
     def delete_deployment(browser_alias,
                           backend_name):
+        """
+        deletes the deployment
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.delete_backend,
                               timeout=SettingsKeywords.timeout)
         browser.input_text(SettingsLocators.delete_conformation_input_field,
                            backend_name,
                            timeout=SettingsKeywords.timeout)
-        time.sleep(10)
         browser.click_element(SettingsLocators.destroy_button,
                               timeout=SettingsKeywords.timeout)
-        browser.click_element(SettingsLocators.destroy_button,
-                              timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.delete_confirm_message, 
+                                            timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def check_deployment_is_deleted(browser_alias, backend_name):
+        """
+        checks the deployment is deleted on the dropdown list 
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_does_not_contain_element(SettingsLocators.backend_dropdown_list.replace("%s", backend_name), 
+                                                    timeout=SettingsKeywords.timeout)
 
     @staticmethod
     def update_backend_organization(browser_alias, organization):
+        """
+        update the organization for the backend 
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         ui_organization = browser.get_text(SettingsLocators.organization_name,
                                            timeout=SettingsKeywords.timeout)
@@ -89,11 +103,17 @@ class SettingsKeywords:
 
     @staticmethod
     def click_api_key_tab(browser_alias):
+        """
+        clicks the api key tab on the setting menu
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.api_keys_tab, timeout=SettingsKeywords.timeout)
 
     @staticmethod
     def create_new_api_key(browser_alias, api_key_name, key_type=None):
+        """
+        creates a new api key
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.create_api_key_button, timeout=SettingsKeywords.timeout)
         browser.input_text(SettingsLocators.enter_api_name_textbox,
@@ -103,20 +123,29 @@ class SettingsKeywords:
 
     @staticmethod
     def click_general_tab(browser_alias):
+        """
+        clicks the general tab in the settings menu
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.general_tab, timeout=SettingsKeywords.timeout)
 
     @staticmethod
-    def verify_api_key_generated(browser_alias, api_key_name): 
+    def verify_api_key_generated(browser_alias, api_key_name):
+        """
+        verifies the API key is generated
+        """ 
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=timeout.SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
         browser.wait_until_page_contains_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
 
     @staticmethod
     def delete_api_key(browser_alias, api_key_name):
+        """
+        deletes the API key generated
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.delete_button, timeout=SettingsKeywords.timeout)
-        browser.wait_until_page_contains_element(SettingsLocators.delete_api_key_confirm, timeout=timeout.SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
         browser.wait_until_page_does_not_contain_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)

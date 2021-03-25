@@ -35,10 +35,14 @@ class DashboardLocators:
     backend_endpoint = "xpath =//div[@title='Creating Backend']//input"
     backend_listbox = "xpath =//button[@aria-haspopup='listbox']"
     graphql_schema_button = "xpath = //button[text()='GraphQL Schema']"
-    graphql_endpoint = "xpath = //input[@value='%s']"
+    graphql_endpoint = "xpath = //*[contains(@value,'%s')]"
     avatar_button = "xpath =//button//img[@alt='avatar']"
     cluster_usage = "xpath =//div[text()='Cluster Usage']"
     logout = "xpath = //button[text()='Log out']"
+    schema_label = "xpath = //h3[text()='Schema']"
+    lambdas_label = "xpath = //h3[text()='Lambdas']"
+    settings_label = "xpath = //h3[text()='Settings']"
+    api_explorer_label = "xpath = //div[text()='Explorer']"
 
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"
