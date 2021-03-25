@@ -8,7 +8,7 @@ Library           Collections
 Library           DateTime
 
 *** Variables ***
-${is_latest}
+${is_latest_global_check}
 ${docker_exe_string}
 ${zero_count}   0
 ${alpha_count}  0
@@ -33,7 +33,7 @@ Start Dgraph
     ...  ELSE
     ...  Set variable       ${version}
     ${check}=   check dgraph version    ${version}
-    Set Suite Variable      ${is_latest}    ${check}
+    Set Suite Variable      ${is_latest_global_check}    ${check}
     ${zero_count}   Evaluate        ${zero_count} + 1
     ${alpha_count}  Evaluate        ${alpha_count} + 1
     Set Suite Variable      ${zero_count}    ${zero_count}
@@ -58,7 +58,7 @@ Start Dgraph Ludicrous Mode
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ...  ELSE
     ...  Set variable       ${version}
-    Set Suite Variable      ${is_latest}    ${check}
+    Set Suite Variable      ${is_latest_global_check}    ${check}
     ${zero_count}   Evaluate        ${zero_count} + 1
     ${alpha_count}  Evaluate        ${alpha_count} + 1
     Set Suite Variable      ${zero_count}    ${zero_count}
@@ -204,7 +204,7 @@ Set Dgraph Version from docker
     ${branch}=      Get Dgraph Docker Branch Details
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ${check}=   Set Execution To Docker     ${version}      ${branch}
-    Set Suite Variable      ${is_latest}        ${check}
+    Set Suite Variable      ${is_latest_global_check}        ${check}
     Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
 
 Execute Live Loader with rdf and schema parameters
@@ -235,7 +235,7 @@ Trigger Loader Process
     ${dir_path}=    normalize path    ${CURDIR}/..
     log     ${docker_exe_string}
     ${path}=    Set Variable If      '${docker_exe_string}' != ''   /Automation     ${dir_path}
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest}  docker_string=${docker_exe_string}      
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest_global_check}  docker_string=${docker_exe_string}      
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Monitor Live loader Process
@@ -322,7 +322,7 @@ Execute Increment Command
     FOR    ${i}    IN RANGE    ${num_threads}
         ${alpha_offset}    Set Variable If     ${i}>=1     ${alpha_offset}      0
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
-        ${inc_command}  Get dgraph increment command    is_latest_version=${is_latest}  docker_string=${docker_exe_string}      alpha_offset=${alpha_offset}
+        ${inc_command}  Get dgraph increment command    is_latest_version=${is_latest_global_check}  docker_string=${docker_exe_string}      alpha_offset=${alpha_offset}
         ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results/inc_logs    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
         Wait For Process    ${inc_alias}    timeout=10 s
     END
@@ -384,7 +384,7 @@ Export NFS data using admin endpoint
     Verify file exists in a directory with parent folder name    ${export_path}
 
 
-Perform a restore on backup
+Perform a restore on backup latest versions
     [Arguments]  ${increment_size}
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
     Connect request server
@@ -411,6 +411,29 @@ Perform a restore on backup
     ...    AND    Sleep    5s
     ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}
     Health Check for Restore Operation
+
+Perform a restore on backup by older dgraph versions
+    [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
+    Connect request server
+    ${root_dir}=    normalize path    ${CURDIR}/..
+    ${path}=    Join Path    ${root_dir}/backup
+    @{dirs_backup}=    List Directories In Directory    ${path}
+    FOR     ${i}  IN    ${dirs_backup}
+        ${restore_dir}=    Set Variable    ${i}[0]
+        ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
+        ${tls_check}=    Get Tls Value
+        ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${restore_dir}
+        ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
+        ...    AND    Process Should Be Running    zero
+        ...    AND    Process Should Be Running    alpha
+        ...    AND    Process Should Be Running    restore
+        ...    AND    Wait For Process    restore
+        ...    AND    Process Should Be Stopped    restore
+        ...    AND    Sleep    5s
+        ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
+        Health Check for Restore Operation
+    END
+
 
 Health Check for Restore Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
