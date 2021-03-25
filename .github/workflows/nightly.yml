@@ -51,7 +51,7 @@ jobs:
         run: |
           hostname
           hostname -I
-          sudo chmod 777 ${{ github.workspace }}
+          sudo chmod -R 777 ${{ github.workspace }}
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
