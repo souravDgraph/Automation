@@ -120,7 +120,7 @@ jobs:
           tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           export PATH=~/go/bin/:$PATH
-          ps -ef | grep 'myProcessName' | grep -v grep | awk '{print $2}' | sudo xargs -r kill -9
+          ps -ef | grep dgraph | grep -v grep | awk '{print $2}' | sudo xargs -r kill -9
           echo " ---- Running Dgraph Testcases ----"
           sudo robot --splitlog --include NIGHTLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
           sudo robot --splitlog --include NIGHTLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
