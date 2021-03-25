@@ -120,12 +120,11 @@ jobs:
           #tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           export PATH=~/go/bin/:$PATH
-          echo " ---- Running Dgraph Testcases ----"
+          echo " ---- Running Dgraph Testcases 01 ----"
           robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
           mv results results_01
           mkdir results/
           ls
-          robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
           
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
@@ -138,10 +137,7 @@ jobs:
           
           cat test_suites/dgraph/Linux/dgraph_suite_03.robot
           export PATH=~/go/bin/:$PATH
-          echo " ---- Running Dgraph Testcases ----" 
-          mv results results_01
-          mkdir results/
-          ls
+          echo " ---- Running Dgraph Testcases 03 ----" 
           robot --splitlog -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
           
       
@@ -154,23 +150,36 @@ jobs:
           format: YYYYMMDD-HH_mm_ss
           utcOffset: "+05:30"
       
-      # Publish Artifacts
-      - name: Use the Upload Artifact GitHub Action
-        uses: actions/upload-artifact@v2
-        if: always()
-        with: 
-          name: fullAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
-          path: |
-            ${{ github.workspace }}/Automation_workspace/
-            !${{ github.workspace }}/Automation_workspace/test_data
-            !${{ github.workspace }}/Automation_workspace/doc
+#       # Publish Artifacts
+#       - name: Use the Upload Artifact GitHub Action
+#         uses: actions/upload-artifact@v2
+#         if: always()
+#         with: 
+#           name: fullAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
+#           path: |
+#             ${{ github.workspace }}/Automation_workspace/
+#             !${{ github.workspace }}/Automation_workspace/test_data
+#             !${{ github.workspace }}/Automation_workspace/doc
             
       # Publish Artifacts
       - name: Use the Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         if: always()
         with: 
-          name: resultAutomationArtifact_${{ steps.current-time.outputs.formattedTime }}
+          name: resultAutomationArtifact_01_${{ steps.current-time.outputs.formattedTime }}
+          path: |
+            ${{ github.workspace }}/Automation_workspace/results_01/
+            !${{ github.workspace }}/Automation_workspace/results_01/output.xml
+            !${{ github.workspace }}/Automation_workspace/results_01/p
+            !${{ github.workspace }}/Automation_workspace/results_01/w
+            !${{ github.workspace }}/Automation_workspace/results_01/zw
+            !${{ github.workspace }}/Automation_workspace/results_01/t
+            
+      - name: Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v2
+        if: always()
+        with: 
+          name: resultAutomationArtifact_03_${{ steps.current-time.outputs.formattedTime }}
           path: |
             ${{ github.workspace }}/Automation_workspace/results/
             !${{ github.workspace }}/Automation_workspace/results/output.xml
