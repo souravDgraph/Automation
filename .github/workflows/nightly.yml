@@ -84,11 +84,11 @@ jobs:
       -  name: Build Dgraph on GitAction Runner
          run: |
            cd dgraph_workspace/dgraph
-           git checkout/tags v20.11.3-rc1
+           git checkout tags/v20.11.3-rc1 -b automation
            make install
            export PATH=~/go/bin/:$PATH
            dgraph version
-           cp /home/dg/go/bin/dgraph /usr/bin/
+           sudo cp /home/dg/go/bin/dgraph /usr/bin/
            sudo dgraph version
            
 #       -  name: Build Dgraph on Self-Hosted Runner
@@ -120,6 +120,7 @@ jobs:
           tree
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           export PATH=~/go/bin/:$PATH
+          ps -ef | grep dgraph | grep -v grep | awk '{print $2}' | sudo xargs -r kill -9
           echo " ---- Running Dgraph Testcases ----"
           sudo robot --splitlog --include NIGHTLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
           sudo robot --splitlog --include NIGHTLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
@@ -137,7 +138,7 @@ jobs:
             mkdir results
             
       # delete dgraph from root:
-      - name: Backup Results Folder
+      - name: Remove Dgraph from root
         run: |
             sudo rm -rf /usr/bin/dgraph
           
