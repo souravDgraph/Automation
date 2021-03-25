@@ -441,7 +441,7 @@ class DgraphCLI:
             if type(latest_version_check) == bool:
                 is_latest_version = latest_version_check
             else:
-                is_latest_version = self.check_version(latest_version_check)
+                is_latest_version = self.set_dgraph_version(latest_version_check)
 
         logger.debug(f"Is dgraph latest version? {is_latest_version}")
 
@@ -503,8 +503,8 @@ class DgraphCLI:
 
         # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
-            if latest_version_check == "release":
-                is_latest_version = self.check_version(latest_version_check)
+            if type(latest_version_check) == bool:
+                is_latest_version = self.set_dgraph_version(latest_version_check)
             else:
                 is_latest_version = latest_version_check
 
