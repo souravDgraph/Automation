@@ -31,11 +31,14 @@ jobs:
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Cleanup workspace
+        run: |
+          sudo rm -rf ${{ github.workspace }}/Automation_workspace/
+          
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with: 
           path: Automation_workspace
-          clean: false
         
       - name: Setup Python
         uses: actions/setup-python@v2.2.1
@@ -52,8 +55,8 @@ jobs:
         run: |
           hostname
           hostname -I
-          echo ${{ github.workspace }}
           sudo chmod -R 777 ${{ github.workspace }}
+          echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           sudo python3 env_setup.py -l All -c enabled -o 200
