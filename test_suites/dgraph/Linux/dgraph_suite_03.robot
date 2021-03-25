@@ -39,8 +39,8 @@ TC_04 Perform NFS backup and restore data
      [Tags]    regression   C702    C700   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup      1
-     log        ${is_latest}
-     Run Keyword If     ${is_latest}     Perform a restore on backup latest versions    0
+     log        ${global_is_ludicrous_mode}
+     Run Keyword If     ${global_is_ludicrous_mode}     Perform a restore on backup latest versions    0
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   true
      [Teardown]    NONE
@@ -57,7 +57,7 @@ TC_06 Perform Increment backup and restore data
      [Tags]    regression   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup    2
-     Run Keyword If     ${is_latest}     Perform a restore on backup latest versions    1
+     Run Keyword If     ${global_is_ludicrous_mode}     Perform a restore on backup latest versions    1
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   true
      [Teardown]    NONE
