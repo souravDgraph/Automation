@@ -13,31 +13,35 @@ Library           String
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema
 
+
 *** Test Cases ***
 TC_01 Perform live load data.
      [Documentation]    Perform live load operation on dataset.
      ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   C698  NIGHTLY
+     [Tags]    regression   C698     CI  NIGHTLY
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_02 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
-     [Tags]    regression  NIGHTLY
+     [Tags]    regression   CI  NIGHTLY
      Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_03 Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.
+    ...    *Author*: Krishna, Sourav and Sankalan
     [Tags]      regression   WEEKLY
-    Export NFS data using admin endpoint    rdf    true
+    Export NFS data using admin endpoint    json    true
 
 TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
-     ...    *Author*: Krishna, Sourav and Sankalan
+     ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup      1
-     perform a restore on backup    0
+     log        ${is_latest}
+     Run Keyword If     ${is_latest}     Perform a restore on backup latest versions    0
+     ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   true
      [Teardown]    NONE
 
@@ -53,7 +57,8 @@ TC_06 Perform Increment backup and restore data
      [Tags]    regression   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup    2
-     perform a restore on backup    1
+     Run Keyword If     ${is_latest}     Perform a restore on backup latest versions    1
+     ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   true
      [Teardown]    NONE
 
