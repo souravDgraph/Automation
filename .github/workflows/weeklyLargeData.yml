@@ -91,8 +91,6 @@ jobs:
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           echo " ---- Running Dgraph Testcases ----"
           sudo robot --splitlog --include WEEKLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
-          sudo robot --splitlog --include WEEKLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_03.robot
-          
           # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
           # echo " ---- Running Slash Testcases ----"
           # robot test_suites/slash/slash_api/sanity.robot
