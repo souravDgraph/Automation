@@ -58,7 +58,6 @@ User should be able to add new API key
     Create New Api Key      ${Browser_Alias}       ${API_key_name}
     sleep     20
     Verify Api Key Generated     ${Browser_Alias}     ${API_key_name}
-    Click General Tab      ${Browser_Alias}
 
 User should be able to delete API Key
     [Documentation]
@@ -71,7 +70,6 @@ User should be able to delete API Key
     sleep     20
     Verify Api Key Generated     ${Browser_Alias}     ${API_key_name}
     Delete Api Key      ${Browser_Alias}      ${API_key_name}
-    Click General Tab      ${Browser_Alias}
 
 User should be able to delete a backend
     [Documentation]
@@ -116,5 +114,6 @@ Create Backend
 
 Delete Backend
     Click Settings In Menu      ${Browser_Alias}
+    Click General Tab      ${Browser_Alias}
     Delete Deployment     ${Browser_Alias}     ${BACKEND_NAME}
     Check Deployment Is Deleted     ${Browser_Alias}     ${BACKEND_NAME}
