@@ -29,10 +29,18 @@ class DashboardKeywords():
     @staticmethod
     def click_launch_new_backend(browser_alias):
         """
-        clicks the launch new backend button
+        click the launch new backend button.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Launch New Backend | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.create_backend, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.launch_new_backend_label, timeout=DashboardKeywords.timeout)
 
     @staticmethod
     def fill_backend_details(browser_alias,
@@ -43,7 +51,20 @@ class DashboardKeywords():
                              provider=None,
                              zone=None):
         """
-        fills the backend details
+        fill the backend details.
+        | browser_alias |  alias of the browser |
+        | backend_name |  name of the backend |
+        | select_product |  product type for the backend |
+        | subdomain |  subdomain for the backend |
+        | organization |  organization for the backend |
+        | provider |  provider for the backend |
+        | zone |  zone for the backend |
+        
+        Example:
+        | Fill Backend Details | browser_1 | test | 
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.input_text(DashboardLocators.backend_name,
@@ -73,7 +94,14 @@ class DashboardKeywords():
     @staticmethod
     def click_launch_button(browser_alias):
         """
-        clicks the launch button
+        click the launch button in the launch new backend page.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Launch Button | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.launch_button,
@@ -83,7 +111,15 @@ class DashboardKeywords():
     def monitor_backend_creation(browser_alias,
                                  timeout):
         """
-        monitors the backend when creation
+        monitor the backend creation spinning for the backend.
+        | browser_alias |  alias of the browser |
+        | timeout | 10 |
+
+        Example:
+        | Monitor Backend Creation | browser_1 | 10 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(DashboardLocators.spinning_backend,
@@ -95,7 +131,14 @@ class DashboardKeywords():
     @keyword
     def click_schema_in_menu(browser_alias):
         """
-        clicks the schema menu
+        click the schema for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Schema In Menu | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.schema,
@@ -106,7 +149,14 @@ class DashboardKeywords():
     @keyword
     def click_lambdas_in_menu(browser_alias):
         """
-        clicks the lambda menu
+        click the lambdas for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Lambdas In Menu | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.lambdas,
@@ -117,7 +167,14 @@ class DashboardKeywords():
     @keyword
     def click_settings_in_menu(browser_alias):
         """
-        clicks the settings menu
+        click the settings for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Settings In Menu | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.settings,
@@ -127,7 +184,14 @@ class DashboardKeywords():
     @staticmethod
     def click_api_explorer_in_menu(browser_alias):
         """
-        clicks the api explorer menu
+        click the api explorer for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Api Explorer In Menu | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.api_explorer,
@@ -137,7 +201,14 @@ class DashboardKeywords():
     @staticmethod
     def click_overview_in_menu(browser_alias):
         """
-        clicks the overview menu
+        click the overview for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Overview In Menu | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.overview,
@@ -148,7 +219,15 @@ class DashboardKeywords():
     @staticmethod
     def view_graphql_endpoint(browser_alias, endpoint):
         """
-        graphql endpoint should be visible in the overview menu
+        view the graphql endpoint for the backend.
+        | browser_alias |  alias of the browser |
+        | endpoint |  graphql endpoint for the backend |
+
+        Example:
+        | View Graphql Endpoint | browser_1 | stgdgraph.aws.stage.thegaas.com/graphql |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.element_should_be_visible(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
@@ -156,7 +235,14 @@ class DashboardKeywords():
     @staticmethod
     def click_documentation_in_menu(browser_alias):
         """
-        clicks the documentation menu
+        click the documentation for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Documentation In Menu | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.documentation,
@@ -165,7 +251,14 @@ class DashboardKeywords():
     @staticmethod
     def click_avatar(browser_alias):
         """
-        clicks the avatar present at the top right cornor
+        click the avatar present at the top right corner for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Avartar | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.avatar_button,
@@ -174,7 +267,14 @@ class DashboardKeywords():
     @staticmethod
     def click_logout_button(browser_alias):
         """
-        clicks the logout button 
+        click the logout button.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Logout Button | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.logout,
@@ -183,7 +283,14 @@ class DashboardKeywords():
     @staticmethod
     def check_starter_product_disabled(browser_alias):
         """
-        checks starter product disabled
+        check the starter product disabled for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Check Starter Product Disabled | browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.element_should_be_disabled(DashboardLocators.starter_product_disabled)

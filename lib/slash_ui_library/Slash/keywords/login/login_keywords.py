@@ -6,6 +6,7 @@ Author: vivetha@dgraph.io
 
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.login.login import LoginLocators
+from Slash.locators.dashboard.dashboard import DashboardLocators
 
 __all__ = ['LoginKeywords']
 __author__ = "Vivetha Madesh"
@@ -40,6 +41,7 @@ class LoginKeywords():
         browser.input_text(LoginLocators.username, username, timeout=LoginKeywords.timeout)
         browser.input_text(LoginLocators.password, password, timeout=LoginKeywords.timeout)
         browser.click_element(LoginLocators.login_button)
+        browser.wait_until_page_contains_element(DashboardLocators.create_backend, timeout=LoginKeywords.timeout)
 
     @staticmethod
     def click_organizations_in_profile(browser_alias):

@@ -43,6 +43,7 @@ class DashboardLocators:
     lambdas_label = "xpath = //h3[text()='Lambdas']"
     settings_label = "xpath = //h3[text()='Settings']"
     api_explorer_label = "xpath = //div[text()='Explorer']"
+    launch_new_backend_label = "xpth = //h3[text()='Launch a New Backend']"
 
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"

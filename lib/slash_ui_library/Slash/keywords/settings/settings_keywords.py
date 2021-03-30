@@ -62,7 +62,15 @@ class SettingsKeywords:
     def delete_deployment(browser_alias,
                           backend_name):
         """
-        deletes the deployment
+        delete the backend and wait for the confirmation message.
+        | browser_alias |  alias of the browser |
+        | backend_name |  name of the backend |
+
+        Example:
+        | Delete Deployment | Browser_1 | test |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.delete_backend,
@@ -78,7 +86,15 @@ class SettingsKeywords:
     @staticmethod
     def check_deployment_is_deleted(browser_alias, backend_name):
         """
-        checks the deployment is deleted on the dropdown list 
+        check the deployment is deleted.
+        | browser_alias |  alias of the browser |
+        | backend_name |  name of the backend |
+
+        Example:
+        | Check Deployment Is Deleted | Browser_1 | test |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_does_not_contain_element(SettingsLocators.backend_dropdown_list.replace("%s", backend_name), 
@@ -87,7 +103,15 @@ class SettingsKeywords:
     @staticmethod
     def update_backend_organization(browser_alias, organization):
         """
-        update the organization for the backend 
+        update the organization name for the backend.
+        | browser_alias |  alias of the browser |
+        | organization |  name of the organization |
+
+        Example:
+        | Update Backend Organization | Browser_1 | test_org |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         ui_organization = browser.get_text(SettingsLocators.organization_name,
@@ -104,7 +128,14 @@ class SettingsKeywords:
     @staticmethod
     def click_api_key_tab(browser_alias):
         """
-        clicks the api key tab on the setting menu
+        click the api key tab for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Api Key Tab | Browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.api_keys_tab, timeout=SettingsKeywords.timeout)
@@ -112,7 +143,16 @@ class SettingsKeywords:
     @staticmethod
     def create_new_api_key(browser_alias, api_key_name, key_type=None):
         """
-        creates a new api key
+        create a new api key for the backend.
+        | browser_alias |  alias of the browser |
+        | api_key_name | name of the api key |
+        | key_type | type of api key |
+
+        Example:
+        | Create New Api Key | Browser_1 | test_api | 
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.create_api_key_button, timeout=SettingsKeywords.timeout)
@@ -120,11 +160,19 @@ class SettingsKeywords:
                            api_key_name,
                            timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.create_api_button, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
 
     @staticmethod
     def click_general_tab(browser_alias):
         """
-        clicks the general tab in the settings menu
+        click the general tab for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click General Tab | Browser_1 |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.general_tab, timeout=SettingsKeywords.timeout)
@@ -132,8 +180,16 @@ class SettingsKeywords:
     @staticmethod
     def verify_api_key_generated(browser_alias, api_key_name):
         """
-        verifies the API key is generated
-        """ 
+        verify the api key generated for the backend.
+        | browser_alias |  alias of the browser |
+        | api_key_name | name of the api key |
+
+        Example:
+        | Verify Api Key Generated | Browser_1 | test_api |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
@@ -142,7 +198,15 @@ class SettingsKeywords:
     @staticmethod
     def delete_api_key(browser_alias, api_key_name):
         """
-        deletes the API key generated
+        delete the api key for the backend.
+        | browser_alias |  alias of the browser |
+        | api_key_name | name of the api key |
+
+        Example:
+        | Delete Api Key | Browser_1 | test_api |
+
+        Return:
+            None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.delete_button, timeout=SettingsKeywords.timeout)
