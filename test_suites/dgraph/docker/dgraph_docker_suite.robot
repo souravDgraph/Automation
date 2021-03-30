@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Docker Test Suite
-Suite Setup       Start Dgraph In Docker    ${docker-file}
+Suite Setup       Start Dgraph In Docker    ${docker-file}      ${offset_value}
 Test Setup      Monitor Health And State check
 Suite Teardown    End Docker Execution    ${docker-file}    false
 Default Tags    docker
@@ -11,6 +11,7 @@ ${rdf_file}        1million.rdf.gz
 ${schema_file}     1million.schema
 ${docker-node}      2
 ${docker-file}      docker-${docker-node}node
+${offset_value}     0
 
 *** Test Cases ***
 TC_01 Docker - Verify Increment Operation
