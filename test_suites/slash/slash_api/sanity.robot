@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     This is a simple test with Robot Framework
 Suite Setup       Create Backend
-Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
 Test Setup
 Test Teardown
 Default Tags      Sanity
@@ -20,10 +20,10 @@ Create Deployment
     ...    \ \ \ \ - Delete Deployment
     [Tags]    C236    Sanity
     [Template]
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
-    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${backend_id}
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
     [Teardown]
 
 Get deployments
@@ -32,13 +32,13 @@ Get deployments
     ...    - Get Deployments
     ...    \ \ \ \ - Deployments health API
     [Tags]    C224    Sanity
-    ${deployments}=    Get Deployments    ${Session_alias}    ${URL}    ${HEADERS}
+    ${deployments}=    Get Deployments    ${Session_alias}    ${URL}    ${HEADER}
     log    ${deployments}
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
+    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADER}
 
 Update Deployment mode
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test-edit    deployment_mode=flexible
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    test-edit    deployment_mode=flexible
+    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADER}
 
 Introspection API without Schema
     ${response}=    Perform Operation To Database    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${introspection_query}
@@ -88,13 +88,13 @@ create , get and delete API key
     ...    - Create API key
     ...    \ \ \ \ - Delete API Key
     ...    - Get API key
-    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    test
+    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    test
     log    ${api_key_details}
     ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
-    Get Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
-    Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
+    Get Api Key    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
+    Delete Api Key    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
 
 freeze deployment
     Freeze Ops    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    false    true
@@ -141,15 +141,30 @@ update Deployment name
     ...    - Update deployment name
     [Tags]    C236    Sanity
     [Template]
-    Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    updated
-    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    updated
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
     ${deployment_name}=    get deployment attribute data    ${deployment_details}    name
     Should Be Equal    ${deployment_name}    updated
     [Teardown]
 
+update Deployment type from free to shared
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update deployment name
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    deploymentType=shared
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
+    ${type}=    get deployment attribute data    ${deployment_details}    deploymentType
+    Should Be Equal    ${type}    shared
+    [Teardown]
+
 *** Keywords ***
 Create Backend
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    free
+    ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME}    ${PASSWORD}
+    ${HEADER}=    Create Dictionary    Authorization=Bearer ${auth_token}    Content-Type=application/json
+    Set Suite Variable    ${HEADER}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
@@ -165,7 +180,7 @@ Create Backend
 
 Create API Keys
     [Arguments]    ${deployment_id}    ${api_name}
-    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_name}
+    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    ${api_name}
     ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid
@@ -174,7 +189,7 @@ Create API Keys
 
 Delete API Keys
     [Arguments]    ${api_key_uid}
-    Delete Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
+    Delete Api Key    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    ${api_key_uid}    API Key Deleted Successfully.
 
 get deployment attribute data
     [Arguments]    ${deployment_details}    ${attribute}

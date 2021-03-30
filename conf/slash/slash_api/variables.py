@@ -1,10 +1,11 @@
 URL = "https://api.stage.thegaas.com/"
 BACKEND_NAME = "Test"
-BACKEND_ZONE = "stgdgraph"
-HEADERS = { "Authorization" : "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1ETXlNemcyTnpFME1qTkNORUUzTWpZME1UVTJNa0pCTVRjMFFUUkVPVEJFT0VZNE5UWXhSUSJ9.eyJpc3MiOiJodHRwczovL2Rldi1kZ3JhcGgtc2Fhcy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDA5ODU2MDI0NDA2Njk3NTI1ODIiLCJhdWQiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDcwIiwiaHR0cHM6Ly9kZXYtZGdyYXBoLXNhYXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTYxNTg2NTU2MCwiZXhwIjoxNjE1OTUxOTYwLCJhenAiOiJnYnBWcTdpMWdNdmdtdEkzbXVBem9aSEpiVTJieDVqdCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.g8zWd0TibCO9Zymsg7d7FrlQnGLuhsq3mZJ2LnH0Wa-kNqVMiXkYY2Ymuskl4CjmBcPMgU_Pn4spMM25mFlXEhBVo50MyIn7DG5O4431SVqRD0wrUnWZBJngsGv7Aa6lbpsh4v6JIBPcMJ_HJTJrvtP7YwLaFmgKsl1bddIY4I9AGcxghzD_VUQdVvkFOXh6qxRLUnNFW_3j3D4TxWi-7EZcihUwjWDMlrp2bedhoENdN9v9IAlAB5uP_n1b1lSyemJDLL5bhUz30zeg4IiU0ldiHXbCDgRDz1JgIlqjXD5Y9Y5HjvK2zKjHiSUb-iX5TcaAkVxHBglEGbCZXKS-yQ",
-            "Content-Type" : "application/json" }
-USER2_HEADER = { "Authorization" : "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1ETXlNemcyTnpFME1qTkNORUUzTWpZME1UVTJNa0pCTVRjMFFUUkVPVEJFT0VZNE5UWXhSUSJ9.eyJpc3MiOiJodHRwczovL2Rldi1kZ3JhcGgtc2Fhcy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjAyNTMzZmI3YzBkZmYwMDcwZDI5ZmY3IiwiYXVkIjpbImh0dHA6Ly9sb2NhbGhvc3Q6ODA3MCIsImh0dHBzOi8vZGV2LWRncmFwaC1zYWFzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2MTM1Mzc1MDgsImV4cCI6MTYxMzYyMzkwOCwiYXpwIjoiZ2JwVnE3aTFnTXZnbXRJM211QXpvWkhKYlUyYng1anQiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIn0.IjayaW2INq1rMpEEqZxXg4IiYObpbSVM_K5DMkOoDyGaEHTrCHuxjjiAtxFsluXXGJySH_SoqirvcKKey3MW7rw6fOM7MZo5jaIEgfUDjJqQzd-1EPmDV_BFSuZ67rjRc45gSDIHzwf_vMNGTs-djt0Mm5QsgG1FZ4EccqThaxJ-2d3Kqjl-fzusdSoNM6XLzxArsGuOCRFFDEaH27iipknUOLzsWMlK_flB6UrttQhMmA7i5mboR9SODqt1XfA295AzqIsIrJ1cZCRwqQwybWxakdc8QcldoVWKtFQTxOfudgUoofwXHiBk5HKdEjYiiM4dmshjYL-5dKcUZmIWHA",
-            "Content-Type" : "application/json" }
+BACKEND_ZONE = "us-east-1"
+USER_NAME = "vivetha+test25@dgraph.io"
+PASSWORD = "Password@123"
+HEADERS = { "Content-Type" : "application/json" }
+USER2_HEADER = { "Authorization" : "earer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwNzAiLCJleHAiOjE2MTcyMDk3MTAsImlzcyI6Imh0dHBzOi8vZGV2LWRncmFwaC1zYWFzLmF1dGgwLmNvbS8iLCJzdWIiOiIweDI3NmZhIn0.zFbUhkQ6NS2QW3UEoKpm3HFk2VXgUrPvd1DQNUG18is",
+"Content-Type" : "application/json" }
 DELETE_API_KEY_MESSAGE = "API Key Deleted Successfully."
 SCHEMA = "type Task { id: ID! title: String! @search(by: [fulltext]) completed: Boolean! @search  user: User! }type User { username: String! @id @search(by: [hash]) name: String @search(by: [exact]) tasks: [Task] @hasInverse(field: user) }"
 MUTATION_QUERY_1 = """{\"query\":\"mutation AddTasks {\\n addTask(input: [\\n {title: \\\"Create a database\\\", completed: false, user: {username: \\\"your-email@example.com\\\"}}]) {\\n numUids\\n task {\\n title\\n user {\\n username\\n }\\n  }\\n  }\\n}\"}"""

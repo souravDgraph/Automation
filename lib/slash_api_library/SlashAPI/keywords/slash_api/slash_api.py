@@ -6,7 +6,7 @@ Author: vivetha@dgraph.io
 
 from SlashAPI.keywords.deployemnts.deployment_keywords import DeploymentKeywords
 from SlashAPI.keywords.organizations.organizations_keywords import OrganizationsKeywords
-
+from SlashAPI.keywords.auth.auth_keywords import AuthKeywords
 # pylint: disable=too-many-ancestors
 
 __version__ = "1.0.0"
@@ -19,7 +19,9 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class SlashAPI(DeploymentKeywords, OrganizationsKeywords):
+class SlashAPI(DeploymentKeywords,
+               OrganizationsKeywords,
+               AuthKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
 
     All the keywords pertaining to Networker are

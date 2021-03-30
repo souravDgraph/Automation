@@ -61,10 +61,11 @@ class DeploymentKeywords():
                           deployment_uid,
                           expected_response=200):
         logger.info("Deleting a Deployment of Uid : %s" % deployment_uid)
-        url = base_url + "deployment/" + str(deployment_uid)
+        url = base_url + "graphql"
         Deployments.delete_deployment(session_alias,
                                       url,
                                       auth,
+                                      deployment_uid,
                                       expected_response)
 
     @staticmethod

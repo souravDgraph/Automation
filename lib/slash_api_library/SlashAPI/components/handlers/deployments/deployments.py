@@ -78,13 +78,19 @@ class Deployments():
         return deployment_details
 
     @staticmethod
-    def delete_deployment(session_alias, url, auth,
+    def delete_deployment(session_alias,
+                          url,
+                          auth,
+                          backend_uid,
                           expected_response=200):
-
+        properties = {"deploymentID": backend_uid}
+        data = Utils.render_data_from_template(DeploymentModels.delete_deployment,
+                                               properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
-        response = connection.delete_on_session(session_alias,
+        response = connection.post_on_session(session_alias,
                                                 '',
+                                                json=data,
                                                 headers=auth,
                                                 expected_status=str(expected_response))
         logger.info(response.json)
