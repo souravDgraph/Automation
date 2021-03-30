@@ -159,6 +159,21 @@ update Deployment type from free to shared
     Should Be Equal    ${type}    shared
     [Teardown]
 
+Update Schema with Non-Existing API Key
+    [Documentation]
+    ...    List of Tests Covered
+    ...
+    ...    Create API Key
+    ...    Update Schema with API Key
+    ...    Delete API Key
+    ...    Update Schema with that API Key
+    ${api_key_uid}     ${api_key}      Create API Keys      ${deployment_id}      test
+    ${deployment_auth}=    Create Dictionary    x-auth-token=${api_key}    Content-Type=application/json
+    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}
+    Delete API Keys    ${api_key_uid}
+    Update Schema To Deployment    ${Session_alias}    ${deployment_endpoint}    ${deployment_auth}    ${Schema}      401
+
+
 *** Keywords ***
 Create Backend
     ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME}    ${PASSWORD}

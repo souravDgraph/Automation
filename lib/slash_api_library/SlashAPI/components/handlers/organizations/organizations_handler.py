@@ -270,8 +270,8 @@ class OrganizationsHandler:
             raise Exception("Exception occurred while removing deployment from organization"
                             ", deployment was not found: " + deployment_name)
 
-        response = deployment_handler.update_deployment(session_alias, self.url+"/deployment/" + str(dep_uid),
-                                                        organizationId="empty", auth=self.headers, expected_response=str(expected_response))
+        response = deployment_handler.update_deployment(session_alias, self.url+"/graphql",
+                                                        organizationUID="empty", auth=self.headers, uid=dep_uid, expected_response=str(expected_response))
         return response
 
     def add_organization_to_deployment(self, deployment_name, org_uid, expected_response=200):
@@ -296,7 +296,7 @@ class OrganizationsHandler:
         if dep_uid is None:
             raise Exception("Exception occurred while removing deployment from organization"
                             ", deployment not found: " + deployment_name)
-        response = deployment_handler.update_deployment(session_alias, self.url+"/deployment/" + dep_uid,
-                                                        organizationId=org_uid, auth=self.headers, expected_response=str(expected_response))
+        response = deployment_handler.update_deployment(session_alias, self.url+"/graphql",
+                                                        organizationUID=org_uid, auth=self.headers, uid=dep_uid, expected_response=str(expected_response))
         logger.debug(response.json())
         return response.json()
