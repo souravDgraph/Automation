@@ -27,20 +27,21 @@ class DashboardKeywords():
     """
     timeout = 10
     @staticmethod
-    def click_launch_new_backend(browser_alias):
+    def click_launch_new_backend(browser_alias, timeout):
         """
         click the launch new backend button.
         | browser_alias |  alias of the browser |
+        | timeout | timeout for the element |
 
         Example:
-        | Click Launch New Backend | browser_1 |
+        | Click Launch New Backend | browser_1 | 20 |
 
         Return:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.create_backend, timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.launch_new_backend_label, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.launch_new_backend_label, timeout=timeout)
 
     @staticmethod
     def fill_backend_details(browser_alias,
@@ -62,6 +63,7 @@ class DashboardKeywords():
         
         Example:
         | Fill Backend Details | browser_1 | test | 
+        | Fill Backend Details | browser_1 | test | Dgraph Cloud | name | test_org | AWS | us-east-1 |
 
         Return:
             None
@@ -90,6 +92,9 @@ class DashboardKeywords():
         if zone:
             browser.click_element(DashboardLocators.zone.replace("%s", zone),
                                   timeout=DashboardKeywords.timeout)
+
+        browser.wait_until_page_does_not_contain_element(DashboardLocators.zone.replace("%s", 'Select Region'), 
+                                        timeout=DashboardKeywords.timeout)
 
     @staticmethod
     def click_launch_button(browser_alias):

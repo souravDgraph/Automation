@@ -113,7 +113,7 @@ Setup
     Login    ${Browser_Alias}    ${USER_NAME}    ${PASSWORD}
 
 Create Backend
-    Click Launch New Backend      ${Browser_Alias}
+    Click Launch New Backend      ${Browser_Alias}     20
     Fill Backend Details      ${Browser_Alias}      ${BACKEND_NAME}
     Click Launch Button      ${Browser_Alias}
     Monitor Backend Creation      ${Browser_Alias}      70
