@@ -22,9 +22,8 @@ __status__ = "Production"
 class SlashAPI(DeploymentKeywords,
                OrganizationsKeywords,
                AuthKeywords):
-    """Robot Framework Slash GraphQL Keyword Library.
-
-    All the keywords pertaining to Networker are
+    """Robot Framework Dgraph cloud API Keyword Library.
+    All the keywords pertaining to Dgraph cloud are
     exposed to the user through this library.
     """
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
