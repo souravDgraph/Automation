@@ -46,7 +46,7 @@ class DashboardLocators:
     launch_new_backend_label = "xpath = //h3[text()='Launch a New Backend']"
     deployment_location = "xpath = //div[text()='%s']"
     data_transfer = "xpath = //div[contains(text(),'Bytes')]"
-    no_of_queries = "xpath = //div[text()='0']"
+    no_of_queries_label = "xpath = //div[text()='Number of Queries']"
 
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"

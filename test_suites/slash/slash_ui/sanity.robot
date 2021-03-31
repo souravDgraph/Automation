@@ -56,7 +56,7 @@ User should be able to view the location of the deployment
     ...    Click the overview for the backend
     ...    View the location
     Click Overview In Menu       ${Browser_Alias}
-    View Deployment Location      ${Browser_Alias}       ${BACKEND_ZONE}
+    View Deployment Zone      ${Browser_Alias}       ${BACKEND_ZONE}
     
 User should not be able to create more than one backend
     [Documentation]

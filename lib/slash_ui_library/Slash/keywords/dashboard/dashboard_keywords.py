@@ -93,8 +93,6 @@ class DashboardKeywords():
             browser.click_element(DashboardLocators.zone.replace("%s", zone),
                                   timeout=DashboardKeywords.timeout)
 
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.zone.replace("%s", 'Select Region'), 
-                                        timeout=DashboardKeywords.timeout)
 
     @staticmethod
     def click_launch_button(browser_alias):
@@ -238,14 +236,14 @@ class DashboardKeywords():
         browser.element_should_be_visible(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
 
     @staticmethod
-    def view_deployment_location(browser_alias, zone):
+    def view_deployment_zone(browser_alias, zone):
         """
-        view the deployment location for the backend.
+        view the deployment zone for the backend.
         | browser_alias |  alias of the browser |
-        | zone |  location of the deployment |
+        | zone |  zone of the deployment |
 
         Example:
-        | View Deployment Location | browser_1 | us-east-1 |
+        | View Deployment Zone | browser_1 | us-east-1 |
 
         Return:
             None
@@ -270,7 +268,7 @@ class DashboardKeywords():
                                                          timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.data_transfer,
                                                         timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.no_of_queries,
+        browser.wait_until_page_contains_element(DashboardLocators.no_of_queries_label,
                                                         timeout=DashboardKeywords.timeout)
                                                         
     @staticmethod
