@@ -18,9 +18,7 @@ __status__ = "Production"
 
 class AuthKeywords:
     """
-
     Auth Keywords
-
     """
 
     @staticmethod
@@ -30,6 +28,18 @@ class AuthKeywords:
               email,
               password,
               expected_response=200):
+        """
+        Method to Log into dgraph cloud and get authentication token 
+        \n:param session_alias: <name for the session>
+        \n:param baseurl: <URL to be hit to login>
+        \n:param auth:<bearer type auth code>
+        \n:param email: <email id(username) of the user>
+        \n:param password: <password of the user>
+        \n:return:<auth token>
+
+        Example:
+        | Login | session1| url | headers | user@user.com | password |
+        """
         logger.info("Login")
         url = base_url + "graphql"
         token = Auth.login(session_alias,
