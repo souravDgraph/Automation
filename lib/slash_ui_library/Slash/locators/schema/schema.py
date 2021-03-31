@@ -23,3 +23,7 @@ class SchemaLocators:
     name_text_box = "css = [placeholder='Name']"
 
     add_user_button = "xpath = //*[text()='Add Enum']"
+
+    graphql_schema_button = "xpath = //button[text()='GraphQL Schema']"
+    ui_mode_button = "xpath = //button[text()='Switch to UI Mode']"
+    text_mode_button = "xpath = //button[text()='Switch to Text Mode']"

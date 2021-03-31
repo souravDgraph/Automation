@@ -10,6 +10,15 @@ ${Browser_Alias}    Browser1
 ${API_key_name}     test
 
 *** Test Cases ***
+Dashboard should show the cluster usage statistics
+    [Documentation]
+    ...    List of tests covered
+    ...
+    ...    Click the overview for the backend
+    ...    dashboard shows the cluster usage statistics
+    Click Overview In Menu       ${Browser_Alias}
+    View Cluster Usage Statistics      ${Browser_Alias}  
+    
 User should be able to create backend and navigate to schema page
     [Documentation]
     ...    List of tests covered
@@ -40,6 +49,15 @@ User should be able to view the graphql endpoint in Overview
     Click Overview In Menu       ${Browser_Alias}
     View Graphql Endpoint      ${Browser_Alias}      ${BACKEND_ZONE}.aws.stage.thegaas.com/graphql
 
+User should be able to view the location of the deployment
+    [Documentation]
+    ...    List of tests covered
+    ...
+    ...    Click the overview for the backend
+    ...    View the location
+    Click Overview In Menu       ${Browser_Alias}
+    View Deployment Location      ${Browser_Alias}       ${BACKEND_ZONE}
+    
 User should not be able to create more than one backend
     [Documentation]
     ...    List of tests covered
