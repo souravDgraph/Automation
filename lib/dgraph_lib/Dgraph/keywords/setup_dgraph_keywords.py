@@ -52,7 +52,7 @@ class SetupDgraphKeywords:
         cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, **kwargs)
         return cli_command
 
-    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version: None,
+    def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version=None,
                                   docker_string=None):
         """
         Method to build CLI command for live | bulk loading

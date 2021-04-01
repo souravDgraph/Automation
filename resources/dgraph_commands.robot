@@ -138,7 +138,7 @@ Post Execution Verify Zero contents
     [Arguments]    ${is_clear_folder}
     [Documentation]  Keyword to verify alpha and zero logs
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    Sleep   60s
+    Sleep   30s
     @{zero_context}    Create List    All done. Goodbye!
     @{dir}    Create List    w  zw
     Verify alpha and zero contents in results folder    zero    @{zero_context}
@@ -148,7 +148,7 @@ Post Execution Verify Alpha contents
     [Arguments]    ${is_clear_folder}
     [Documentation]  Keyword to verify alpha and zero logs
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    Sleep   60s
+    Sleep   20s
     @{dir}    Create List    p   t
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
