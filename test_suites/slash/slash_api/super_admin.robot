@@ -151,6 +151,36 @@ Update deployment type
     Should Be Equal    ${type}    shared
     [Teardown]
 
+Update jaeger deployment
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update dgraph cloud deployment jaeger
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    deploymentType=shared    jaegerEnabled=true
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
+    ${jaeger}=    get deployment attribute data    ${deployment_details}    jaegerEnabled
+    Should Be Equal    ${jaeger}    true
+    [Teardown]
+
+Update jaeger deployment options
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update dgraph cloud deployment jaeger
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    deploymentType=shared    jaegerEnabled=true    jaegerSize=0.5    jaegerTrace=0.01
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
+    ${jaeger}=    get deployment attribute data    ${deployment_details}    jaegerEnabled
+    Should Be Equal    ${jaeger}    true
+    ${jaeger_size}=    get deployment attribute data    ${deployment_details}    jaegerSize
+    ${jaeger_size}=    Convert To String    ${jaeger_size}
+    Should Be Equal    ${jaeger_size}    0.5
+    ${jaeger_trace}=    get deployment attribute data    ${deployment_details}    jaegerTrace
+    ${jaeger_trace}=    Convert To String    ${jaeger_trace}
+    Should Be Equal    ${jaeger_trace}    0.01
+    [Teardown]
+
 *** Keywords ***
 Create Backend
     ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME}    ${PASSWORD}
