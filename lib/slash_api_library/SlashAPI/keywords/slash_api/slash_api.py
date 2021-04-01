@@ -6,7 +6,7 @@ Author: vivetha@dgraph.io
 
 from SlashAPI.keywords.deployemnts.deployment_keywords import DeploymentKeywords
 from SlashAPI.keywords.organizations.organizations_keywords import OrganizationsKeywords
-
+from SlashAPI.keywords.auth.auth_keywords import AuthKeywords
 # pylint: disable=too-many-ancestors
 
 __version__ = "1.0.0"
@@ -19,10 +19,11 @@ __email__ = "vivetha@dgraph.io"
 __status__ = "Production"
 
 
-class SlashAPI(DeploymentKeywords, OrganizationsKeywords):
-    """Robot Framework Slash GraphQL Keyword Library.
-
-    All the keywords pertaining to Networker are
+class SlashAPI(DeploymentKeywords,
+               OrganizationsKeywords,
+               AuthKeywords):
+    """Robot Framework Dgraph cloud API Keyword Library.
+    All the keywords pertaining to Dgraph cloud are
     exposed to the user through this library.
     """
     ROBOT_LIBRARY_SCOPE = 'TEST SUITE'
