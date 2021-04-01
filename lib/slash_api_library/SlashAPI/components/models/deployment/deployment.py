@@ -241,3 +241,7 @@ class DeploymentModels:
         "protect": ""
         }}}
     """
+    delete_deployment = """
+           {"query":"mutation DeleteDeployment($deploymentID: String!) {deleteDeployment(deploymentID: $deploymentID)}",
+           "variables":{"deploymentID":{{ '"' + properties['deploymentID'] + '"' }}}}
+        """
