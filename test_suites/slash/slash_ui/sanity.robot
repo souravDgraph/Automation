@@ -10,15 +10,6 @@ ${Browser_Alias}    Browser1
 ${API_key_name}     test
 
 *** Test Cases ***
-Dashboard should show the cluster usage statistics
-    [Documentation]
-    ...    List of tests covered
-    ...
-    ...    Click the overview for the backend
-    ...    dashboard shows the cluster usage statistics
-    Click Overview In Menu       ${Browser_Alias}
-    View Cluster Usage Statistics      ${Browser_Alias}  
-    
 User should be able to create backend and navigate to schema page
     [Documentation]
     ...    List of tests covered

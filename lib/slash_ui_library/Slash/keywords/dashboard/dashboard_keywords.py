@@ -250,26 +250,6 @@ class DashboardKeywords():
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.element_should_be_visible(DashboardLocators.deployment_location.replace("%s", zone))
-
-    @staticmethod
-    def view_cluster_usage_statistics(browser_alias):
-        """
-        view the cluster usage statistics for the backend.
-        | browser_alias |  alias of the browser |
-
-        Example:
-        | View cluster_usage_statistics | browser_1 |
-
-        Return:
-            None
-        """
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(DashboardLocators.cluster_usage,
-                                                         timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.data_transfer,
-                                                        timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.no_of_queries_label,
-                                                        timeout=DashboardKeywords.timeout)
                                                         
     @staticmethod
     def click_documentation_in_menu(browser_alias):
