@@ -24,6 +24,11 @@ jobs:
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    
+      - name: Install requirements for Dgraph and Slash
+        run: |
+          sudo rm -rf ${{ github.workspace }}/Automation_workspace_weeklyLargeData
+          
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with: 
@@ -96,12 +101,11 @@ jobs:
       - name: Backup Result folder and list contents
         run: |
             cd ${{ github.workspace }}/Automation_workspace_weeklyLargeData
-            mv results results_last_run
-            cd results_last_run
+            mv results /ssd/qa/results_last_weeklyLargeData_run
+            cd /ssd/qa/results_last_weeklyLargeData_run
             pwd
             ls
-            cd ..
-            mkdir results
+            mkdir  ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results
             
       # delete dgraph from root:
       - name: Delete dgraph from root
