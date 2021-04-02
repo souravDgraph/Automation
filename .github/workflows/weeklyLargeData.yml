@@ -70,7 +70,7 @@ jobs:
            cd dgraph_workspace_weeklyLargeData/dgraph
            make install
            dgraph version
-           cp /home/dg/go/bin/dgraph /usr/bin/
+           sudo cp /home/dg/go/bin/dgraph /usr/bin/
            sudo dgraph version
          
       - name: Run Robot Framework Testcases
