@@ -310,7 +310,7 @@ class DgraphCLI:
                 args_appender = args_appender + self.get_ludicrous_command(is_latest)
         
         if is_latest:
-            cli_command = f"dgraph {cli_name} --cache "size-mb=6000" -v=2 " \
+            cli_command = f"dgraph {cli_name} --cache \"size-mb=6000\" -v=2 " \
                           f"--zero={self.zero_server_name}:{self.zero_addr}"
         else:
             cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
