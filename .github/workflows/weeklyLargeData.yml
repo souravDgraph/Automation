@@ -91,35 +91,42 @@ jobs:
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           echo " ---- Running Dgraph Testcases ----"
           sudo robot --splitlog --include WEEKLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
-          # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
-          # echo " ---- Running Slash Testcases ----"
-          # robot test_suites/slash/slash_api/sanity.robot
       
-      # delete dgraph from root:
-      - name: Backup Results Folder
+      - name: Backup Result folder and list contents
         run: |
-            sudo rm -rf /usr/bin/dgraph
+            cd ${{ github.workspace }}/Automation_workspace_weeklyLargeData
+            mv results results_last_run
+            cd results_last_run
+            pwd
+            ls
+            cd ..
+            mkdir results
+            
+      # delete dgraph from root:
+      - name: Delete dgraph from root
+        run: |
+            sudo rm -rf /usr/bin/dgraph  
       
-      # Getting Current time
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        if: always()
-        id: current-time
-        with:
-          format: YYYYMMDD-HH_mm_ss
-          utcOffset: "+05:30"
+#       # Getting Current time
+#       - name: Get current time
+#         uses: 1466587594/get-current-time@v2
+#         if: always()
+#         id: current-time
+#         with:
+#           format: YYYYMMDD-HH_mm_ss
+#           utcOffset: "+05:30"
       
-      # Publish Artifacts
-      - name: Use the Upload Artifact GitHub Action
-        uses: actions/upload-artifact@v2
-        if: always()
-        with: 
-          name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
-          path: |
-            ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/output.xml
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/p
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/w
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/zw
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/t
+#       # Publish Artifacts
+#       - name: Use the Upload Artifact GitHub Action
+#         uses: actions/upload-artifact@v2
+#         if: always()
+#         with: 
+#           name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
+#           path: |
+#             ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/output.xml
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/p
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/w
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/zw
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/t
         
