@@ -80,9 +80,10 @@ jobs:
           # ---- Commenting the below lines as Git Actions are failing, due to heavy workload. ----
           sed -i "s/1million/stackoverflow/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
           cd ./test_data/datasets
-          wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.com.rdf.gz
-          wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.schema
-          mv ./stackoverflow.com.rdf.gz ./stackoverflow.rdf.gz
+          # wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.com.rdf.gz
+          # wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.schema
+          # mv ./stackoverflow.com.rdf.gz ./stackoverflow.rdf.gz
+          cp /ssd/qa/CopyofStackoverflowData/* ./
           zcat stackoverflow.rdf.gz | head -n 5
           head stackoverflow.schema
           cd ../..
