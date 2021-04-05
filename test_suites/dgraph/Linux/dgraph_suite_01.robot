@@ -3,7 +3,7 @@ Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph
 Suite Teardown     End All Process    false
 Test Setup      Monitor Health And State check
-Test Teardown   Monitor zero and alpha process
+Test Teardown   Monitor zero and alpha process  true
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
 Library           String
@@ -16,13 +16,13 @@ ${schema_file}    1million.schema
 TC_01 Perform live load data.
      [Documentation]    Perform live load operation on dataset.
      ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   C698
+     [Tags]    regression   C698     NIGHTLY
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_02 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
-     [Tags]    regression
+     [Tags]    regression  CI  NIGHTLY
      Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_03 Perfrom NFS export on dgraph
@@ -35,26 +35,33 @@ TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
-     Create NFS Backup      1
-     perform a restore on backup    0
      Clear Backup Folders   true
+     Create NFS Backup      1
+     log        ${is_latest_global_check}
+     Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    0
+     ...    ELSE    Perform a restore on backup by older dgraph versions
+     Clear Backup Folders   true
+     [Teardown]    NONE
 
 TC_05 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression   CI   WEEKLY
+     [Tags]    regression   WEEKLY
      Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
-     Create NFS Backup    2
-     perform a restore on backup    1
      Clear Backup Folders   true
+     Create NFS Backup    2
+     Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    1
+     ...    ELSE    Perform a restore on backup by older dgraph versions
+     Clear Backup Folders   true
+     [Teardown]    NONE
 
 TC_07 Perform parallel live loads.
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
-     [Tags]    regression   WEEKLY
+     [Tags]    regression   WEEKLY  CI
      Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2

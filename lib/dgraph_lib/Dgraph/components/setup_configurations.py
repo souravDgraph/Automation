@@ -220,7 +220,7 @@ class DgraphCLI:
         """
         logger.debug("Enabling ludicrous mode in alpha")
         if is_latest:
-            ludicrous_mode = " --ludicrous enabled"
+            ludicrous_mode = ' --ludicrous "enabled=true"'
         else:
             ludicrous_mode = " --ludicrous_mode"
         return ludicrous_mode
@@ -275,6 +275,7 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
 
         # Configure tls and mtls
@@ -302,18 +303,23 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
         for key, value in kwargs.items():
             if key == "ludicrous_mode" and value == "enabled":
                 args_appender = args_appender + self.get_ludicrous_command(is_latest)
-
-        cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
-                      f"--zero={self.zero_server_name}:{self.zero_addr}"
-
+        
+        if is_latest:
+            cli_command = f"dgraph {cli_name} --cache \"size-mb=6000\" -v=2 " \
+                          f"--zero={self.zero_server_name}:{self.zero_addr}"
+        else:
+            cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
+                          f"--zero={self.zero_server_name}:{self.zero_addr}"
+                
         cli_command = cli_command + self.get_security_command(is_latest)
 
         if bulk_path:
-            appender = appender + " -p " + bulk_path
+            appender = appender + f' --postings "{bulk_path}" '
         if self.acl:
             appender = appender + self.get_acl_command(is_latest)
         if self.enc:
@@ -371,9 +377,9 @@ class DgraphCLI:
             second = str(version_details).split(".")[1]
             logger.debug(first, second)
             if int(first) == 21:
-                return "latest"
+                return True
             else:
-                return "release"
+                return False
         else:
             logger.debug("Version is empty so considering it as latest dgraph"
                          " from master branch.")
@@ -391,11 +397,11 @@ class DgraphCLI:
                 version = branch
             else:
                 version = self.get_dgraph_version_details("Dgraph version")
-            is_latest = True if self.check_version(version) == "latest" or branch == "master" or branch == "" \
+            is_latest = True if self.check_version(version) or branch == "master" or branch == "" \
                 else False
         else:
             logger.debug("Dgraph docker setup is executed.")
-            is_latest = True if self.check_version(version) == "latest" or branch == "master" \
+            is_latest = True if self.check_version(version) or branch == "master" \
                 else False
         logger.debug(f"check version if latest: {is_latest}")
         return is_latest
@@ -443,7 +449,7 @@ class DgraphCLI:
         # Loader CLI command generation
         cli_command = " dgraph"
         cli_bulk_encryption = ""
-
+        logger.debug(f"offset value: {self.offset}")
         loader_type = loader_type.lower()
         docker_location = None
         if docker_string:
@@ -483,6 +489,14 @@ class DgraphCLI:
 
         cli_command = cli_command + mtls_certs
         return cli_command
+
+    @staticmethod
+    def check_is_latest_version(dgraph_branch):
+
+        if dgraph_branch == "release":
+            return False
+        else:
+            return True
 
     def build_increment_cli_command(self, latest_version_check=None, docker_string=None, alpha_offset: int = 0):
         """

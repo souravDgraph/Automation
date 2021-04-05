@@ -129,14 +129,17 @@ dmypy.json
 
 # results folder
 results/**
+results/alpha_zero_logs/**
+results/inc_logs/**
 !results/inc_logs/.gitkeep
+!results/alpha_zero_logs/.keep
 
 # backup folder
 backup/*
 !backup/.gitkeep
 
 # export folder
-export/*
+export/**
 !export/.gitkeep
 
 #other files

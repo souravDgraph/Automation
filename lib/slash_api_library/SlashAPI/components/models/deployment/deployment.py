@@ -3,6 +3,13 @@ class DeploymentModels:
     {"query":"mutation updateGQLSchema($sch: String!) {updateGQLSchema(input: { set: { schema: $sch } }) {gqlSchema {schema generatedSchema}}}",
     "variables":{"sch":{{ '"' + properties['schema'] + '"' }}}}
     """
+    update_rules = """{"operationName":"UpdateRules",
+        "variables":{"deploymentID":{{ '"' + properties['deploymentID'] + '"' }},"anonAccess":{{ '"' + properties['anonAccess'] + '"' }}},
+        "query":"mutation UpdateRules($deploymentID: String!, $anonAccess: String!) {updateDeploymentAnonAccess(deploymentID: $deploymentID, anonAccess: $anonAccess)}"
+    }"""
+
+    get_rules = """{"query":"query GetExistingRules($deploymentID: ID!) { getDeploymentByID(deploymentID: $deploymentID) { uid    name   anonAccess } }", "variables":{"deploymentID":{{ '"' + properties['deploymentID'] + '"'}}}}"""
+
     get_schema = """{"query":"{getGQLSchema {schema generatedSchema }}"}"""
 
     drop_data = """{"query":"mutation { dropData(allData: true) { response { code message } } }"}"""
@@ -71,6 +78,10 @@ class DeploymentModels:
         "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled isProtected deploymentType} }",
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
+
+    read_rules_attributes = """{"rules":{"types": ["get{{ properties['type'] }}","query{{ properties['type'] }}","aggregate{{ properties['type'] }}"],"lambdas":[]}}"""
+
+    write_rules_attributes = """{"rules":{"types": ["update{{ properties['type'] }}","add{{ properties['type'] }}","delete{{ properties['type'] }}"],"lambdas":[]}}"""
 
     deployment_attributes = """
     {
@@ -230,3 +241,7 @@ class DeploymentModels:
         "protect": ""
         }}}
     """
+    delete_deployment = """
+           {"query":"mutation DeleteDeployment($deploymentID: String!) {deleteDeployment(deploymentID: $deploymentID)}",
+           "variables":{"deploymentID":{{ '"' + properties['deploymentID'] + '"' }}}}
+        """

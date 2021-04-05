@@ -86,7 +86,7 @@ class CustomRequestKeywords:
         tls_cert = self.dgraph_cli.get_cert_from_pem_file()
         return tls_cert
 
-    def health_check(self, appender):
+    def health_status_check(self, appender):
         """
         Method to check the health of the deployed dgraph instance
         :param appender: URL segment to add to the base URL
@@ -105,6 +105,25 @@ class CustomRequestKeywords:
             raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
         status = response.json()[0]['status']
         return status
+
+    def health_check(self, appender):
+        """
+        Method to check the health of the deployed dgraph instance
+        :param appender: URL segment to add to the base URL
+        :return status: healthy/unhealthy
+
+         Example:
+        | health check |  appender
+        | health check |  /health
+        """
+        cert = self.cert
+        headers = self.headers
+        response = None
+        try:
+            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+        except Exception as err:
+            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+        return response.json()
 
     def state_check(self, appender):
         """
@@ -189,10 +208,10 @@ class CustomRequestKeywords:
                                              variables=variables, cert=cert)
         except Exception as err:
             raise Exception(f"Something went wrong with the backup request.. {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
-        assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
-        logger.info('Backup successfully completed')
-        return response
+        # assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
+        # assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
+        logger.info('Backup successfully initiated')
+        return response.json()
 
     def restore_using_admin(self, path):
         """
@@ -248,10 +267,10 @@ class CustomRequestKeywords:
             response = self.req_handler.post_request(appender=appender, headers=headers, body=payload, cert=cert)
         except Exception as err:
             raise Exception(f"Something went wrong with the backup request... {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
-        assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
+        # assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
+        # assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
         logger.info('Backup successfully completed')
-        return response
+        return response.json()
 
     def restore_using_admin_backup(self, path):
         """
