@@ -120,9 +120,12 @@ End All Process
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Terminate All Processes
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
+    ${passed}=  Run Keyword And Return Status   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
+    Run Keyword If      ${passed}       Fail
     Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Backup alpha and zero logs
@@ -149,6 +152,9 @@ Post Execution Verify Alpha contents
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Sleep   60s
     @{dir}    Create List    p   t
+    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
+    ${passed}=  Run Keyword And Return Status   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
+    Run Keyword If      ${passed}       Fail
     @{alpha_context}    Create List    Buffer flushed successfully.
     Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
