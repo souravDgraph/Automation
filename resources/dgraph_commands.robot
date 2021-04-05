@@ -149,7 +149,6 @@ Post Execution Verify Alpha contents
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Sleep   60s
     @{dir}    Create List    p   t
-    Wait Until Keyword Succeeds    3x    5minute    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
     @{alpha_context}    Create List    Buffer flushed successfully.
     Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
