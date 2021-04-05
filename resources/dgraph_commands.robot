@@ -120,12 +120,11 @@ End All Process
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Terminate All Processes
-    Sleep   80s
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
-    Verify alpha and zero contents in results folder    zero    @{zero_context}
-    Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
+    Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Backup alpha and zero logs
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
@@ -141,7 +140,7 @@ Post Execution Verify Zero contents
     Sleep   60s
     @{zero_context}    Create List    All done. Goodbye!
     @{dir}    Create List    w  zw
-    Verify alpha and zero contents in results folder    zero    @{zero_context}
+    Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Post Execution Verify Alpha contents
@@ -150,8 +149,9 @@ Post Execution Verify Alpha contents
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Sleep   60s
     @{dir}    Create List    p   t
-    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.
-    Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Wait Until Keyword Succeeds    3x    5minute    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
+    @{alpha_context}    Create List    Buffer flushed successfully.
+    Wait Until Keyword Succeeds     300x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 End Alpha Process
