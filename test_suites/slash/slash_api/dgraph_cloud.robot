@@ -28,7 +28,7 @@ create Dgraph cloud deployment with default options
 create Dgraph cloud deployment with HA
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment with HA enabled
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    true
@@ -40,7 +40,7 @@ create Dgraph cloud deployment with HA
 create Dgraph cloud deployment with ACL enabled
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deploymentwith ACL enabled
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    true    aclEnabled=true
@@ -52,7 +52,7 @@ create Dgraph cloud deployment with ACL enabled
 create Dgraph cloud deployment with Jaeger enabled
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment with Jaeger enabled
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true
@@ -64,7 +64,7 @@ create Dgraph cloud deployment with Jaeger enabled
 create Dgraph cloud deployment with Jaeger size and sampling time
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment with specified jaeger deployment options
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
@@ -76,7 +76,7 @@ create Dgraph cloud deployment with Jaeger size and sampling time
 create Dgraph cloud deployment with defined storage
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment with user defined storage
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    alphaStorage=80
@@ -88,7 +88,7 @@ create Dgraph cloud deployment with defined storage
 create Dgraph cloud deployment with different backend tier
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment by picking a non default backend tire
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    size=large    alphaStorage=40
@@ -100,7 +100,7 @@ create Dgraph cloud deployment with different backend tier
 create Dgraph cloud deployment with Jaeger size and default deployment values
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment with non default Jeager deployment size
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true
@@ -112,7 +112,7 @@ create Dgraph cloud deployment with Jaeger size and default deployment values
 create Dgraph cloud deployment with all options enabled
     [Documentation]    List of tests covered
     ...
-    ...    - Create Dgraph cloud Deployment
+    ...    - Create Dgraph cloud Deployment with all the options enabled
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    size=large    alphaStorage=90    dgraphHA=true    aclEnabled=true    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
@@ -160,7 +160,7 @@ Update deployment jaeger
 Update deployment ACL
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment jaeger
+    ...    - Update dgraph cloud deployment ACL
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    aclEnabled=true
@@ -172,7 +172,7 @@ Update deployment ACL
 Update deployment size
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment jaeger
+    ...    - Update dgraph cloud deployment size
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    size=large
@@ -184,7 +184,7 @@ Update deployment size
 update Deployment mode
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment name
+    ...    - Update dgraph cloud deployment mode
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    deploymentMode=readonly
@@ -196,7 +196,7 @@ update Deployment mode
 Update Enable jaeger with deployment options
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment name
+    ...    - Update dgraph cloud deployment jaeger with options
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
@@ -212,7 +212,7 @@ Update Enable jaeger with deployment options
 create Enable jaeger deployment and modified deployment options
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment name
+    ...    - Create dgraph cloud deployment with jaeger enabled and modify the jaeger depolyment options
     [Tags]    C236    Sanity
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
