@@ -140,7 +140,6 @@ Post Execution Verify Zero contents
     [Arguments]    ${is_clear_folder}
     [Documentation]  Keyword to verify alpha and zero logs
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    Sleep   60s
     @{zero_context}    Create List    All done. Goodbye!
     @{dir}    Create List    w  zw
     Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
@@ -150,7 +149,6 @@ Post Execution Verify Alpha contents
     [Arguments]    ${is_clear_folder}
     [Documentation]  Keyword to verify alpha and zero logs
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    Sleep   60s
     @{dir}    Create List    p   t
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    10 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
