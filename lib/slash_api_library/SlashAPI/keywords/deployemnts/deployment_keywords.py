@@ -36,6 +36,10 @@ class DeploymentKeywords():
                           deployment_subdomain=None,
                           organization=None,
                           deploymentMode="graphql",
+                          aclEnabled='false',
+                          jaegerEnabled='false',
+                          jaegerSize='0.5',
+                          jaegerTrace='0.01',
                           expected_response=200):
         logger.info("Creating a Deployment of Name : %s" % deployment_name)
         url = base_url + "graphql"
@@ -51,6 +55,10 @@ class DeploymentKeywords():
                                                  deployment_subdomain,
                                                  organization,
                                                  deploymentMode,
+                                                 aclEnabled,
+                                                 jaegerEnabled,
+                                                 jaegerSize,
+                                                 jaegerTrace,
                                                  expected_response)
         return response
 
@@ -134,7 +142,11 @@ class DeploymentKeywords():
                                     deploymentType="free",
                                     size="small",
                                     alphaStorage="10",
-                                    dgraphHA="false"
+                                    dgraphHA="false",
+                                    aclEnabled='false',
+                                    jaegerEnabled='false',
+                                    jaegerSize='0.5',
+                                    jaegerTrace='0.01'
                                     ):
         logger.info("validating deployment")
         Deployments.validate_deployment_details(response,
@@ -146,7 +158,11 @@ class DeploymentKeywords():
                                                 deploymentType,
                                                 size,
                                                 alphaStorage,
-                                                dgraphHA)
+                                                dgraphHA,
+                                                aclEnabled,
+                                                jaegerEnabled,
+                                                jaegerSize,
+                                                jaegerTrace)
 
     @staticmethod
     def update_deployment(session_alias,
@@ -166,6 +182,8 @@ class DeploymentKeywords():
                           backupInterval=None,
                           backupBucketFormat=None,
                           aclEnabled=None,
+                          jaegerSize='0.5',
+                          jaegerTrace='0.01',
                           expected_response_text="Successfully Updated the backend",
                           expected_response=200):
         logger.info("Updating a Deployment of Name : %s" % deployment_id)
@@ -188,6 +206,8 @@ class DeploymentKeywords():
                                                  backupInterval,
                                                  backupBucketFormat,
                                                  aclEnabled,
+                                                 jaegerSize,
+                                                 jaegerTrace,
                                                  expected_response_text,
                                                  expected_response)
         return response

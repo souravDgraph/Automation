@@ -30,7 +30,7 @@ class DeploymentModels:
            {% if properties['deploymentID'] and properties['deploymentID'] != "" %}
             "deploymentID": {{ '"' + properties['deploymentID'] + '"' }}
             {% endif %}
-            
+
             {% if properties['apiKeyID'] and properties['apiKeyID'] != "" %}
             ,"apiKeyID": {{ '"' + properties['apiKeyID'] + '"' }}
             {% endif %}
@@ -46,11 +46,11 @@ class DeploymentModels:
            {% if properties['deploymentID'] and properties['deploymentID'] != "" %}
             "deploymentID": {{ '"' + properties['deploymentID'] + '"' }}
             {% endif %}
-            
+
             {% if properties['name'] and properties['name'] != "" %}
             ,"name": {{ '"' + properties['name'] + '"' }}
             {% endif %}
-            
+
             {% if properties['role'] and properties['role'] != "" %}
             ,"role": {{ '"' + properties['role'] + '"' }}
             {% endif %}
@@ -75,7 +75,7 @@ class DeploymentModels:
     }"""
 
     get_deployment = """{
-        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled isProtected deploymentType} }",
+        "query":"query GetDeploymentById($id: ID!){ getDeploymentByID(deploymentID: $id) { uid  url  name  zone  subdomain jaegerEnabled size deploymentMode dgraphHA backupInterval backupBucketFormat aclEnabled isProtected deploymentType jaegerSize jaegerTrace} }",
         "variables":{"id":{{ '"' + properties['deployment_id'] + '"' }}}
         }"""
 
@@ -88,50 +88,50 @@ class DeploymentModels:
         {% if properties['name'] and properties['name'] != "" %}
         "name": {{ '"' + properties['name'] + '"' }}
         {% endif %}
-    
+
         {% if properties['zone'] and properties['zone'] != "" %}
         ,"zone": {{ '"' + properties['zone'] + '"' }}
         {% endif %}
-    
+
         {% if properties['subdomain'] and properties['subdomain'] != "" %}
         ,"subdomain": {{ '"' + properties['subdomain'] + '"' }}
         {% endif %}
-    
+
         {% if properties['organization'] and properties['organization'] != "" %}
         ,"organization": {{ '"' + properties['organization'] + '"' }}
         {% endif %}
-    
+
         {% if properties['deploymentMode'] and properties['deploymentMode'] != "" %}
         ,"deploymentMode": {{ '"' + properties['deploymentMode'] + '"' }}
         {% endif %}
-    
+
         {% if properties['dgraphHA'] and properties['dgraphHA'] != "" %}
         ,"dgraphHA": {{ '"' + properties['dgraphHA'] + '"' }}
         {% endif %}
-    
+
         {% if properties['size'] and properties['size'] != "" %}
         ,"size": {{ '"' + properties['size'] + '"' }}
         {% endif %}
-    
+
         {% if properties['organizationId'] and properties['organizationId'] == "empty" %}
         "organizationId": null
         {% elif properties['organizationId'] and properties['organizationId'] != "" %}
         ,"organizationId": {{'"' + properties['organizationId'] + '"' }}
         {% endif %}
-        
+
         {% if properties['deploymentType'] and properties['deploymentType'] != "" %}
         ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}
         {% endif %}
-        
+
         {% if properties['alphaStorage'] and properties['alphaStorage'] != "" %}
         ,"alphaStorage": {{ '"' + properties['alphaStorage'] + '"' }}
         {% endif %}
-    
+
     }"""
 
     create_deployment = """
     {
-    "query":"mutation CreateDeployment($input: NewDeployment!) {createDeployment(input: $input) {enterprise size uid url name zone deploymentType alphaStorage subdomain charts{compact full} jwtToken organization {uid name createdBy {accountType}} owner deletedAt frontendUrl frontendRepo deploymentMode lambdaScript dgraphHA}}",
+    "query":"mutation CreateDeployment($input: NewDeployment!) {createDeployment(input: $input) {enterprise size uid url name zone deploymentType alphaStorage subdomain charts{compact full} jwtToken organization {uid name createdBy {accountType}} owner deletedAt frontendUrl frontendRepo deploymentMode lambdaScript dgraphHA jaegerEnabled jaegerSize jaegerTrace aclEnabled}}",
     "variables":{
         "input":{
             {% if properties['name'] and properties['name'] != "" %}
@@ -143,26 +143,43 @@ class DeploymentModels:
             {% if properties['alphaStorage'] and properties['alphaStorage'] != "" %}
             ,"alphaStorage": {{ '"' + properties['alphaStorage'] + '"' }}
             {% endif %}
-            
+
             {% if properties['zone'] and properties['zone'] != "" %}
             ,"zone": {{ '"' + properties['zone'] + '"' }}
             {% endif %}
-            
+
             {% if properties['subdomain'] and properties['subdomain'] != "" %}
             ,"subdomain": {{ '"' + properties['subdomain'] + '"' }}
             {% endif %}
-            
+
             {% if properties['enterprise'] and properties['enterprise'] != "" %}
             ,"enterprise": {{ '"' + properties['enterprise'] + '"' }}
             {% endif %}
-            
+
             {% if properties['size'] and properties['size'] != "" %}
             ,"size": {{ '"' + properties['size'] + '"' }}
             {% endif %}
-            
+
             {% if properties['dgraphHA'] and properties['dgraphHA'] != "" %}
             ,"dgraphHA": {{ '"' + properties['dgraphHA'] + '"' }}
             {% endif %}
+
+            {% if properties['aclEnabled'] and properties['aclEnabled'] != "" %}
+            ,"aclEnabled": {{ '"' + properties['aclEnabled'] + '"' }}
+            {% endif %}
+
+            {% if properties['jaegerEnabled'] and properties['jaegerEnabled'] != "" %}
+            ,"jaegerEnabled": {{ '"' + properties['jaegerEnabled'] + '"' }}
+            {% endif %}
+
+            {% if properties['jaegerSize'] and properties['jaegerSize'] != "" %}
+            ,"jaegerSize": {{ '"' + properties['jaegerSize'] + '"' }}
+            {% endif %}
+
+            {% if properties['jaegerTrace'] and properties['jaegerTrace'] != "" %}
+            ,"jaegerTrace": {{ '"' + properties['jaegerTrace'] + '"' }}
+            {% endif %}
+
             }
             }
     }
@@ -175,41 +192,49 @@ class DeploymentModels:
         {% if properties['name'] and properties['name'] != "" %}
         ,"name": {{ '"' + properties['name'] + '"' }}
         {% endif %}
-    
+
         {% if properties['zone'] and properties['zone'] != "" %}
         ,"zone": {{ '"' + properties['zone'] + '"' }}
         {% endif %}
-    
+
         {% if properties['subdomain'] and properties['subdomain'] != "" %}
         ,"subdomain": {{ '"' + properties['subdomain'] + '"' }}
         {% endif %}
-    
+
         {% if properties['organization'] and properties['organization'] != "" %}
         ,"organization": {{ '"' + properties['organization'] + '"' }}
         {% endif %}
-    
+
         {% if properties['deploymentMode'] and properties['deploymentMode'] != "" %}
         ,"deploymentMode": {{ '"' + properties['deploymentMode'] + '"' }}
         {% endif %}
-    
+
         {% if properties['dgraphHA'] and properties['dgraphHA'] != "" %}
         ,"dgraphHA": {{ '"' + properties['dgraphHA'] + '"' }}
         {% endif %}
-    
+
         {% if properties['size'] and properties['size'] != "" %}
         ,"size": {{ '"' + properties['size'] + '"' }}
         {% endif %}
-    
+
         {% if properties['organizationUID'] and properties['organizationUID'] == "empty" %}
         ,"organizationUID": null
         {% elif properties['organizationUID'] and properties['organizationUID'] != "" %}
         ,"organizationUID": {{'"' + properties['organizationUID'] + '"' }}
         {% endif %}
-        
+
         {% if properties['jaegerEnabled'] and properties['jaegerEnabled'] != "" %}
         ,"jaegerEnabled": {{ '"' + properties['jaegerEnabled'] + '"' }}
         {% endif %}
-        
+
+        {% if properties['jaegerSize'] and properties['jaegerSize'] != "" %}
+        ,"jaegerSize": {{ '"' + properties['jaegerSize'] + '"' }}
+        {% endif %}
+
+        {% if properties['jaegerTrace'] and properties['jaegerTrace'] != "" %}
+        ,"jaegerTrace": {{ '"' + properties['jaegerTrace'] + '"' }}
+        {% endif %}
+
         {% if properties['storage'] and properties['storage'] != "" %}
         ,"storage": {{ '"' + properties['storage'] + '"' }}
         {% endif %}
@@ -230,7 +255,7 @@ class DeploymentModels:
         ,"deploymentType": {{ '"' + properties['deploymentType'] + '"' }}  
         {% endif %}
         }
-        
+
      }}
     """
 
