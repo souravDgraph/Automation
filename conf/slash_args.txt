@@ -3,6 +3,7 @@
 --console verbose
 --consolemarkers on
 --loglevel TRACE:INFO
+--splitlog
 test_suites/slash/slash_api/org.robot
 
 #Additional arguments

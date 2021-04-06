@@ -142,8 +142,8 @@ End All Process
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_error_context}
     Run Keyword And Return If      ${passed}       Fail
-    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in sepcific folder    zero    ${backup_folder_name}    @{zero_context}
-    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in sepcific folder    zero    ${backup_folder_name}    @{zero_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 End Zero Process
@@ -157,7 +157,7 @@ Post Execution Verify Zero contents
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     @{zero_context}    Create List    All done. Goodbye!
     @{dir}    Create List    w  zw
-    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Post Execution Verify Alpha contents
@@ -172,7 +172,7 @@ Post Execution Verify Alpha contents
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
     Run Keyword And Return If      ${passed}       Fail
     @{alpha_context}    Create List    Buffer flushed successfully.
-    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 End Alpha Process
