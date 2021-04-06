@@ -13,7 +13,7 @@ Variables         ../../../conf/slash/slash_api/variables.py
 ${Session_alias}    Session1
 
 *** Test Cases ***
-create Dgraph cloud deployment
+create Dgraph cloud deployment with default options
     [Documentation]    List of tests covered
     ...
     ...    - Create Dgraph cloud Deployment
@@ -21,6 +21,102 @@ create Dgraph cloud deployment
     [Template]
     ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with HA
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment with HA enabled
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    true
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40    dgraphHA=true
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with ACL enabled
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deploymentwith ACL enabled
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    true    aclEnabled=true
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40    dgraphHA=true    aclEnabled=true
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with Jaeger enabled
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment with Jaeger enabled
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40    jaegerEnabled=true
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with Jaeger size and sampling time
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment with specified jaeger deployment options
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with defined storage
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment with user defined storage
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    alphaStorage=80
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=80
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with different backend tier
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment by picking a non default backend tire
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    size=large    alphaStorage=40
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=large    alphaStorage=40
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with Jaeger size and default deployment values
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment with non default Jeager deployment size
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40    jaegerEnabled=true
+    ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
+    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
+    [Teardown]
+
+create Dgraph cloud deployment with all options enabled
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create Dgraph cloud Deployment with all the options enabled
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    size=large    alphaStorage=90    dgraphHA=true    aclEnabled=true    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=large    alphaStorage=90    dgraphHA=true    aclEnabled=true    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
     ${backend_id}=    Collections.Get From Dictionary    ${data}    uid
     Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${backend_id}
     [Teardown]
@@ -64,7 +160,7 @@ Update deployment jaeger
 Update deployment ACL
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment jaeger
+    ...    - Update dgraph cloud deployment ACL
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    aclEnabled=true
@@ -76,7 +172,7 @@ Update deployment ACL
 Update deployment size
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment jaeger
+    ...    - Update dgraph cloud deployment size
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    size=large
@@ -88,13 +184,47 @@ Update deployment size
 update Deployment mode
     [Documentation]    List of tests covered
     ...
-    ...    - Update dgraph cloud deployment name
+    ...    - Update dgraph cloud deployment mode
     [Tags]    C236    Sanity
     [Template]
     Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    deploymentMode=readonly
     ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
     ${deployment_mode}=    get deployment attribute data    ${deployment_details}    deploymentMode
     Should Be Equal    ${deployment_mode}    readonly
+    [Teardown]
+
+Update Enable jaeger with deployment options
+    [Documentation]    List of tests covered
+    ...
+    ...    - Update dgraph cloud deployment jaeger with options
+    [Tags]    C236    Sanity
+    [Template]
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
+    ${jaeger_size}=    get deployment attribute data    ${deployment_details}    jaegerSize
+    ${jaeger_size}=    Convert To String    ${jaeger_size}
+    Should Be Equal    ${jaeger_size}    1
+    ${jaeger_trace}=    get deployment attribute data    ${deployment_details}    jaegerTrace
+    ${jaeger_trace}=    Convert To String    ${jaeger_trace}
+    Should Be Equal    ${jaeger_trace}    0.02
+    [Teardown]
+
+create Enable jaeger deployment and modified deployment options
+    [Documentation]    List of tests covered
+    ...
+    ...    - Create dgraph cloud deployment with jaeger enabled and modify the jaeger depolyment options
+    [Tags]    C236    Sanity
+    [Template]
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    dedicated    jaegerEnabled=true    jaegerSize=1    jaegerTrace=0.02
+    Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}    deploymentType=dedicated    size=medium    alphaStorage=40    jaegerEnabled=true
+    Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    jaegerSize=0.5    jaegerTrace=0.01
+    ${deployment_details}=    Get Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
+    ${jaeger_size}=    get deployment attribute data    ${deployment_details}    jaegerSize
+    ${jaeger_size}=    Convert To String    ${jaeger_size}
+    Should Be Equal    ${jaeger_size}    0.5
+    ${jaeger_trace}=    get deployment attribute data    ${deployment_details}    jaegerTrace
+    ${jaeger_trace}=    Convert To String    ${jaeger_trace}
+    Should Be Equal    ${jaeger_trace}    0.01
     [Teardown]
 
 *** Keywords ***

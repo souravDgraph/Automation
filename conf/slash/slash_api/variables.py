@@ -1,6 +1,6 @@
 URL = "https://api.stage.thegaas.com/"
 BACKEND_NAME = "Test"
-BACKEND_ZONE = "us-east-1"
+BACKEND_ZONE = "stgdgraph"
 USER_NAME = "vivetha+test25@dgraph.io"
 PASSWORD = "Password@123"
 HEADERS = { "Content-Type" : "application/json" }

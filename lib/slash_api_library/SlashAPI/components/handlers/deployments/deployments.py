@@ -38,10 +38,20 @@ class Deployments():
                           deployment_subdomain=None,
                           organization=None,
                           deploymentMode="graphql",
+                          aclEnabled='false',
+                          jaegerEnabled='false',
+                          jaegerSize='0.5',
+                          jaegerTrace='0.01',
                           expected_response=200):
         properties = {"name": deployment_name, "zone": deployment_zone, "deploymentType" : deploymentType}
         if deploymentType == "dedicated":
-            ha_properties = {"size" : size, "alphaStorage" : alphaStorage, "dgraphHA" : dgraphHA}
+            ha_properties = {"size" : size,
+                             "alphaStorage" : alphaStorage,
+                             "dgraphHA" : dgraphHA,
+                             "aclEnabled": aclEnabled,
+                             "jaegerEnabled": jaegerEnabled,
+                             "jaegerSize": jaegerSize,
+                             "jaegerTrace": jaegerTrace}
             properties.update(ha_properties)
         else:
             size = "small"
@@ -73,7 +83,12 @@ class Deployments():
                                                 deploymentType,
                                                 size,
                                                 alphaStorage,
-                                                dgraphHA)
+                                                dgraphHA,
+                                                aclEnabled,
+                                                jaegerEnabled,
+                                                jaegerSize,
+                                                jaegerTrace
+                                                )
         logger.info(deployment_details)
         return deployment_details
 
@@ -113,6 +128,8 @@ class Deployments():
                           backupInterval=None,
                           backupBucketFormat=None,
                           aclEnabled=None,
+                          jaegerSize='0.5',
+                          jaegerTrace='0.01',
                           expected_response_text="Successfully Updated the backend",
                           expected_response=None):
         properties = locals()
@@ -231,7 +248,12 @@ class Deployments():
                                     deploymentType="free",
                                     size="small",
                                     alphaStorage="10",
-                                    dgraphHA="false"):
+                                    dgraphHA="false",
+                                    aclEnabled='false',
+                                    jaegerEnabled='false',
+                                    jaegerSize='0.5',
+                                    jaegerTrace='0.01'
+                                    ):
         properties = locals()
         logger.info(properties)
         del properties["response_data"]
@@ -261,7 +283,7 @@ class Deployments():
                                                 properties)
         connection = Connection()
         connection.create_session(session_alias, url, auth)
-        response = connection.post_on_session(session_alias, '', 
+        response = connection.post_on_session(session_alias, '',
                                                 json=data,
                                                 headers=auth,
                                                 expected_status=str(expected_response))
