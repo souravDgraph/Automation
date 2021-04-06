@@ -27,19 +27,47 @@ class DashboardKeywords():
     """
     timeout = 10
     @staticmethod
-    def click_launch_new_backend(browser_alias):
+    def click_launch_new_backend(browser_alias, timeout):
+        """
+        click the launch new backend button.
+        | browser_alias |  alias of the browser |
+        | timeout | timeout for the element |
 
+        Example:
+        | Click Launch New Backend | browser_1 | 20 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.create_backend, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.launch_new_backend_label, timeout=timeout)
 
     @staticmethod
     def fill_backend_details(browser_alias,
                              backend_name,
+                             select_product="Starter",
                              subdomain=None,
                              organization=None,
                              provider=None,
                              zone=None):
+        """
+        fill the backend details.
+        | browser_alias |  alias of the browser |
+        | backend_name |  name of the backend |
+        | select_product |  product type for the backend |
+        | subdomain |  subdomain for the backend |
+        | organization |  organization for the backend |
+        | provider |  provider for the backend |
+        | zone |  zone for the backend |
+        
+        Example:
+        | Fill Backend Details | browser_1 | test | 
+        | Fill Backend Details | browser_1 | test | Dgraph Cloud | name | test_org | AWS | us-east-1 |
 
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.input_text(DashboardLocators.backend_name,
                            backend_name,
@@ -56,12 +84,28 @@ class DashboardKeywords():
         if provider:
             browser.click_element(DashboardLocators.provider.replace("%s", provider),
                                   timeout=DashboardKeywords.timeout)
+        
+        if select_product:
+            browser.click_element(DashboardLocators.select_product.replace("%s", select_product),
+                                    timeout=DashboardKeywords.timeout)
+
         if zone:
             browser.click_element(DashboardLocators.zone.replace("%s", zone),
                                   timeout=DashboardKeywords.timeout)
 
+
     @staticmethod
     def click_launch_button(browser_alias):
+        """
+        click the launch button in the launch new backend page.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Launch Button | browser_1 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.launch_button,
                               timeout=DashboardKeywords.timeout)
@@ -69,33 +113,203 @@ class DashboardKeywords():
     @staticmethod
     def monitor_backend_creation(browser_alias,
                                  timeout):
+        """
+        monitor the backend creation spinning for the backend.
+        | browser_alias |  alias of the browser |
+        | timeout | 10 |
+
+        Example:
+        | Monitor Backend Creation | browser_1 | 10 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(DashboardLocators.spinning_backend,
                                                  timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(DashboardLocators.spinning_backend,
+        browser.wait_until_page_contains_element(DashboardLocators.cluster_usage,
                                                          timeout=timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.backend_live,
-                                                 timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.create_schema_button,
-                                                 timeout=DashboardKeywords.timeout)
-
+                                                         
     @staticmethod
     @keyword
     def click_schema_in_menu(browser_alias):
+        """
+        click the schema for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Schema In Menu | browser_1 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.schema,
                               timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.schema_label)
 
     @staticmethod
     @keyword
     def click_lambdas_in_menu(browser_alias):
+        """
+        click the lambdas for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Lambdas In Menu | browser_1 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.lambdas,
                               timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.lambdas_label)
 
     @staticmethod
     @keyword
     def click_settings_in_menu(browser_alias):
+        """
+        click the settings for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Settings In Menu | browser_1 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.settings,
                               timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.settings_label)
+
+    @staticmethod
+    def click_api_explorer_in_menu(browser_alias):
+        """
+        click the api explorer for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Api Explorer In Menu | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.api_explorer,
+                                timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.api_explorer_label)
+
+    @staticmethod
+    def click_overview_in_menu(browser_alias):
+        """
+        click the overview for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Overview In Menu | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.overview,
+                                timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.cluster_usage,
+                                                         timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def view_graphql_endpoint(browser_alias, endpoint):
+        """
+        view the graphql endpoint for the backend.
+        | browser_alias |  alias of the browser |
+        | endpoint |  graphql endpoint for the backend |
+
+        Example:
+        | View Graphql Endpoint | browser_1 | stgdgraph.aws.stage.thegaas.com/graphql |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.element_should_be_visible(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
+
+    @staticmethod
+    def view_deployment_zone(browser_alias, zone):
+        """
+        view the deployment zone for the backend.
+        | browser_alias |  alias of the browser |
+        | zone |  zone of the deployment |
+
+        Example:
+        | View Deployment Zone | browser_1 | us-east-1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.element_should_be_visible(DashboardLocators.deployment_location.replace("%s", zone))
+                                                        
+    @staticmethod
+    def click_documentation_in_menu(browser_alias):
+        """
+        click the documentation for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Documentation In Menu | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.documentation,
+                                timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def click_avatar(browser_alias):
+        """
+        click the avatar present at the top right corner for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Avartar | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.avatar_button,
+                                timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def click_logout_button(browser_alias):
+        """
+        click the logout button.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Logout Button | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.logout,
+                                    timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def check_starter_product_disabled(browser_alias):
+        """
+        check the starter product disabled for the backend.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Check Starter Product Disabled | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.element_should_be_disabled(DashboardLocators.starter_product_disabled)
