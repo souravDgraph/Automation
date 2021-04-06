@@ -125,7 +125,7 @@ End All Process
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
-    Run Keyword If      ${passed}       Fail
+    Run Keyword And Return If      ${passed}       Fail
     Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
     Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Backup alpha and zero logs
@@ -152,7 +152,7 @@ Post Execution Verify Alpha contents
     @{dir}    Create List    p   t
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
-    Run Keyword If      ${passed}       Fail
+    Run Keyword And Return If      ${passed}       Fail
     @{alpha_context}    Create List    Buffer flushed successfully.
     Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
