@@ -313,3 +313,21 @@ class DashboardKeywords():
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.element_should_be_disabled(DashboardLocators.starter_product_disabled)
+
+    @staticmethod
+    def click_super_admin_in_menu(browser_alias):
+        """
+        Click Super Admin in Menu
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Super Admin In Menu | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.super_admin, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.super_admin_label, 
+                                                    timeout=DashboardKeywords.timeout)
+                                                    

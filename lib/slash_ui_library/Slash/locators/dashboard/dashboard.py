@@ -45,6 +45,7 @@ class DashboardLocators:
     api_explorer_label = "xpath = //div[text()='Explorer']"
     launch_new_backend_label = "xpath = //h3[text()='Launch a New Backend']"
     deployment_location = "xpath = //div[text()='%s']"
+    super_admin_label = "xpath = //h3[text()='Super Admin']"
 
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"
@@ -53,6 +54,7 @@ class DashboardLocators:
     api_explorer = "xpath = //a[@href='/_/explorer']"
     overview = "xpath = //a[@href='/_/dashboard']"
     documentation = "xpath = //a[@href='https://dgraph.io/docs/slash-graphql/slash-quick-start/']"
+    super_admin = "xpath = //a[@href='/_/super-admin']"
 
     backends_list = "xpath = //button[@aria-haspopup='listbox']"
     backend_selection = "xpath = //li/div[text()='RC3']"
