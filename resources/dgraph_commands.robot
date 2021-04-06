@@ -34,6 +34,9 @@ Start Dgraph
     Set Suite Variable      ${zero_count}    ${zero_count}
     Set Suite Variable      ${alpha_count}    ${alpha_count}
     Set Suite Variable      ${global_is_ludicrous_mode}    False
+    @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph Ludicrous Mode
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
@@ -53,6 +56,9 @@ Start Dgraph Ludicrous Mode
     ${alpha_count}  Evaluate        ${alpha_count} + 1
     Set Suite Variable      ${zero_count}    ${zero_count}
     Set Suite Variable      ${alpha_count}    ${alpha_count}
+    @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph In Docker
     [Arguments]     ${folder_name}
@@ -101,6 +107,9 @@ Start Dgraph Alpha
     Wait For Process    timeout=20 s    on_timeout=continue
     ${alpha_count}  Evaluate        ${alpha_count} + 1
     Set Suite Variable      ${alpha_count}    ${alpha_count}
+    @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph Alpha for bulk loader
     [Arguments]    ${path}      ${is_ludicrous_mode}
@@ -113,6 +122,9 @@ Start Dgraph Alpha for bulk loader
     Process Should Be Running    alpha
     Wait For Process    timeout=20 s    on_timeout=continue
     ${alpha_count}  Evaluate        ${alpha_count} + 1
+    @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
     # End dgraph and zero process and clear the folders created in results
 
 End All Process
@@ -124,11 +136,14 @@ End All Process
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
+    @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
+    ${backup_folder_name}      Backup alpha and zero logs
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_err_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_error_context}
     Run Keyword And Return If      ${passed}       Fail
-    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
-    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
-    Backup alpha and zero logs
+    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in sepcific folder    zero    ${backup_folder_name}    @{zero_context}
+    Wait Until Keyword Succeeds     30x    10 sec     Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 End Zero Process
@@ -150,6 +165,9 @@ Post Execution Verify Alpha contents
     [Documentation]  Keyword to verify alpha and zero logs
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     @{dir}    Create List    p   t
+    @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_err_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
     Run Keyword And Return If      ${passed}       Fail
@@ -543,6 +561,17 @@ Verify alpha and zero contents in results folder
         Should Contain Any    ${file_context}    @{context}
     END
 
+Verify alpha and zero contents in sepcific folder
+    [Arguments]    ${file_name}    ${folder_name}   @{context}
+    [Documentation]    Keyword for checking content in .txt files generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${count}=   Set Variable If     '${file_name}' == 'zero'   ${zero_count}   ${alpha_count}
+    FOR     ${i}  IN RANGE   ${count}
+        ${file_context}=    Get File    ${dir_path}/results/${folder_name}/${file_name}_${i}.txt
+        Should Contain Any    ${file_context}    @{context}
+    END
+
 Verify file Content in results folder
     [Arguments]    ${file_name}    @{context}
     [Documentation]    Keyword for checking content in .txt files generated in results folder
@@ -644,3 +673,9 @@ Backup alpha and zero logs
     [Documentation]
     ${datetime} =	Get Current Date      result_format=%d-%m-%Y-%H-%M-%S
     Move Files      results/*.txt	   results/exe_logs_${datetime}
+    @{dirs}     Create List     w   zw  p   t  out  alpha
+    FOR  ${i}  IN    @{dirs}
+        ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/exe_logs_${datetime}
+    END
+    [Return]  exe_logs_${datetime}

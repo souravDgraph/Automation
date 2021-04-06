@@ -212,6 +212,34 @@ class DgraphCLI:
 
         return sec
 
+    def get_encryption_command(self, is_latest):
+        """
+        Method to enable encryption
+        :param is_latest: <check_dgraph_version>
+        """
+        logger.debug("Appending encryption..")
+        enc_path = self.curr_path + self.cfg['enc']['location']
+        if is_latest:
+            enc = f" --encryption key-file={enc_path}; "
+        else:
+            enc = f" --encryption_key_file {enc_path} "
+
+        return enc
+
+    @staticmethod
+    def get_cache_command(is_latest):
+        """
+        Method to append cache size
+        :param is_latest: <check_dgraph_version>
+        """
+        logger.debug("Appending Cache..")
+        if is_latest:
+            cache = f" --cache \"size-mb=6000\" "
+        else:
+            cache = f" --cache_mb=6000 "
+
+        return cache
+
     @staticmethod
     def get_ludicrous_command(is_latest):
         """
@@ -308,14 +336,10 @@ class DgraphCLI:
         for key, value in kwargs.items():
             if key == "ludicrous_mode" and value == "enabled":
                 args_appender = args_appender + self.get_ludicrous_command(is_latest)
-        
-        if is_latest:
-            cli_command = f"dgraph {cli_name} --cache \"size-mb=6000\" -v=2 " \
-                          f"--zero={self.zero_server_name}:{self.zero_addr}"
-        else:
-            cli_command = f"dgraph {cli_name} --cache_mb=6000 -v=2 " \
-                          f"--zero={self.zero_server_name}:{self.zero_addr}"
-                
+
+        cli_command = f"dgraph {cli_name} {self.get_cache_command(is_latest)} " \
+                      f"--zero={self.zero_server_name}:{self.zero_addr}"
+
         cli_command = cli_command + self.get_security_command(is_latest)
 
         if bulk_path:
@@ -323,8 +347,7 @@ class DgraphCLI:
         if self.acl:
             appender = appender + self.get_acl_command(is_latest)
         if self.enc:
-            enc_path = self.curr_path + self.cfg['enc']['location']
-            appender = appender + " --encryption_key_file " + enc_path
+            appender = appender + self.get_encryption_command(is_latest)
 
         # Configure tls and mtls
         if is_latest:
@@ -336,7 +359,7 @@ class DgraphCLI:
 
         appender = appender + args_appender
 
-        cli_command = cli_command + appender + " 2>&1"
+        cli_command = cli_command + appender + "  -v=2  2>&1"
         return cli_command
 
     def store_dgraph_details(self):
@@ -470,10 +493,8 @@ class DgraphCLI:
                           f"--http localhost:{8000 + self.offset}" \
                           f" --zero={self.zero_server_name}:{self.zero_addr} "
             if self.enc:
-                enc_path = self.curr_path + self.cfg['enc']['location']
-                cli_command = cli_command + cli_bulk_encryption + \
-                              " --encrypted_out=True --encrypted=False" \
-                              " --encryption_key_file " + enc_path
+                cli_command = cli_command + cli_bulk_encryption + f" --encrypted_out=True --encrypted=False" \
+                                                                  f" {self.get_encryption_command(is_latest_version)}"
 
         # Fetch ACL args based on configuration
         if self.acl and loader_type != "bulk":
