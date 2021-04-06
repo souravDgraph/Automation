@@ -5,9 +5,9 @@ name: weeklyLargeData
 # Controls when the action will run. 
 on:
   # Triggers the workflow
-  schedule:     
-     - cron:  '0 22 * * 6'
-     - cron:  '0 10 * * 3'
+#   schedule:     
+#      - cron:  '0 22 * * 6'
+#      - cron:  '0 10 * * 3'
      
 
   # Allows you to run this workflow manually from the Actions tab
@@ -29,6 +29,11 @@ jobs:
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    
+      - name: Install requirements for Dgraph and Slash
+        run: |
+          sudo rm -rf ${{ github.workspace }}/Automation_workspace_weeklyLargeData
+          
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with: 
@@ -85,9 +90,10 @@ jobs:
           # ---- Commenting the below lines as Git Actions are failing, due to heavy workload. ----
           sed -i "s/1million/stackoverflow/g" test_suites/dgraph/Linux/dgraph_suite_01.robot
           cd ./test_data/datasets
-          wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.com.rdf.gz
-          wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.schema
-          mv ./stackoverflow.com.rdf.gz ./stackoverflow.rdf.gz
+          # wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.com.rdf.gz
+          # wget -q https://storage.googleapis.com/dgraph-datasets/stackoverflow/stackoverflow.schema
+          # mv ./stackoverflow.com.rdf.gz ./stackoverflow.rdf.gz
+          cp /ssd/qa/CopyofStackoverflowData/* ./
           zcat stackoverflow.rdf.gz | head -n 5
           head stackoverflow.schema
           cd ../..
@@ -96,35 +102,41 @@ jobs:
           cat test_suites/dgraph/Linux/dgraph_suite_01.robot
           echo " ---- Running Dgraph Testcases ----"
           sudo robot --splitlog --include WEEKLY -d results/ --loglevel TRACE:INFO test_suites/dgraph/Linux/dgraph_suite_01.robot
-          # These are commented as we do not have a fixed bearer token, once we have those we will enable the below TCs.
-          # echo " ---- Running Slash Testcases ----"
-          # robot test_suites/slash/slash_api/sanity.robot
       
-      # delete dgraph from root:
-      - name: Backup Results Folder
+      - name: Backup Result folder and list contents
         run: |
-            sudo rm -rf /usr/bin/dgraph
+            cd ${{ github.workspace }}/Automation_workspace_weeklyLargeData
+            mv results /ssd/qa/results_last_weeklyLargeData_run
+            cd /ssd/qa/results_last_weeklyLargeData_run
+            pwd
+            ls
+            mkdir  ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results
+            
+      # delete dgraph from root:
+      - name: Delete dgraph from root
+        run: |
+            sudo rm -rf /usr/bin/dgraph  
       
-      # Getting Current time
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        if: always()
-        id: current-time
-        with:
-          format: YYYYMMDD-HH_mm_ss
-          utcOffset: "+05:30"
+#       # Getting Current time
+#       - name: Get current time
+#         uses: 1466587594/get-current-time@v2
+#         if: always()
+#         id: current-time
+#         with:
+#           format: YYYYMMDD-HH_mm_ss
+#           utcOffset: "+05:30"
       
-      # Publish Artifacts
-      - name: Use the Upload Artifact GitHub Action
-        uses: actions/upload-artifact@v2
-        if: always()
-        with: 
-          name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
-          path: |
-            ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/output.xml
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/p
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/w
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/zw
-            !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/t
+#       # Publish Artifacts
+#       - name: Use the Upload Artifact GitHub Action
+#         uses: actions/upload-artifact@v2
+#         if: always()
+#         with: 
+#           name: automationArtifact_${{ steps.current-time.outputs.formattedTime }}
+#           path: |
+#             ${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/output.xml
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/p
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/w
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/zw
+#             !${{ github.workspace }}/Automation_workspace_weeklyLargeData/results/t
         

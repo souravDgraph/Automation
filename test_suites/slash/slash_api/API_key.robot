@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     This is a simple test with Robot Framework
 Suite Setup       Create Backend
-Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
 Test Setup
 Test Teardown
 Default Tags      Sanity
@@ -59,11 +59,14 @@ freeze deployment
 
 *** Keywords ***
 Create Backend
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
+    ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME}    ${PASSWORD}
+    ${HEADER}=    Create Dictionary    Authorization=Bearer ${auth_token}    Content-Type=application/json
+    Set Suite Variable    ${HEADER}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
+    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADER}
     ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     Set Suite Variable    ${deployment_id}
     Set Suite Variable    ${deployment_endpoint}
@@ -76,7 +79,7 @@ Create Backend
 
 Generate_APIKEY
     [Arguments]    ${deployment_id}    ${api_key_name}    ${api_key_type}=admin
-    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${api_key_name}    ${api_key_type}
+    ${api_key_details}=    Create Api Key    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    ${api_key_name}    ${api_key_type}
     log    ${api_key_details}
     ${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
