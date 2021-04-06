@@ -2,6 +2,7 @@
 #--timestampoutput
 --console verbose
 --consolemarkers on
+--splitlog
 --loglevel TRACE:INFO
 --listener CustomTestRailListener
 test_suites/sample_test_cases/sample_test_rails.robot

@@ -3,6 +3,7 @@
 --console verbose
 --consolemarkers on
 --loglevel TRACE:INFO
+--splitlog
 test_suites/dgraph/docker/dgraph_docker_suite.robot
 
 #Additional arguments

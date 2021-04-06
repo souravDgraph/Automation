@@ -3,6 +3,7 @@
 --console verbose
 --consolemarkers on
 --loglevel TRACE:INFO
+--splitlog
 test_suites/dgraph/Linux/dgraph_suite_01.robot
 
 #Additional arguments
