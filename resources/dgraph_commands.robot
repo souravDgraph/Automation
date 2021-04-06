@@ -135,7 +135,7 @@ End All Process
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
-    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
+    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
     ${backup_folder_name}      Backup alpha and zero logs
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_err_context}
@@ -168,7 +168,7 @@ Post Execution Verify Alpha contents
     @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_err_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error
-    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:
+    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
     Run Keyword And Return If      ${passed}       Fail
     @{alpha_context}    Create List    Buffer flushed successfully.
