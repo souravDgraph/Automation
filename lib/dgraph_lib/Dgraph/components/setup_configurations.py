@@ -220,7 +220,7 @@ class DgraphCLI:
         logger.debug("Appending encryption..")
         enc_path = self.curr_path + self.cfg['enc']['location']
         if is_latest:
-            enc = f" --encryption key-file={enc_path}; "
+            enc = f" --encryption \"key-file={enc_path};\" "
         else:
             enc = f" --encryption_key_file {enc_path} "
 
