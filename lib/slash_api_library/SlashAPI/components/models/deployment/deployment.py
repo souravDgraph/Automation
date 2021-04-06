@@ -227,7 +227,6 @@ class DeploymentModels:
         ,"jaegerEnabled": {{ '"' + properties['jaegerEnabled'] + '"' }}
         {% endif %}
 
-<<<<<<< HEAD
         {% if properties['jaegerSize'] and properties['jaegerSize'] != "" %}
         ,"jaegerSize": {{ '"' + properties['jaegerSize'] + '"' }}
         {% endif %}
@@ -236,10 +235,7 @@ class DeploymentModels:
         ,"jaegerTrace": {{ '"' + properties['jaegerTrace'] + '"' }}
         {% endif %}
 
-         {% if properties['storage'] and properties['storage'] != "" %}
-=======
         {% if properties['storage'] and properties['storage'] != "" %}
->>>>>>> 1906196b7d0024788026652992c6ede677e18ceb
         ,"storage": {{ '"' + properties['storage'] + '"' }}
         {% endif %}
 
