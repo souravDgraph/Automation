@@ -595,8 +595,8 @@ Monitor zero and alpha process
     ${zero_process_check}=    Is Process Running    zero
     Run Keyword If      ${alpha_process_check}     End Alpha Process
     Run Keyword If      ${zero_process_check}      End Zero Process
-    Run Keyword If      ${alpha_process_check}     Post Execution Verify Alpha contents     ${is_clear_folder}
-    Run Keyword If      ${zero_process_check}     Post Execution Verify Zero contents     ${is_clear_folder}
+    Post Execution Verify Alpha contents     ${is_clear_folder}
+    Post Execution Verify Zero contents     ${is_clear_folder}
     Run Keyword If  ${global_is_ludicrous_mode}     Start Dgraph Ludicrous Mode
     ...     ELSE
     ...     Start Dgraph
