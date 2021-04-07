@@ -2,7 +2,7 @@
 
 **This is a Automation Repo for Dgraph including Slash.**
 
-[![nightly](https://github.com/souravDgraph/Automation/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/souravDgraph/Automation/actions/workflows/nightly.yml)                [![CI](https://github.com/souravDgraph/Automation/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/souravDgraph/Automation/actions/workflows/CI.yml)                [![weeklyLargeData](https://github.com/souravDgraph/Automation/actions/workflows/weeklyLargeData.yml/badge.svg)](https://github.com/souravDgraph/Automation/actions/workflows/weeklyLargeData.yml)
+[![nightly](https://github.com/souravDgraph/Automation/actions/workflows/nightly.yml/badge.svg?branch=main)](https://github.com/souravDgraph/Automation/actions/workflows/nightly.yml)                [![CI Build Status](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:QADgraphAutomation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=QADgraphAutomation&buildId=lastFinished&guest=1)               [![weeklyLargeData](https://github.com/souravDgraph/Automation/actions/workflows/weeklyLargeData.yml/badge.svg)](https://github.com/souravDgraph/Automation/actions/workflows/weeklyLargeData.yml)
 
 ## Table of Contents
 
