@@ -2,7 +2,9 @@
 
 **This is a Automation Repo for Dgraph including Slash.**
 
-[![nightly](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Nightly_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Nightly_Automation&buildId=lastFinished&guest=1)                [![CI Build Status](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:QADgraphAutomation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=QADgraphAutomation&buildId=lastFinished&guest=1)               [![weeklyLargeData](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Weekely_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Weekely_Automation&buildId=lastFinished&guest=1)
+Nightly | CI  |  Weekely
+--------|-----|----------
+[![nightly](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Nightly_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Nightly_Automation&buildId=lastFinished&guest=1)          |      [![CI Build Status](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:QADgraphAutomation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=QADgraphAutomation&buildId=lastFinished&guest=1)        |       [![weeklyLargeData](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Weekely_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Weekely_Automation&buildId=lastFinished&guest=1)
 
 ## Table of Contents
 
