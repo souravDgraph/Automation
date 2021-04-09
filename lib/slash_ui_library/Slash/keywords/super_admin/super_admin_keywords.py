@@ -5,7 +5,6 @@
 Author: santhosh@dgraph.io
 """
 
-from robot.api.deco import keyword
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.super_admin.super_admin import SuperAdminLocators
 
@@ -24,21 +23,36 @@ class SuperAdminKeywords():
     timeout = 10
 
     @staticmethod
-    def validate_search_deployment_fields(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.list_name.replace("%s", "User Email"))
-        browser.element_should_be_visible(SuperAdminLocators.search_input_field.replace("%s", "User Email"))
-        browser.click_element(SuperAdminLocators.list_name.replace("%s", "User Email"), timeout=SuperAdminKeywords.timeout)
-        browser.click_element(SuperAdminLocators.list_name.replace("%s", "Deployment ID"), timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.list_name.replace("%s", "Deployment ID"))
-        browser.element_should_be_visible(SuperAdminLocators.search_input_field.replace("%s", "Deployment ID"))
-        browser.click_element(SuperAdminLocators.list_name.replace("%s", "Deployment ID"), timeout=SuperAdminKeywords.timeout)
-        browser.click_element(SuperAdminLocators.list_name.replace("%s", "Endpoint"), timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.list_name.replace("%s", "Endpoint"))
-        browser.element_should_be_visible(SuperAdminLocators.search_input_field.replace("%s", "Endpoint"))
+    def validate_search_deployment_fields(browser_alias, search_deployment_fields):
+        """
+        Validate search deployment fields
 
+        | browser_alias | Alias of the browser |
+        | search_deployment_fields | deployment fields to search |
+
+        Example:
+            Validate Search Deployment Fields    Browser1    ['User Email', 'Deployment ID', 'Endpoint']
+        """       
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        for each_field in range(len(search_deployment_fields)):
+            browser.element_should_be_visible(SuperAdminLocators.list_name.replace("%s", search_deployment_fields[each_field]))
+            browser.element_should_be_visible(SuperAdminLocators.search_input_field.replace("%s", search_deployment_fields[each_field]))
+            browser.click_element(SuperAdminLocators.list_name.replace("%s", search_deployment_fields[each_field]), timeout=SuperAdminKeywords.timeout)
+            if each_field!=len(search_deployment_fields)-1:
+                browser.click_element(SuperAdminLocators.list_name.replace("%s", search_deployment_fields[each_field+1]), timeout=SuperAdminKeywords.timeout)
+    
     @staticmethod
     def search_deployment(browser_alias, search_type, input_text):
+        """
+         search deployment 
+
+        | browser_alias | Alias of the browser |
+        | search_type | search field for the deployment |
+        | input_text | value for the search field |
+
+        Example:
+            Validate Search Deployment Fields    Browser1    User Email     santhosh@dgraph.io
+        """ 
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SuperAdminLocators.list_name.replace("%s", "User Email"), timeout=SuperAdminKeywords.timeout)
         browser.click_element(SuperAdminLocators.list_name.replace("%s", search_type), timeout=SuperAdminKeywords.timeout)
@@ -49,374 +63,308 @@ class SuperAdminKeywords():
         browser.click_element(SuperAdminLocators.search_btn, timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def validate_response_for_invalid_search(browser_alias):
+    def validate_response_for_invalid_search(browser_alias, response="No deployments found."):
+        """
+        Validate response for invalid search
+
+        | browser_alias | Alias of the browser |
+        | response | response for the invalid search |
+
+        Example:
+            Validate Response For Invalid Search    Browser1 
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.no_deployment_found, 
+        browser.wait_until_page_contains_element(SuperAdminLocators.error_message, 
+                                                    timeout=SuperAdminKeywords.timeout)
+        browser.wait_until_page_contains_element(SuperAdminLocators.no_deployment_found.replace("%s", response), 
                                                     timeout=SuperAdminKeywords.timeout)
     
     @staticmethod
-    def validate_deployment_detail_labels(browser_alias, backend_name):
+    def validate_deployment_detail_labels(browser_alias, deployment_labels, backend_name):
+        """
+        Validate deployment detail labels
+
+        | browser_alias | Alias of the browser |
+        | deployment_labels | deployment labels for the backend |
+        | backend_name | name of the backend |
+
+        Example:
+            Validate Deployment Detail Labels    Browser1    ['Dgraph HA','Do Not Freeze','Deployment Mode']      Test
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(SuperAdminLocators.user_info_label,
                                                         timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "ID").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "Name").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "URL").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "Owner").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "JWT Token").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "Debug Links").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "Configs").replace("backend", backend_name), 
+        for each_deployment_label in deployment_labels:
+            browser.wait_until_page_contains_element(SuperAdminLocators.deployment_label.replace("%s", "ID").replace("backend", backend_name), 
                                                         timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def validate_deployment_detail_links(browser_alias, backend_name):
+    def validate_deployment_detail_links(browser_alias, deployment_links, backend_name):
+        """
+        Validate deployment detail links
+
+        | browser_alias | Alias of the browser |
+        | deployment_links | deployment links for the backend |
+        | backend_name | name of the backend |
+
+        Example:
+            Validate Deployment Detail Links    Browser1    ['Ratel','ChartIO']      Test
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Grafana HTTP").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Grafana GRPC").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Jaeger").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Ratel").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Alpha Logs").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Zero Logs").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "Kube Events").replace("backend", backend_name), 
-                                                        timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", "ChartIO").replace("backend", backend_name), 
+        for each_deployment_link in deployment_links:
+            browser.wait_until_page_contains_element(SuperAdminLocators.deployment_link.replace("%s", each_deployment_link).replace("backend", backend_name), 
                                                         timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.edit_btn.replace("%s", backend_name), 
                                                         timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
     def click_edit_button(browser_alias, backend_name):
+        """
+        Click edit button on the search deployment page
+
+        | browser_alias | Alias of the browser |
+        | backend_name | name of the backend |
+
+        Example:
+            Click Edit Button    Browser1       Test
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.edit_btn.replace("%s", backend_name),
-                                        timeout=SuperAdminKeywords.timeout)
         browser.click_element(SuperAdminLocators.edit_btn.replace("%s", backend_name),
                                         timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.edit_deployment_label,
                                                     timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def validate_dgraph_lambda_script_field_tooltip_message(browser_alias):
+    def validate_deployment_field_tooltip_message(browser_alias, deployment_field, tooltip_message):
+        """
+        Validate deployment field tooltip message
+
+        | browser_alias | Alias of the browser |
+        | deployment_field | deployment field name |
+        | tooltip_message | tooltip message for the backend |
+
+        Example:
+           Validate Deployment Field Tooltip Message   Browser1    Deployment Size        Defaults to Small
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_lambda_script_label,
+        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_label.replace("%s", deployment_field),
                                                     timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.dgraph_lambda_script_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_lambda_script_tooltip_message,
+        browser.mouse_over(SuperAdminLocators.deployment_field_tooltip.replace("%s", deployment_field))
+        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_tooltip_message.replace("%s", tooltip_message),
                                                     timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def validate_do_not_freeze_field_tooltip_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.do_not_freeze_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.do_not_freeze_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.do_not_freeze_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
+    def validate_deployment_field_values(browser_alias, deployment_field, values, know_more_link=None):
+        """
+        Validate deployment field values
 
-    @staticmethod
-    def validate_do_not_freeze_field_values(browser_alias):
+        | browser_alias | Alias of the browser |
+        | deployment_field | deployment field name |
+        | values | values for the deployment field |
+        | know_more | know more link for the deployment field | 
+
+        Example:
+           Validate Deployment Field Values    Browser1    Do Not Freeze     ['False', 'True']
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.do_not_freeze_value.replace("%s", 'False'))
-        browser.click_element(SuperAdminLocators.do_not_freeze_value.replace("%s", 'False'), 
+        browser.element_should_be_visible(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field))
+        browser.click_element(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field),
                                                 timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.do_not_freeze_list_value.replace("%s", 'False'),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.do_not_freeze_list_value.replace("%s", 'True'),
-                                                    timeout=SuperAdminKeywords.timeout)
+        if type(values) is list:
+            for each_value in values:
+                browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_list_value.replace("%s", deployment_field).replace("value", each_value),
+                                                            timeout=SuperAdminKeywords.timeout)
+        elif type(values) is str:
+            browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_input_value.replace("%s", deployment_field).replace("value", values),
+                                                            timeout=SuperAdminKeywords.timeout)
+        if know_more_link:
+            browser.click_element(SuperAdminLocators.know_more_link.replace("%s", know_more_link), timeout=SuperAdminKeywords.timeout)
+            browser.go_back()
 
     @staticmethod
-    def validate_dgraph_ha_field_tooltip_message(browser_alias):
+    def validate_fields_alert_message(browser_alias, deployment_fields):
+        """
+        Validate fields alert message
+
+        | browser_alias | Alias of the browser |
+        | deployment_fields | deployment fields name |
+
+        Example:
+           Validate Fields Alert Message    Browser1    ['Deployment Size', 'Deployment Mode']
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_ha_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.dgraph_ha_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_ha_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
+        for each_deployment_field in deployment_fields:
+            browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", each_deployment_field),
+                                                        timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def validate_dgraph_ha_field_values(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.dgraph_ha_default_value.replace("%s", 'False'))
-        browser.click_element(SuperAdminLocators.dgraph_ha_default_value.replace("%s", 'False'), 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_ha_value.replace("%s", 'False'),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_ha_value.replace("%s", 'True'),
-                                                    timeout=SuperAdminKeywords.timeout)
+    def check_default_value_present_for_fields(browser_alias, deployment_fields_values_dict, backend_name):
+        """
+        Check default value present for fields
 
-    @staticmethod
-    def validate_deployment_mode_field_tooltip_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_mode_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.deployment_mode_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_mode_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
+        | browser_alias | Alias of the browser |
+        | deployment_fields_values_dict | deployment fields name with default value |
+        | backend_name | name of the backend |
 
-    @staticmethod
-    def validate_deployment_mode_field_values(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(SuperAdminLocators.deployment_mode_link, timeout=SuperAdminKeywords.timeout)
-        browser.go_back()
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_mode_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.deployment_mode_graphql_value)
-        browser.click_element(SuperAdminLocators.deployment_mode_graphql_value, 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_mode_value.replace("%s", 'Flexible'),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_mode_value.replace("%s", 'Read Only'),
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_deployment_size_field_tooltip_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_size_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.deployment_size_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_size_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_deployment_size_field_values(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(SuperAdminLocators.deployment_size_link, timeout=SuperAdminKeywords.timeout)
-        browser.go_back()
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_size_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.deployment_size_small_value)
-        browser.click_element(SuperAdminLocators.deployment_size_small_value, 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_size_value.replace("%s", 'Medium (2C)'),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_size_value.replace("%s", 'Large (4C)'),
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_backup_interval_field_tooltip_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.backup_interval_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.backup_interval_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.backup_interval_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_backup_interval_field_values(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.backup_interval_default_value)
-        browser.click_element(SuperAdminLocators.backup_interval_link, timeout=SuperAdminKeywords.timeout)
-        browser.go_back()
-
-    @staticmethod
-    def validate_backup_bucket_format_field_tooltip_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.backup_bucket_format_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.backup_bucket_format_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.backup_bucket_format_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_backup_bucket_format_field_values(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.backup_bucket_format_default_value)
-        browser.click_element(SuperAdminLocators.backup_bucket_format_link, timeout=SuperAdminKeywords.timeout)
-        browser.go_back()
-
-    @staticmethod
-    def validate_jaeger_tracing_field_tooltip_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.jaeger_tracing_label,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.mouse_over(SuperAdminLocators.jaeger_tracing_tooltip)
-        browser.wait_until_page_contains_element(SuperAdminLocators.jaeger_tracing_tooltip_message,
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_jaeger_tracing_field_values(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.jaeger_tracing_default_value)
-        browser.click_element(SuperAdminLocators.jaeger_tracing_default_value, 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.jaeger_tracing_list_value.replace("%s", 'False'),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.jaeger_tracing_list_value.replace("%s", 'True'),
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def validate_fields_alert_message(browser_alias):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Do Not Freeze"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Enable ACL"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Dgraph HA"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Deployment Mode"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Deployment Size"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Backup Interval"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Backup Bucket Format"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Enable Jaeger Tracing"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Jaeger Trace Ratio"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Jaeger Size"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Deployment Type"),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.fields_alert_message.replace("%s", "Dgraph Lambda Script"),
-                                                    timeout=SuperAdminKeywords.timeout)
-
-    @staticmethod
-    def check_default_value_present_for_fields(browser_alias, backend_name):
+        Example:
+           Check Default Value Present For Fields    Browser1    {'Do Not Freeze': 'False', 'Deployment Mode':'Free'}     Test
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(SuperAdminLocators.deployment_name_field.replace("%s", backend_name), 
                                                     timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.do_not_freeze_value.replace("%s", 'False'), 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_ha_default_value.replace("%s", 'False'), 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_mode_graphql_value, 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_size_small_value, 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.jaeger_tracing_default_value, 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.backup_interval_default_value, 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.backup_bucket_format_default_value, 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.enable_acl_default_value, 
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_lambda_script_default_value,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.deployment_type_default_value,
-                                                    timeout=SuperAdminKeywords.timeout)
+        for deployment_field, deployment_value in deployment_fields_values_dict.items():
+            if deployment_value and deployment_field not in ['Backup Interval', 'Backup Bucket Format', 'Dgraph Lambda Script']:
+                browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_value.replace("%s", deployment_field).replace("value", deployment_value), 
+                                                            timeout=SuperAdminKeywords.timeout)
+            else:
+                browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_input_value.replace("%s", deployment_field).replace("value", deployment_value), 
+                                                            timeout=SuperAdminKeywords.timeout)
+            browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field),
+                                                            timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.protect_button,
                                                     timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.backup_button,
                                                     timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.update_button,
                                                     timeout=SuperAdminKeywords.timeout)
-
-                                                
+                     
     @staticmethod
     def click_back_button(browser_alias):
+        """
+        Click the back button on the edit deploymen page
+
+        | browser_alias | Alias of the browser |
+
+        Example:
+           Click Back Button    Browser1   
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SuperAdminLocators.back_button, timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.search_deployment_label, 
                                                     timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def change_do_not_freeze_field(browser_alias, current_freeze_value, new_freeze_value):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.do_not_freeze_value.replace("%s", current_freeze_value))
-        browser.click_element(SuperAdminLocators.do_not_freeze_value.replace("%s", current_freeze_value), 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.do_not_freeze_list_value.replace("%s", new_freeze_value),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.click_element(SuperAdminLocators.do_not_freeze_list_value.replace("%s", new_freeze_value),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.do_not_freeze_value.replace("%s", new_freeze_value))
+    def change_deployment_field_value(browser_alias, deployment_field_name, old_value, new_value):
+        """
+        Change the deployment field value 
 
-    @staticmethod
-    def change_jaeger_tracing_field(browser_alias, jaeger_tracing_value):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.jaeger_tracing_default_value)
-        browser.click_element(SuperAdminLocators.jaeger_tracing_default_value, 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.jaeger_tracing_list_value.replace("%s", jaeger_tracing_value),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.click_element(SuperAdminLocators.jaeger_tracing_list_value.replace("%s", jaeger_tracing_value),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.jaeger_tracing_value.replace("%s", jaeger_tracing_value))
+        | browser_alias | Alias of the browser |
+        | deployment_field_name | name of the deployment field |
+        | old_value | old value for the field |
+        | new_value | new value for the field |
 
-    @staticmethod
-    def change_dgraph_ha_field(browser_alias, current_dgraph_ha_value, new_dgraph_ha_value):
+        Example:
+           Change Deployment Field Value    Browser1    Do Not Freeze    False     True
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.dgraph_ha_default_value.replace("%s", current_dgraph_ha_value))
-        browser.click_element(SuperAdminLocators.dgraph_ha_default_value.replace("%s", current_dgraph_ha_value), 
+        browser.element_should_be_visible(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field_name))
+        browser.click_element(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field_name), 
                                                 timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.dgraph_ha_value.replace("%s", new_dgraph_ha_value),
+        browser.click_element(SuperAdminLocators.deployment_field_list_value.replace("%s", deployment_field_name).replace("value", new_value),
                                                     timeout=SuperAdminKeywords.timeout)
-        browser.click_element(SuperAdminLocators.dgraph_ha_value.replace("%s", new_dgraph_ha_value),
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.element_should_be_visible(SuperAdminLocators.dgraph_ha_default_value.replace("%s", new_dgraph_ha_value))
+        browser.element_should_be_visible(SuperAdminLocators.deployment_field_value.replace("%s", deployment_field_name).replace("value", new_value))
+
 
     @staticmethod
     def click_update_button(browser_alias):
+        """
+        Click update button in the edit deployment page
+
+        | browser_alias | Alias of the browser |
+
+        Example:
+           Click Update Button    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.element_should_be_visible(SuperAdminLocators.update_button)
         browser.click_element(SuperAdminLocators.update_button, timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.update_alert_message, 
-                                                timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(SuperAdminLocators.update_alert_message, 
-                                                            timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
-    def check_do_not_freeze_value(browser_alias, freeze_value):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.do_not_freeze_value.replace("%s", freeze_value))
+    def check_deployment_field_value(browser_alias, deployment_field, value):
+        """
+        Check the deployment field value 
 
-    @staticmethod
-    def check_jaeger_tracing_value(browser_alias, jaeger_tracing_value):
-        browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.jaeger_tracing_value.replace("%s", jaeger_tracing_value))
+        | browser_alias | Alias of the browser |
+        | deployment_field_name | name of the deployment field |
+        | value | value for the field |
 
-    @staticmethod
-    def check_dgraph_ha_value(browser_alias, dgraph_ha_value):
+        Example:
+           Check Deployment Field Value    Browser1    Do Not Freeze    False
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.element_should_be_visible(SuperAdminLocators.dgraph_ha_default_value.replace("%s", dgraph_ha_value))
-
+        browser.element_should_be_visible(SuperAdminLocators.deployment_field_value.replace("%s", deployment_field).replace("value", value))
+        
     @staticmethod
     def click_protect_button(browser_alias):
+        """
+        Click protect button in the edit deployment page
+
+        | browser_alias | Alias of the browser |
+
+        Example:
+           Click Protect Button    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SuperAdminLocators.protect_button, timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.protect_alert_message,
-                                                            timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(SuperAdminLocators.protect_alert_message,
-                                                            timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.unprotect_button,
                                                     timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
     def check_unprotect_button_present(browser_alias):
+        """
+        Check unprotect button present in the edit deployment page
+
+        | browser_alias | Alias of the browser |
+
+        Example:
+           Check Unprotect Button Present    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(SuperAdminLocators.unprotect_button,
                                                     timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
     def click_update_button_for_protect_deployment(browser_alias):
+        """
+        Click update button for protect deployment in the edit deployment page
+
+        | browser_alias | Alias of the browser |
+
+        Example:
+           Click Update Button For Protect Deployment    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SuperAdminLocators.update_button, timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.protect_update_alert_message,
-                                                    timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(SuperAdminLocators.protect_update_alert_message,
-                                                            timeout=SuperAdminKeywords.timeout)
 
     @staticmethod
     def click_unprotect_button(browser_alias):
+        """
+        Click unprotect button in the edit deployment page
+
+        | browser_alias | Alias of the browser |
+
+        Example:
+           Click Unprotect Button    Browser1
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SuperAdminLocators.unprotect_button, timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_contains_element(SuperAdminLocators.protect_alert_message,
-                                                            timeout=SuperAdminKeywords.timeout)
-        browser.wait_until_page_does_not_contain_element(SuperAdminLocators.protect_alert_message,
-                                                            timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.protect_button,
                                                     timeout=SuperAdminKeywords.timeout)
+
+    @staticmethod
+    def validate_alert(browser_alias, alert_message):
+        """
+        Validate alert message
+
+        | browser_alias | Alias of the browser |
+        | alert_message | alert message |
+
+        Example:
+           Validate Alert    Browser1       Deployment has been updated
+           Validate Alert    Browser1       Something went wrong
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_contains_element(SuperAdminLocators.alert_message.replace("%s", alert_message),
+                                                            timeout=SuperAdminKeywords.timeout)
+        browser.wait_until_page_does_not_contain_element(SuperAdminLocators.alert_message.replace("%s", alert_message),
+                                                            timeout=SuperAdminKeywords.timeout)
