@@ -213,3 +213,35 @@ class SettingsKeywords:
         browser.wait_until_page_contains_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
         browser.wait_until_page_does_not_contain_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def click_backups_tab(browser_alias):
+        """
+        Click the backups tab in the settings page.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Backups Tab | Browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SettingsLocators.backup_tab, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.backup_label, timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def click_create_backup_button(browser_alias):
+        """
+        Click the create backup button in the backups tab.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Create Backup Button | Browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SettingsLocators.create_backup_button, timeout=SettingsKeywords.timeout)
+        browser.click_element(SettingsLocators.backup_initiated_okay_button, timeout=SettingsKeywords.timeout)

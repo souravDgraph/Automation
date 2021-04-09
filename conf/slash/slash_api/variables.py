@@ -4,7 +4,7 @@ BACKEND_ZONE = "stgdgraph"
 USER_NAME = "vivetha+test25@dgraph.io"
 PASSWORD = "Password@123"
 HEADERS = { "Content-Type" : "application/json" }
-USER2_HEADER = { "Authorization" : "earer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwNzAiLCJleHAiOjE2MTcyMDk3MTAsImlzcyI6Imh0dHBzOi8vZGV2LWRncmFwaC1zYWFzLmF1dGgwLmNvbS8iLCJzdWIiOiIweDI3NmZhIn0.zFbUhkQ6NS2QW3UEoKpm3HFk2VXgUrPvd1DQNUG18is",
+USER2_HEADER = { "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwNzAiLCJleHAiOjE2MTcyMDk3MTAsImlzcyI6Imh0dHBzOi8vZGV2LWRncmFwaC1zYWFzLmF1dGgwLmNvbS8iLCJzdWIiOiIweDI3NmZhIn0.zFbUhkQ6NS2QW3UEoKpm3HFk2VXgUrPvd1DQNUG18is",
 "Content-Type" : "application/json" }
 DELETE_API_KEY_MESSAGE = "API Key Deleted Successfully."
 SCHEMA = "type Task { id: ID! title: String! @search(by: [fulltext]) completed: Boolean! @search  user: User! }type User { username: String! @id @search(by: [hash]) name: String @search(by: [exact]) tasks: [Task] @hasInverse(field: user) }"
@@ -24,3 +24,6 @@ GETQUERY = """{"query":"query MyQuery { getUser(id: \\"0x4\\") { firstName   id 
 UPDATE = """{"query":"mutation MyMutation {  updateUser(input: {filter: {id: \\"0x4\\"}, set: {firstName: \\"user2\\"}}) {   numUids }}","variables":null,"operationName":"MyMutation"}"""
 DELETE = """{"query":"mutation MyMutation { deleteUser(filter: {id: \\"0x4\\"}) { msg }}","variables":null,"operationName":"MyMutation"}"""
 SLEEP_TIME = "10 minutes"
+SCHEMA2 = "type UntitledType0 { id: ID!  name: String }"
+SCHEMA3 = "type UntitledType0 { id: ID!  name: String  age: Int }"
+QUERY1 = """{"query":"query MyQuery {  queryUntitledType0 {id  name }}","variables":null,"operationName":"MyQuery"}"""

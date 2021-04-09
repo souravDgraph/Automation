@@ -10,6 +10,8 @@ from Slash.keywords.lambdas.lambdas_keywords import LambdaKeywords
 from Slash.keywords.login.login_keywords import LoginKeywords
 from Slash.keywords.settings.settings_keywords import SettingsKeywords
 from Slash.keywords.organization.organization_keywords import OrganizationKeywords
+from Slash.keywords.schema.schema_keywords import SchemaKeywords
+from Slash.keywords.api_explorer.api_explorer_keywords import ApiExplorerKeywords
 
 
 
@@ -30,7 +32,9 @@ class Slash(BrowserKeywords,
             DashboardKeywords,
             OrganizationKeywords,
             LambdaKeywords,
-            SettingsKeywords):
+            SettingsKeywords,
+            SchemaKeywords,
+            ApiExplorerKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
 
     All the keywords pertaining to Networker are

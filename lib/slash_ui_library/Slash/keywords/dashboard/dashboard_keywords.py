@@ -236,6 +236,23 @@ class DashboardKeywords():
         browser.element_should_be_visible(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
 
     @staticmethod
+    def get_deployment_endpoint(browser_alias, endpoint):
+        """
+        get the entire graphql endpoint for the backend.
+        | browser_alias |  alias of the browser |
+        | endpoint |  endpoint for the backend |
+
+        Example:
+        | Get Deployment Endpoint | browser_1 | stgdgraph.enterprise.stage.thegaas.com/graphql |
+
+        Return:
+            https://spring-waterfall.stgdgraph.enterprise.stage.thegaas.com/graphql
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        graphql_endpoint = browser.get_text(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
+        return graphql_endpoint
+
+    @staticmethod
     def view_deployment_zone(browser_alias, zone):
         """
         view the deployment zone for the backend.
@@ -313,3 +330,67 @@ class DashboardKeywords():
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.element_should_be_disabled(DashboardLocators.starter_product_disabled)
+
+    @staticmethod
+    def click_billing_button(browser_alias):
+        """
+        click the billing button.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Billing Button | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.billing_button, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.billing_label, 
+                                                    timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def cancel_subscription(browser_alias):
+        """
+        cancel the subscription for the account.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Cancel Subscription | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.cancel_subscription_button, 
+                                timeout=DashboardKeywords.timeout)
+        browser.click_element(DashboardLocators.cancel_subscription_confirm_button,
+                                timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.card_cancelled_alert_message, 
+                                                    timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def add_card(browser_alias, card_number, expiry_date, cvc, postal):
+        """
+        add card to the account.
+        | browser_alias |  alias of the browser |
+        | card_number | card number to be added |
+        | expiry_date | expiry date for the card |
+        | cvc | cvc for the card |
+        | postal | postal for the card |
+
+        Example:
+        | Check Starter Product Disabled | browser_1 | 4242424242424242 | 424 | 242 | 42424
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.select_frame(DashboardLocators.iframe_element)
+        browser.input_text(DashboardLocators.add_card_number, card_number)
+        browser.input_text(DashboardLocators.expiry_date, expiry_date)
+        browser.input_text(DashboardLocators.cvc, cvc)
+        browser.input_text(DashboardLocators.postal, postal)
+        browser.unselect_frame()
+        browser.click_element(DashboardLocators.add_button, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.card_added_alert_message,                
+                                                    timeout=DashboardKeywords.timeout)

@@ -26,7 +26,7 @@ class LoginKeywords():
     timeout = 10
 
     @staticmethod
-    def login(browser_alias, username, password):
+    def login_ui(browser_alias, username, password):
         """
         Log into Slash with the username and password provided
 
@@ -35,7 +35,7 @@ class LoginKeywords():
         | password | Password for slash |
 
         Example:
-            Login    Browser1    user    password
+            Login Ui    Browser1    user    password
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.input_text(LoginLocators.username, username, timeout=LoginKeywords.timeout)
