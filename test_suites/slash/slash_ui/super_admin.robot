@@ -209,7 +209,7 @@ Validate Unprotect Deployment
     Change Deployment Field Value      ${Browser_Alias}      Do Not Freeze      False      True
     Click Update Button      ${Browser_Alias}
     Validate Alert        ${Browser_Alias}       Successfully Updated the backend
-    Check Do Not Freeze Value      ${Browser_Alias}      True
+    Check Deployment Field Value     ${Browser_Alias}       Do Not Freeze      True
 
 *** Keywords ***
 Setup

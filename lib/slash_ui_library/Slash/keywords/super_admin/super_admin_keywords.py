@@ -54,6 +54,7 @@ class SuperAdminKeywords():
             Validate Search Deployment Fields    Browser1    User Email     santhosh@dgraph.io
         """ 
         browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SuperAdminLocators.seach_deployment_list_button, timeout=SuperAdminKeywords.timeout)
         browser.click_element(SuperAdminLocators.list_name.replace("%s", "User Email"), timeout=SuperAdminKeywords.timeout)
         browser.click_element(SuperAdminLocators.list_name.replace("%s", search_type), timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.list_name.replace("%s", search_type), 
@@ -74,8 +75,6 @@ class SuperAdminKeywords():
             Validate Response For Invalid Search    Browser1 
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(SuperAdminLocators.error_message, 
-                                                    timeout=SuperAdminKeywords.timeout)
         browser.wait_until_page_contains_element(SuperAdminLocators.no_deployment_found.replace("%s", response), 
                                                     timeout=SuperAdminKeywords.timeout)
     
@@ -175,8 +174,10 @@ class SuperAdminKeywords():
                 browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_list_value.replace("%s", deployment_field).replace("value", each_value),
                                                             timeout=SuperAdminKeywords.timeout)
         elif type(values) is str:
-            browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_input_value.replace("%s", deployment_field).replace("value", values),
+            browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_input_value.replace("%s", deployment_field).replace("default_value", values),
                                                             timeout=SuperAdminKeywords.timeout)
+        browser.click_element(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field),
+                                                timeout=SuperAdminKeywords.timeout)
         if know_more_link:
             browser.click_element(SuperAdminLocators.know_more_link.replace("%s", know_more_link), timeout=SuperAdminKeywords.timeout)
             browser.go_back()
@@ -217,7 +218,7 @@ class SuperAdminKeywords():
                 browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_value.replace("%s", deployment_field).replace("value", deployment_value), 
                                                             timeout=SuperAdminKeywords.timeout)
             else:
-                browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_input_value.replace("%s", deployment_field).replace("value", deployment_value), 
+                browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_input_value.replace("%s", deployment_field).replace("default_value", deployment_value), 
                                                             timeout=SuperAdminKeywords.timeout)
             browser.wait_until_page_contains_element(SuperAdminLocators.deployment_field_button.replace("%s", deployment_field),
                                                             timeout=SuperAdminKeywords.timeout)
