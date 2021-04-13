@@ -131,7 +131,6 @@ Start Dgraph Alpha for bulk loader
     # End dgraph and zero process and clear the folders created in results
 
 End All Process
-    [Arguments]
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Terminate All Processes
@@ -148,7 +147,7 @@ End All Process
 
 Terminate and Create Backup of Dgraph Execution
     [Arguments]  ${is_clear_folder}
-    Run Keyword And Continue On Failure    End All Process     ${is_clear_folder}
+    Run Keyword And Continue On Failure    End All Process
     ${backup_folder_name}      Backup alpha and zero logs
     Backup directories created while execution      ${backup_folder_name}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
