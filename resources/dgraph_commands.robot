@@ -77,8 +77,6 @@ Start Dgraph In Docker
 End Docker Execution
     [Arguments]     ${folder_name}      ${is_clear_folder}
     Terminate All Processes
-#    @{alpha_context}    Create List    Buffer flushed successfully.
-#    Wait Until Keyword Succeeds     3x    40 sec     Grep and Verify file Content in results folder    docker_compose_up   @{alpha_context}
     ${dir_path}=    normalize path    ${CURDIR}/..
     Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    down    alias=dc_down    cwd=results    shell=True    stdout=docker_compose_down.txt     stderr=docker_compose_down_err.txt
     Process Should Be Running    dc_down
