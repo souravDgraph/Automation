@@ -43,6 +43,7 @@ TC_04 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
      [Tags]    regression  CI  NIGHTLY
+     [Setup]  Monitor zero and alpha process  true
      Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_05 Perform parallel live and bulk load on data
