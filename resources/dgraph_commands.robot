@@ -284,7 +284,6 @@ Execute Parallel Loader with rdf and schema parameters
     @{loader_type}=    Create List    live    bulk
     FOR    ${i}    IN    @{loader_type}
         ${alpha_process_check}=    Is Process Running    alpha
-        Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Alpha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}
         Wait For Process    timeout=30 s
@@ -316,11 +315,10 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         Trigger Loader Process      ${loader_alias}     ${rdf_filename}    ${schema_filename}    live
         Sleep    60s
         Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}       live
-        Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
     END
     FOR    ${i}    IN RANGE    ${num_threads}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
-        ${result_check}=    Run Keyword And Return Status    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
+        ${result_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    5minute    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
         Run Keyword And Return If    "${result_check}" == "PASS"    Fail    Error while processing schema file
         Monitor Live loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    live
         Verify process to be stopped    ${loader_alias}
