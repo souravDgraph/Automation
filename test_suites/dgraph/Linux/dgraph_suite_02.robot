@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
-Suite Teardown    End All Process    false
+Suite Teardown    Terminate and Create Backup of Dgraph Execution    false
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
 Library           String
@@ -19,11 +19,11 @@ TC_01 Perform cross version backup and restore.
     ...    *Author*: Sourav
     [Tags]    regression
     Build Dgraph Version    ${prev_version}
-    Start Dgraph    local
-    Create NFS Backup    full
-    Create NFS Backup    increment
+    Start Dgraph
+    Create NFS Backup    2
     End All Process    true
     Build Dgraph Version    ${current_version}
-    Start Dgraph    local
-    perform a restore on backup
+    Start Dgraph
+    Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    1
+     ...    ELSE    Perform a restore on backup by older dgraph versions
     End All Process    false

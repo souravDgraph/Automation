@@ -508,7 +508,7 @@ class DgraphCLI:
         if is_latest_version:
             mtls_certs = self.get_tls_certs_latest("live", location=docker_location)
 
-        cli_command = cli_command + mtls_certs
+        cli_command = cli_command + mtls_certs + " -v 2 "
         return cli_command
 
     @staticmethod
