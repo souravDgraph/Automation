@@ -138,12 +138,12 @@ End All Process
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     @{alpha_init_err_context}  Create List     Dgraph Version  Dgraph codename
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_init_err_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_init_err_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initlization failed.
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_error_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha   @{alpha_error_context}
     Run Keyword And Return If      ${passed}       Fail     Captured few errors in aplpha
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in sepcific folder    zero    ${backup_folder_name}    @{zero_context}
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero        @{zero_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha       @{alpha_context}
 
 Terminate and Create Backup of Dgraph Execution
     [Arguments]  ${is_clear_folder}
