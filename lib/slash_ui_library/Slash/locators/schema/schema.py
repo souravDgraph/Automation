@@ -47,6 +47,7 @@ class SchemaLocators:
     delete_type_button = "xpath = //h3[text()='%s']/ancestor::div[1]//button[2]//*[local-name()='svg']"
     remove_type_confirm_button = "xpath = //button[text()='Remove']"
     unused_fields = "xpath = //div[text()='%s']"
+    drop_data_cancel_button = "xpath = //h3[text()='Drop Data']//following::div//button[text()='Cancel']"
     drop_button = "xpath = //button[text()='Drop']"
     drop_data_label = "xpath = //h3[text()='Drop Data']"
     remove_field_button = "xpath = //button[text()='Remove Field']"

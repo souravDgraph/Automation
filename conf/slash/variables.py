@@ -8,4 +8,4 @@ NEW_ORGANIZATION = "org"
 BACKEND_MONITORING_TIMEOUT = 50
 ORGANIZATION_NAME = "Org2"
 USER_NAME_2 = "vivetha+test2@dgraph.io"
-FIELD_NAMES = ["name", "age", "id"]
+FIELD_NAMES = ["name", "id"]

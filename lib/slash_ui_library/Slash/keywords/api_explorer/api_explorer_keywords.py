@@ -23,40 +23,119 @@ class ApiExplorerKeywords():
 
     @staticmethod
     def select_query_type(browser_alias, query_type):
+        """
+        select query type
+        | browser_alias |  alias of the browser |
+        | query_type | query type to perform  |
+
+        Example:
+        | Select Query Type | Browser_1 | mutation |
+        | Select Query Type | Browser_1 | query |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(ApiExplorerLocators.dropdown_list, timeout=ApiExplorerKeywords.timeout)
         browser.select_from_list_by_value(ApiExplorerLocators.dropdown_list, query_type)
 
     @staticmethod
     def click_add_query_type_button(browser_alias, query_type):
+        """
+        click add query type button
+        | browser_alias |  alias of the browser |
+        | query_type | query type to perform  |
+
+        Example:
+        | Click Add Query Type Button | Browser_1 | mutation |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(ApiExplorerLocators.add_button, timeout=ApiExplorerKeywords.timeout)
         browser.wait_until_page_contains_element(ApiExplorerLocators.query_label.replace("%s", query_type), timeout=ApiExplorerKeywords.timeout)
 
     @staticmethod
     def expand_add_query(browser_alias, process, type_name):
+        """
+        expand add query button
+        | browser_alias |  alias of the browser |
+        | process | name of the process |
+        | type_name | name of the type  |
+
+        Example:
+        | Expand Add Query | Browser_1 | add | User |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(ApiExplorerLocators.add_mutation_span.replace("%s", process+type_name), timeout=ApiExplorerKeywords.timeout)
 
     @staticmethod
     def add_value_to_field(browser_alias, field_name, field_value):
+        """
+        add value to field
+        | browser_alias |  alias of the browser |
+        | field_name | name of the field |
+        | field_value | value for the field  |
+
+        Example:
+        | Add Value To Field | Browser_1 | name | user1 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(ApiExplorerLocators.field_checkbox.replace("%s", field_name), timeout=ApiExplorerKeywords.timeout)
         browser.input_text(ApiExplorerLocators.field_input_textbox.replace("%s", field_name), field_value)
 
     @staticmethod
     def click_execute_query_button(browser_alias):
+        """
+        click execute query button
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Execute Query Button | Browser_1 |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(ApiExplorerLocators.execute_query_button, timeout=ApiExplorerKeywords.timeout)
 
     @staticmethod
     def click_remove_query_button(browser_alias, query_type):
+        """
+        click remove query button
+        | browser_alias |  alias of the browser |
+        | query_type | type of the query to be removed |
+
+        Example:
+        | Click Remove Query Button | Browser_1 | query |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.mouse_over(ApiExplorerLocators.query_label.replace("%s", query_type))
         browser.click_element(ApiExplorerLocators.remove_query_button.replace("%s", query_type), timeout=ApiExplorerKeywords.timeout)
 
     @staticmethod
     def select_search_fields(browser_alias, search_fields):
+        """
+        select all the fields be to searched
+        | browser_alias |  alias of the browser |
+        | search_fields | search fields |
+
+        Example:
+        | Select Search Fields | Browser_1 | ["name", "age", "id" ] |
+
+        Return:
+            None
+        """
         browser = BrowserKeywords.switch_browser(browser_alias)
         for each_field in search_fields:
             browser.click_element(ApiExplorerLocators.field_checkbox.replace("%s", each_field), timeout=ApiExplorerKeywords.timeout)

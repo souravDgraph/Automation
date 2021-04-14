@@ -249,7 +249,8 @@ class DashboardKeywords():
             https://spring-waterfall.stgdgraph.enterprise.stage.thegaas.com/graphql
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        graphql_endpoint = browser.get_text(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
+        graphql_endpoint = browser.get_value(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
+        graphql_endpoint = graphql_endpoint.replace("/graphql", "")
         return graphql_endpoint
 
     @staticmethod
@@ -367,6 +368,8 @@ class DashboardKeywords():
                                 timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.card_cancelled_alert_message, 
                                                     timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.no_active_subscription_label,
+                                                        timeout=DashboardKeywords.timeout)                                        
 
     @staticmethod
     def add_card(browser_alias, card_number, expiry_date, cvc, postal):

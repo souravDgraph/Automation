@@ -54,7 +54,7 @@ class DashboardLocators:
     cancel_subscription_button = "xpath = //button[text()='Cancel Subscription']"
     cancel_subscription_confirm_button = "xpath = //button[text()='Confirm']"
     card_added_alert_message = "xpath = //div[text()='Added payment details successfully']"
-    card_cancelled_alert_message = "xpath = //div[text()='Cancelled subscription']"
+    card_cancelled_alert_message = "xpath = //div[text()='Cancelling subscription...']"
     no_active_subscription_label = "xpath = //h3[text()='No active subscriptions']"
     billing_button = "xpath = //button[text()='Billing']"
     billing_label = "xpath = //h3[text()='Billing']"
