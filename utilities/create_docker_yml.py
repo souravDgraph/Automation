@@ -1,4 +1,6 @@
 import getopt
+import json
+import pathlib
 import sys
 import logging
 import yaml
@@ -74,9 +76,17 @@ def usage():
 
 def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: bool = False, version="master"):
     # Creating Zero container
+    curr_dir = str(pathlib.Path.cwd())
+    curr_path = curr_dir + '/'
+    export_path = curr_path + "../export"
+    backup_path = curr_path + "../backup"
+    working_dir = curr_path + "../results"
+    with open(curr_path + '../conf/dgraph/conf_dgraph.json') as dg_conf_file:
+        dgraph_conf = json.load(dg_conf_file)
+    off_set_value = dgraph_conf['offset']
     services = {}
     zero_services = {}
-    zero_command = 'dgraph zero --my=zero0:5080 --logtostderr -v=2  '
+    zero_command = f'dgraph zero --my=zero0:{5080 + off_set_value} --logtostderr -v=2 -o {off_set_value} '
     dgraph_version = f"dgraph/dgraph:{version}"
     if is_configured:
         zero_command = zero_command + ' --bindall '
@@ -94,7 +104,24 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                 "source": "../../../Automation",
                 "target": "/Automation",
                 "read_only": True
+            }, {
+                "type": "bind",
+                "source": export_path,
+                "target": export_path,
+                "read_only": False
             },
+                {
+                    "type": "bind",
+                    "source": backup_path,
+                    "target": backup_path,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": working_dir,
+                    "target": working_dir,
+                    "read_only": False
+                },
                 {
                     "type": "bind",
                     "source": "../dgraph/mTLS/tls/",
@@ -108,11 +135,31 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                     "source": "../../../Automation",
                     "target": "/Automation",
                     "read_only": True
+                },
+                {
+                    "type": "bind",
+                    "source": export_path,
+                    "target": export_path,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": backup_path,
+                    "target": backup_path,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": working_dir,
+                    "target": working_dir,
+                    "read_only": False
                 }
             ]
+        opening_port = 5080 + off_set_value
+        closing_port = 6080 + off_set_value
         zero_services = {zero_name:
-                             {'image': dgraph_version, 'working_dir': '/data/' + zero_name,
-                              'ports': ["5080:5080", "6080:6080"],
+                             {'image': dgraph_version, 'working_dir': f'{working_dir}/{zero_name}',
+                              'ports': [f"{opening_port}:{opening_port}", f"{closing_port}:{closing_port}"],
                               'volumes': zero_configs,
                               'labels': {'cluster': 'test',
                                          'service': 'zero'},
@@ -129,16 +176,17 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                                                           '  --tls_internal_port_enabled=true '
         alpha_command = alpha_command + enc_command + alc_command + tls_command
 
-    off_set_value = 0
     for alpha_count in range(alphas):
         final_alpha_command = ""
-        port = 7080
+        port = 7080 + off_set_value
         alpha_volumes = []
         ports_list = []
-        opening_port = 8080
-        closing_port = 9080
+        opening_port = 8080 + off_set_value
+        closing_port = 9080 + off_set_value
         ports_list.append(f"{opening_port}:{opening_port}")
         ports_list.append(f"{closing_port}:{closing_port}")
+        if off_set_value != 0:
+            alpha_name = 'alpha' + str(alpha_count) + f' -o {off_set_value}'
         alpha_name = 'alpha' + str(alpha_count)
         if alpha_count >= 1:
             ports_list.clear()
@@ -149,7 +197,8 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
             ports_list.append(f"{opening_port}:{opening_port}")
             ports_list.append(f"{closing_port}:{closing_port}")
             alpha_command = alpha_command + " -o " + str(off_set_value)
-        final_alpha_command = alpha_command + ' --my=' + alpha_name + ':' + str(port) + ' --zero=zero0:5080'
+        final_alpha_command = alpha_command + ' --my=' + alpha_name + ':' + str(port) + \
+                              f' --zero=zero0:{5080 + off_set_value} -o {off_set_value} '
         if is_configured:
             alpha_volumes = [
                 {
@@ -162,6 +211,24 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                     "source": "../dgraph/acl",
                     "target": "/dgraph-acl/",
                     "read_only": True
+                },
+                {
+                    "type": "bind",
+                    "source": working_dir,
+                    "target": working_dir,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": export_path,
+                    "target": export_path,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": backup_path,
+                    "target": backup_path,
+                    "read_only": False
                 },
                 {
                     "type": "bind",
@@ -183,11 +250,29 @@ def create_docker_compose_file(zeros: int = 1, alphas: int = 1, is_configured: b
                     "source": "../../../Automation",
                     "target": "/Automation",
                     "read_only": True
+                },
+                {
+                    "type": "bind",
+                    "source": working_dir,
+                    "target": working_dir,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": export_path,
+                    "target": export_path,
+                    "read_only": False
+                },
+                {
+                    "type": "bind",
+                    "source": backup_path,
+                    "target": backup_path,
+                    "read_only": False
                 }
             ]
         alpha_services = {alpha_name: {
             "image": dgraph_version,
-            "working_dir": "/data/" + alpha_name,
+            "working_dir": f"{working_dir}/{alpha_name}",
             "volumes": alpha_volumes,
             "ports": ports_list,
             "labels": {

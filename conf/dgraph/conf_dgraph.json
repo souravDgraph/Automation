@@ -1,10 +1,11 @@
 {
+    "offset": 400,
     "zero": {
-        "addr": 5080,
+        "addr": 5480,
         "server": "localhost"
     },
     "alpha": {
-        "addr": 9080,
+        "addr": 9480,
         "server": "localhost"
     },
     "acl": {

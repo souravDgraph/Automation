@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite with ludicrous mode
 Suite Setup        Start Dgraph Ludicrous Mode
-Suite Teardown     End All Process    true
+Suite Teardown     Terminate and Create Backup of Dgraph Execution    false
 Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process  true
 Default Tags    ludicrous
