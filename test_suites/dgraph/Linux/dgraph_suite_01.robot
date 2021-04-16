@@ -20,14 +20,7 @@ TC_01 Perform live load data.
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
      [Teardown]    NONE
 
-TC_02 Perfrom NFS export on dgraph
-    [Documentation]  Test Case to perform nfs export.
-    ...    *Author*: Krishna, Sourav and Sankalan
-    [Tags]      regression   WEEKLY
-    Export NFS data using admin endpoint    json    true
-    [Teardown]    NONE
-
-TC_03 Perform NFS backup and restore data
+TC_02 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
@@ -39,20 +32,20 @@ TC_03 Perform NFS backup and restore data
      Clear Backup Folders   true
      [Teardown]    NONE
 
-TC_04 Perform bulk load data.
+TC_03 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
      [Tags]    regression  CI  NIGHTLY
      [Setup]  Monitor zero and alpha process  true
      Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
-TC_05 Perform parallel live and bulk load on data
+TC_04 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
      Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
-TC_06 Perform Increment backup and restore data
+TC_05 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
@@ -63,9 +56,16 @@ TC_06 Perform Increment backup and restore data
      Clear Backup Folders   true
      [Teardown]    NONE
 
-TC_07 Perform parallel live loads.
+TC_06 Perform parallel live loads.
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
      Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2
-     [Teardown]    NONE
+     [Teardown]    NONE     
+ 
+TC_07 Perfrom NFS export on dgraph
+    [Documentation]  Test Case to perform nfs export.
+    ...    *Author*: Krishna, Sourav and Sankalan
+    [Tags]      regression   WEEKLY
+    Export NFS data using admin endpoint    json    true
+    [Teardown]    NONE
