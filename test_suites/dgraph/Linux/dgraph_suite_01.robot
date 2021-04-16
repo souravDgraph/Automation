@@ -69,5 +69,3 @@ TC_07 Perform parallel live loads.
      [Tags]    regression   WEEKLY
      Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2
      [Teardown]    NONE
-
-

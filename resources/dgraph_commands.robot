@@ -137,9 +137,9 @@ End All Process
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     @{alpha_init_err_context}  Create List     Dgraph Version  Dgraph codename
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_init_err_context}
-    Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initlization failed.
+    Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initialization failed.
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha   @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail     Captured few errors in aplpha
+    Run Keyword And Return If      ${passed}       Fail     Captured few ereors in aplpha
     Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero        @{zero_context}
     Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha       @{alpha_context}
 
@@ -174,7 +174,7 @@ Post Execution Verify Alpha contents
     Run Keyword And Return If      ${passed}==${FALSE}       Fail   alpha Initlization failed.
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail     Captured few errors in aplpha
+    Run Keyword And Return If      ${passed}       Fail     Captured few errors in alpha
     @{alpha_context}    Create List    Buffer flushed successfully.
     Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
@@ -259,11 +259,10 @@ Verify Live loader trigger properly or not
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}
     ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
     IF  ${status}==${FALSE}
-        ${result_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
+        ${result_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
         Run Keyword If    ${result_check}        Monitor Live loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
         ...     ELSE    FAIL    Some issue with live loader
     END
-    #Run Keyword And Return If    "${result_check}" == "True"    Fail    Error while processing schema file
 
 Monitor Live loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
