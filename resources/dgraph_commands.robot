@@ -67,22 +67,23 @@ Start Dgraph In Docker
     log    ${dir_path}
     ${result_docker}=    Process.Run Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=True
     log    ${result_docker.stdout}
-    ${result_docker_compose}=    Process.start Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt    cwd=results    shell=True
+    ${result_docker_compose}=    Process.start Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt      stderr=docker_compose_err.txt    cwd=results    shell=True
     OperatingSystem.Create Directory    ${dir_path}/data
     Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    up    alias=dc_up    cwd=results    shell=True    stdout=docker_compose_up.txt
     Process Should Be Running    dc_up
     Wait For Process    timeout=40 s    on_timeout=continue
     Set Dgraph Version from docker  ${folder_name}
-    Set Suite Variable      ${global_offset_value}    ${offset_value}
 
 End Docker Execution
     [Arguments]     ${folder_name}      ${is_clear_folder}
     Terminate All Processes
     ${dir_path}=    normalize path    ${CURDIR}/..
-    Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    down    alias=dc_down    cwd=results    shell=True    stdout=docker_compose_down.txt
+    Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    down    alias=dc_down    cwd=results    shell=True    stdout=docker_compose_down.txt     stderr=docker_compose_down_err.txt
     Process Should Be Running    dc_down
-    Wait For Process    timeout=10 s    on_timeout=continue
-    @{dir}    Create List    p    t    w    out    alpha
+    Wait For Process    timeout=20 s    on_timeout=continue
+    ${backup_folder_name}      Backup alpha and zero logs
+    Backup directories created while execution      ${backup_folder_name}
+    @{dir}    Create List    p    t    w    out    alpha    zero0   alpha0
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
 
 Start Dgraph Zero
@@ -128,22 +129,25 @@ Start Dgraph Alpha for bulk loader
     # End dgraph and zero process and clear the folders created in results
 
 End All Process
-    [Arguments]    ${is_clear_folder}
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
     ...    Accepts argument "is_clear_folder" as a check to clear the folder
     Terminate All Processes
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
     @{zero_context}    Create List    All done. Goodbye!    Got connection request
     @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
-    @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
+    @{alpha_init_err_context}  Create List     Dgraph Version  Dgraph codename
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_init_err_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initialization failed.
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha   @{alpha_error_context}
+    Run Keyword And Return If      ${passed}       Fail     Captured few ereors in aplpha
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero        @{zero_context}
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha       @{alpha_context}
+
+Terminate and Create Backup of Dgraph Execution
+    [Arguments]  ${is_clear_folder}
+    Run Keyword And Continue On Failure    End All Process
     ${backup_folder_name}      Backup alpha and zero logs
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_err_context}
-    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in sepcific folder    zero    ${backup_folder_name}    @{zero_context}
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in sepcific folder    alpha    ${backup_folder_name}   @{alpha_context}
+    Backup directories created while execution      ${backup_folder_name}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 End Zero Process
@@ -167,10 +171,10 @@ Post Execution Verify Alpha contents
     @{dir}    Create List    p   t
     @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_err_context}
-    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error
+    Run Keyword And Return If      ${passed}==${FALSE}       Fail   alpha Initlization failed.
     @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail
+    Run Keyword And Return If      ${passed}       Fail     Captured few errors in alpha
     @{alpha_context}    Create List    Buffer flushed successfully.
     Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
@@ -214,6 +218,7 @@ Set Dgraph Version from docker
     ${version}=     Get Dgraph Docker Version Details
     ${branch}=      Get Dgraph Docker Branch Details
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
+    ...     ELSE    Set Variable    ${version}
     ${check}=   Set Execution To Docker     ${version}      ${branch}
     Set Suite Variable      ${is_latest_global_check}        ${check}
     Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
@@ -249,12 +254,23 @@ Trigger Loader Process
     ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest_global_check}  docker_string=${docker_exe_string}      
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
+Verify Live loader trigger properly or not
+    [Documentation]  Keyword to verify live loader to trigger properly
+    [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}
+    ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
+    IF  ${status}==${FALSE}
+        ${result_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
+        Run Keyword If    ${result_check}        Monitor Live loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
+        ...     ELSE    FAIL    Some issue with live loader
+    END
+
 Monitor Live loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
     [Documentation]  Keyword to monitor if live loader is triggered properly
     Verify process to be stopped    ${loader_alias}
     ${passed}=  Run Keyword And Return Status   Grep and Verify file Content in results folder    ${loader_alias}    Pending transactions found. Please retry operation
-    Run Keyword If  ${passed}  Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${loader_name}
+    ${check_2}=  Run Keyword And Return Status   Grep and Verify file Content in results folder    ${loader_alias}    Please retry operation
+    Run Keyword If  ${passed} or ${check_2}  Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${loader_name}
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
@@ -284,17 +300,17 @@ Execute Parallel Loader with rdf and schema parameters
     @{loader_type}=    Create List    live    bulk
     FOR    ${i}    IN    @{loader_type}
         ${alpha_process_check}=    Is Process Running    alpha
-        Comment    Run Keyword If    "${alpha_process_check}"=="True" and "${i}" == "bulk"    End Alpha Process    false
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}
-        Wait For Process    timeout=30 s
+        #Wait For Process    timeout=30 s
         Log    ${loader_alias}.txt is log file name for this process.
     END
     FOR    ${i}    IN    @{loader_type}
-        ${alpha_process_check}=    Is Process Running    alpha
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
-        ${result_check}=    Run Keyword And Return Status    Wait Until Keyword Succeeds    3x    5minute    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
-        Run Keyword And Return If    "${result_check}" == "True"    Fail    Error while processing schema file
+        IF  '${i}'=='live'
+            Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}    live
+        END
+        ${alpha_process_check}=    Is Process Running    alpha
         Verify process to be stopped    ${loader_alias}
         ${grep_context}=    Set Variable If    "${i}"=="bulk"    100.00%    N-Quads processed per second
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    ${grep_context}
@@ -314,15 +330,11 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         Log    Running thread -- ${i}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
         Trigger Loader Process      ${loader_alias}     ${rdf_filename}    ${schema_filename}    live
-        Sleep    60s
         Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}       live
-        Comment    Wait Until Keyword Succeeds    3x    10minute    Process Should Be Running    ${loader_alias}
     END
     FOR    ${i}    IN RANGE    ${num_threads}
+        Verify Live loader trigger properly or not  ${loader_alias}    ${rdf_filename}    ${schema_filename}    live
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
-        ${result_check}=    Run Keyword And Return Status    Grep and Verify file Content in results folder    ${loader_alias}    Error while processing schema file
-        Run Keyword And Return If    "${result_check}" == "PASS"    Fail    Error while processing schema file
-        Monitor Live loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    live
         Verify process to be stopped    ${loader_alias}
         Grep and Verify file Content in results folder    ${loader_alias}    N-Quads processed per second
     END
@@ -627,7 +639,6 @@ Verify process to be stopped
     [Documentation]    Keyword to check if the process is still running and wait till process completes.
     log    Process which is runing ${process_alias}
     ${process_check}=    Is Process Running    ${process_alias}
-    Sleep   30s
     Run Keyword If    '${process_check}'=='False'    Return From Keyword
     FOR    ${i}    IN RANGE    99999
         log    ${i}
@@ -635,7 +646,6 @@ Verify process to be stopped
         ${process_check}=    Is Process Running    ${process_alias}
         Exit For Loop If    '${process_check}'=='False'
     END
-    Sleep   30s
     Log    ${process_alias} Process is stopped
     Comment    Wait Until Keyword Succeeds    600x    5minute    Process Should Be Stopped    handle=${process_alias}    error_message=${error_message} is still running
 
@@ -670,12 +680,16 @@ Check if parallel process is triggered
 
 
 Backup alpha and zero logs
-    [Documentation]
+    [Documentation]     Kewyword to backup all the logs
     ${datetime} =	Get Current Date      result_format=%d-%m-%Y-%H-%M-%S
     Move Files      results/*.txt	   results/exe_logs_${datetime}
+    [Return]  exe_logs_${datetime}
+
+Backup directories created while execution
+    [Arguments]       ${direc_name}
+    [Documentation]     Keyword to backup execution time directories
     @{dirs}     Create List     w   zw  p   t  out  alpha
     FOR  ${i}  IN    @{dirs}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
-        Run Keyword If  ${passed}   Move Directory   results/${i}   results/exe_logs_${datetime}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${direc_name}
     END
-    [Return]  exe_logs_${datetime}
