@@ -5,6 +5,7 @@
 Author: vivetha@dgraph.io
 """
 
+import re
 from robot.api.deco import keyword
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.dashboard.dashboard import DashboardLocators
@@ -111,23 +112,23 @@ class DashboardKeywords():
                               timeout=DashboardKeywords.timeout)
 
     @staticmethod
-    def monitor_backend_creation(browser_alias,
-                                 timeout):
+    def monitor_backend_creation(browser_alias, backend_name, timeout):
         """
         monitor the backend creation spinning for the backend.
         | browser_alias |  alias of the browser |
-        | timeout | 10 |
+        | backend_name | name of the backend |
+        | timeout | timeout for the backend creation |
 
         Example:
-        | Monitor Backend Creation | browser_1 | 10 |
+        | Monitor Backend Creation | browser_1 | test | 60 |
 
         Return:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(DashboardLocators.spinning_backend,
+        browser.wait_until_page_contains_element(DashboardLocators.backend_creation.replace("%s", backend_name),
                                                  timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.cluster_usage,
+        browser.wait_until_page_contains_element(DashboardLocators.health_status,
                                                          timeout=timeout)
                                                          
     @staticmethod
@@ -348,6 +349,37 @@ class DashboardKeywords():
         browser.click_element(DashboardLocators.billing_button, timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.billing_label, 
                                                     timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def verify_billing_information(browser_alias, total_amount, billing_description, billing_amount):
+        """
+        verify the billing information.
+        | browser_alias |  alias of the browser |
+        | total_amount | total amount on the billing page |
+        | billing_description | billing description |
+        | billing_amount | amount spent on the backends | 
+
+        Example:
+        | Click Billing Button | browser_1 | TOTAL AMOUNT $0 COUPON NA | Description Slash GraphQL Backends (0 Backends) | Amount $0.00 $0.00 $0.00 |
+
+        Return:
+            Boolean (True or False)
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_contains_element(DashboardLocators.active_subscription_label, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.upcoming_invoice_label, timeout=DashboardKeywords.timeout)
+        total_amount_js = "return document.getElementsByClassName('css-s4rimg').valueOf()[0].innerText"
+        total_amount_response = browser.execute_javascript(total_amount_js)
+        total_amount_response = re.sub('\s+', ' ', total_amount_response)
+        billing_description_js = "return document.getElementsByClassName('css-xh0hol')[5].valueOf().innerText"
+        billing_description_response = browser.execute_javascript(billing_description_js)
+        billing_description_response = re.sub('\s+', ' ', billing_description_response)
+        billing_amount_js = "return document.getElementsByClassName('css-19eb4m4').valueOf()[0].innerText"
+        billing_amount_response = browser.execute_javascript(billing_amount_js)
+        billing_amount_response = re.sub('\s+', ' ', billing_amount_response)
+        if(total_amount!=total_amount_response or billing_description!=billing_description_response or billing_amount!=billing_amount_response):
+            return False
+        return True
 
     @staticmethod
     def cancel_subscription(browser_alias):

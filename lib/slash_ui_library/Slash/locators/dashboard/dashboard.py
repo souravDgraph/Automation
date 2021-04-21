@@ -31,6 +31,8 @@ class DashboardLocators:
     launch_button = "xpath = //button[text()='Launch']"
     backend_live = "xpath = //h3[text()='Your Backend is live!']"
     spinning_backend = "xpath = //h3[text()='Creating your backend']"
+    backend_creation = "xpath = //div[@class='css-1n7p5lb' and text()='%s']"
+    health_status = "xpath = //div[text()='Healthy']"
     create_schema_button = "xpath = //button[text()='Create your Schema']"
     backend_endpoint = "xpath =//div[@title='Creating Backend']//input"
     backend_listbox = "xpath =//button[@aria-haspopup='listbox']"
@@ -56,6 +58,8 @@ class DashboardLocators:
     card_added_alert_message = "xpath = //div[text()='Added payment details successfully']"
     card_cancelled_alert_message = "xpath = //div[text()='Cancelling subscription...']"
     no_active_subscription_label = "xpath = //h3[text()='No active subscriptions']"
+    active_subscription_label = "xpath = //h3[text()='Active subscription']"
+    upcoming_invoice_label = "xpath = //h3[text()='Upcoming invoice']"
     billing_button = "xpath = //button[text()='Billing']"
     billing_label = "xpath = //h3[text()='Billing']"
 

@@ -4,7 +4,8 @@
 """
 Author: santhosh@dgraph.io
 """
-
+import re, json, time
+from robot.api import logger
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.api_explorer.api_explorer import ApiExplorerLocators
 
@@ -105,6 +106,30 @@ class ApiExplorerKeywords():
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(ApiExplorerLocators.execute_query_button, timeout=ApiExplorerKeywords.timeout)
+    
+    @staticmethod
+    def get_query_result(browser_alias):
+        """
+        get the query result
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Get Query Result | Browser_1 |
+
+        Return:
+            { queryUser : [{ id: 0xa }] }
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        time.sleep(5)
+        height = browser.execute_javascript("return document.getElementsByClassName('CodeMirror-scroll')[2].scrollHeight")
+        browser.execute_javascript('document.getElementsByClassName("CodeMirror-scroll")[2].scrollTop="'+str(height)+'"')
+        js_exe = "return document.getElementsByClassName('CodeMirror-lines').valueOf()[2].innerText.toString()"
+        response = browser.execute_javascript(js_exe)
+        logger.info(response)
+        response = re.sub('\xa0', '', response) 
+        response = json.loads(response)
+        logger.info(response['data'])
+        return response['data']
 
     @staticmethod
     def click_remove_query_button(browser_alias, query_type):

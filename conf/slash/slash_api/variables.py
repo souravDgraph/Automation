@@ -24,6 +24,3 @@ GETQUERY = """{"query":"query MyQuery { getUser(id: \\"0x4\\") { firstName   id 
 UPDATE = """{"query":"mutation MyMutation {  updateUser(input: {filter: {id: \\"0x4\\"}, set: {firstName: \\"user2\\"}}) {   numUids }}","variables":null,"operationName":"MyMutation"}"""
 DELETE = """{"query":"mutation MyMutation { deleteUser(filter: {id: \\"0x4\\"}) { msg }}","variables":null,"operationName":"MyMutation"}"""
 SLEEP_TIME = "10 minutes"
-SCHEMA2 = "type UntitledType0 { id: ID!  name: String }"
-SCHEMA3 = "type UntitledType0 { id: ID!  name: String  age: Int }"
-QUERY1 = """{"query":"query MyQuery {  queryUntitledType0 {id  name }}","variables":null,"operationName":"MyQuery"}"""

@@ -6,6 +6,7 @@ Author: vivetha@dgraph.io
 """
 
 import time
+from datetime import datetime
 from Slash.keywords.settings.constants import CLONE_TEXT, DELETE_TEXT
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.settings.settings import SettingsLocators
@@ -191,8 +192,11 @@ class SettingsKeywords:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
+        time.sleep(5)
         browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
-        browser.click_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
+        button_top = browser.execute_javascript("return document.getElementsByClassName('css-pgsj7')[2].offsetTop")
+        button_left = browser.execute_javascript("return document.getElementsByClassName('css-pgsj7')[2].offsetLeft")
+        browser.click_element_at_coordinates(SettingsLocators.cancel_button, button_left, button_top)
         browser.wait_until_page_contains_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
 
     @staticmethod
@@ -240,8 +244,51 @@ class SettingsKeywords:
         | Click Create Backup Button | Browser_1 |
 
         Return:
-            None
+            date_time
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SettingsLocators.create_backup_button, timeout=SettingsKeywords.timeout)
+        date_time = datetime.now()
+        date_time = date_time.strftime("%a %b %d %Y - %I:%M").replace(' 0', ' ')
+        time.sleep(5)
         browser.click_element(SettingsLocators.backup_initiated_okay_button, timeout=SettingsKeywords.timeout)
+        return date_time
+
+    @staticmethod
+    def verify_backup_created(browser_alias, backup_type, date_time):
+        """
+        Verify the backup created
+        | browser_alias |  alias of the browser |
+        | backup_type | type of the backup |
+        | date_time | date time for backup created | 
+
+        Example:
+        | Verify Backup Created | Browser_1 | incremental | Wed April 21 2021 - 11:20
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_contains_element(SettingsLocators.backup_type.replace("%s", backup_type), timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.backup_created_at.replace("%s", date_time), timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.backup_clone_button, timeout=SettingsKeywords.timeout)
+        
+    @staticmethod
+    def verify_list_backups(browser_alias):
+        """
+        Verify the backups list
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Verify List Backups | Browser_1 |
+
+        Return:
+            Boolean (True or False)
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_contains_element(SettingsLocators.label_type, timeout=SettingsKeywords.timeout)
+        list_backups = "return document.getElementsByTagName('tbody').valueOf()[0].innerText"
+        backups_list = browser.execute_javascript(list_backups)
+        if(backups_list!=""):
+            return True
+        return False

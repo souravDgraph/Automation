@@ -31,8 +31,10 @@ class SettingsLocators:
     create_api_key_button = "xpath = //button[text()='Create New']"
     enter_api_name_textbox = "xpath = //input[@placeholder='Name']"
     create_api_button = "xpath = //button[text()='Create']"
-    api = "xpath = //div[text()='%s']"
-    okay_button = "xpath = //button[text()='Okay']"
+    api = "xpath = //td[text()='%s']"
+    new_api_key_label = "xpath =//h3[text()='New API Key']"
+    okay_button = "xpath = //button[text()='Cancel']//following::button[text()='Okay']"
+    cancel_button = "xpath = //button[text()='Okay']//preceding-sibling::button"
     delete_button = "xpath = //button[text()='Delete']"
     delete_api_key_confirm = "xpath = //h3[text()='Delete API Key']/following::button[text()='Continue']"
     update_button = "xpath = //button[text()='Update']"
@@ -51,3 +53,8 @@ class SettingsLocators:
 
     backend_mode = "xpath = //h3[normalize-space(text())='Backend Mode']/parent::div"
     select_backend_mode = "xpath = //h3[normalize-space(text())='Backend Mode']//following::div[text()='%s']"
+
+    backup_type = "xpath = //tbody/tr[1]//div[text()='%s']"
+    backup_created_at = "xpath = //tbody/tr[1]//div[contains(text(),'%s')]"
+    backup_clone_button = "xpath = //tbody/tr[1]//button[text()='Clone']"
+    label_type = "xpath = //div[text()='Type']"

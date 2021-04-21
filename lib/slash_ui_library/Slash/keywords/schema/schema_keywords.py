@@ -5,8 +5,11 @@
 Author: santhosh@dgraph.io
 """
 
+import re
+from robot.api import logger
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.schema.schema import SchemaLocators
+from selenium.webdriver.common.keys import Keys
 
 __all__ = ['SchemaKeywords']
 __author__ = "Santhosh S"
@@ -37,6 +40,23 @@ class SchemaKeywords:
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SchemaLocators.ui_mode_button, timeout=SchemaKeywords.timeout)
         browser.wait_until_page_contains_element(SchemaLocators.inspect_panel_label,
+                                                    timeout=SchemaKeywords.timeout)
+
+    @staticmethod
+    def click_switch_to_text_mode(browser_alias):
+        """
+        click switch to text mode button
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Switch To Text Mode | Browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SchemaLocators.text_mode_button, timeout=SchemaKeywords.timeout)
+        browser.wait_until_page_contains_element(SchemaLocators.ui_mode_button,
                                                     timeout=SchemaKeywords.timeout)
     
     @staticmethod
@@ -71,6 +91,47 @@ class SchemaKeywords:
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(SchemaLocators.add_button, timeout=SchemaKeywords.timeout)
         browser.click_element(SchemaLocators.add_type_button, timeout=SchemaKeywords.timeout)
+        browser.wait_until_page_contains_element(SchemaLocators.default_type_name.replace("%s", "UntitledType0"), timeout=SchemaKeywords.timeout)
+
+    @staticmethod
+    def change_type_name(browser_alias, old_type_name, new_type_name):
+        """
+        change type name
+        | browser_alias |  alias of the browser |
+        | old_type_name | old name of the type |
+        | new_type_name | new name for the type |
+
+        Example:
+        | Change Type Name | Browser_1 | UntitledType0 | User |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SchemaLocators.edit_button.replace("%s", old_type_name), timeout=SchemaKeywords.timeout)
+        browser.get_webelement(SchemaLocators.editable_type_name.replace("%s", old_type_name)).send_keys(Keys.COMMAND, 'a')
+        browser.get_webelement(SchemaLocators.editable_type_name.replace("%s", old_type_name)).send_keys(new_type_name)
+        browser.click_element(SchemaLocators.save_button, timeout=SchemaKeywords.timeout)
+        browser.wait_until_page_contains_element(SchemaLocators.default_type_name.replace("%s", new_type_name), timeout=SchemaKeywords.timeout)
+
+    @staticmethod
+    def get_deployed_schema(browser_alias):
+        """
+        get the deployment schema
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Get Deployed Schema | Browser_1 |
+
+        Return:
+            Schema
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        js_exe = "return document.getElementsByClassName('CodeMirror-code').valueOf()[0].textContent"
+        schema = browser.execute_javascript(js_exe)
+        schema = re.sub('[1-9,\u200b]', '', schema)
+        logger.info(schema)
+        return schema
 
     @staticmethod
     def add_field(browser_alias, type_name):
@@ -123,7 +184,7 @@ class SchemaKeywords:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(SchemaLocators.field_type_button.replace("%s", type_name).replace("field_name", field_name).replace("old_data_type", old_data_type), 
+        browser.click_element(SchemaLocators.field_type_button.replace("%s", type_name).replace("old_data_type", old_data_type), 
                                 timeout=SchemaKeywords.timeout)
         browser.click_element(SchemaLocators.select_field_type.replace("%s", type_name).replace("field_name", field_name).replace("new_data_type", new_data_type), 
                                 timeout=SchemaKeywords.timeout)
@@ -138,7 +199,7 @@ class SchemaKeywords:
         | field_name | name of the field |
 
         Example:
-        | Select Unused Field | Browser_1 | UntitledType0.age |
+        | Select Unused Field | Browser_1 | User.age |
 
         Return:
             None
@@ -165,14 +226,14 @@ class SchemaKeywords:
 
 
     @staticmethod
-    def validate_field_removed(browser_alias, field_name):
+    def check_dropped_field_is_not_visible(browser_alias, field_name):
         """
-        validate removed field 
+        check dropped field is removed from the user interface
         | browser_alias |  alias of the browser |
         | field_name | name of the field |
 
         Example:
-        | Validate Field Removed | Browser_1 | UntitledType0.age |
+        | Check Dropped Field Is Not Visible | Browser_1 | User.age |
 
         Return:
             None

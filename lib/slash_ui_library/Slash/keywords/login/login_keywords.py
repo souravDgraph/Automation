@@ -35,7 +35,7 @@ class LoginKeywords():
         | password | Password for slash |
 
         Example:
-            Login Ui    Browser1    user    password
+            Login    Browser1    user@dgraph.io    password
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.input_text(LoginLocators.username, username, timeout=LoginKeywords.timeout)
