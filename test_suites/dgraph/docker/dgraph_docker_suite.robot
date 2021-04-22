@@ -1,24 +1,25 @@
 *** Settings ***
 Documentation     Dgraph Docker Test Suite
-Suite Setup       Start Dgraph In Docker    ${docker-file}
+Suite Setup       Start Dgraph 2-node In Docker    ${docker-version}   ${container_name}
 Test Setup      Monitor Health And State check
-Suite Teardown    End Docker Execution    ${docker-file}    true
+Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution    ${container_name}    true
 Default Tags    docker
 Resource          ../../../resources/dgraph_commands.robot
 
 *** Variables ***
 ${rdf_file}        1million.rdf.gz
 ${schema_file}     1million.schema
-${docker-node}      2
-${docker-file}      docker-${docker-node}node
+${alpha-node}      1
+${zero-node}      1
+${container_name}   dgraph_automation
+${docker-version}   v21.03.0
 
 *** Test Cases ***
 TC_01 Docker - Verify Increment Operation
     [Documentation]    Verify the logs for successful execution of big dataset in live loader
     ...    *Author*: Krishna, Sourav, Vivetha and Sankalan
     [Tags]    regression    C698
-    ${alpha_nodes_check}    Set Variable If     ${docker-node}==4   3   1
-    Execute Increment Command   ${alpha_nodes_check}   100
+    Execute Increment Command   ${alpha-node}   100
 
 TC_02 Docker - Import a big dataset with the live loader - Ubuntu or CentOS
     [Documentation]    Verify the logs for successful execution of big dataset in live loader
@@ -44,11 +45,11 @@ TC_04 Docker - Perform NFS backup and restore data
      Clear Backup Folders   true
      [Teardown]    NONE
 
-#TC_05 Docker - Perform parallel live and bulk load on data
-#     [Documentation]    Perform live load data.
-#     ...    *Author*: Sourav
-#     [Tags]    regression   WEEKLY
-#     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
+TC_02 Docker - Import a big dataset with the Bulk loader - Ubuntu or CentOS
+    [Documentation]    Verify the logs for successful execution of big dataset in bulk loader
+    ...    *Author*: Krishna, Sourav, Vivetha and Sankalan
+    [Tags]    regression    C698  CI
+    Execute Bulk Loader for Docker with rdf and schema parameters    ${docker-version}   ${container_name}      ${rdf_file}    ${schema_file}
 
 TC_06 Docker - Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.

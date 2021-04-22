@@ -52,6 +52,25 @@ class SetupDgraphKeywords:
         cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, **kwargs)
         return cli_command
 
+    def get_zero_and_alpha_docker_cli_command(self, container_name, dgraph_version, zero_count=1, alpha_count=1,
+                                              bulk_path=None):
+        """
+        Method to generate zero docker cli command
+        :param bulk_path: Bulk Path for alpha directory
+        :param alpha_count: alpha count for docker
+        :param zero_count: zero count for docker
+        :param container_name:  container name for docker
+        :param dgraph_version: version of dgraph for docker image
+        :return: <list of services for alpha and zero>
+        """
+        self.dgraph_cli = DgraphCLI()
+        alpha_zero_docker_cli_command_list = self.dgraph_cli.build_docker_zero_and_alpha_cli_command(zero_count=zero_count,
+                                                                                               alpha_count=alpha_count,
+                                                                                               bulk_path=bulk_path,
+                                                                                               container_name=container_name,
+                                                                                               dgraph_version=dgraph_version)
+        return alpha_zero_docker_cli_command_list
+
     def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version=None,
                                   docker_string=None):
         """

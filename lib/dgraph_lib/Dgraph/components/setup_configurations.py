@@ -184,6 +184,19 @@ class DgraphCLI:
         logger.debug(tls_cert)
         return tls_cert
 
+    def get_mtls_verification_type(self):
+        """
+        Method to get the verification type specified in conf file.
+        :return:
+        """
+        verification_type = None
+        logger.debug("getting mtls verification type")
+        for key in self.cfg['tls']['mutual_tls']:
+            if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
+                verification_type = key
+        return verification_type
+
+    # Verification checks based on dgraph version
     def get_acl_command(self, is_latest):
         """
         Method to enabled acl certs
@@ -253,17 +266,23 @@ class DgraphCLI:
             ludicrous_mode = " --ludicrous_mode"
         return ludicrous_mode
 
-    def get_mtls_verification_type(self):
+    def get_creds_command_for_acl_login(self, is_latest, operation="default", username="groot", password="password"):
         """
-        Method to get the verification type specified in conf file.
-        :return:
+        Method to get command for Acl login
+        :param is_latest: <dgraph_version>
+        :param operation: <dgraph command: live, bulk, inc>
+        :param username: <acl_username>
+        :param password: <acl_password>
         """
-        verification_type = None
-        logger.debug("getting mtls verification type")
-        for key in self.cfg['tls']['mutual_tls']:
-            if self.cfg['tls']['mutual_tls'][key] and key != "is_enabled":
-                verification_type = key
-        return verification_type
+        logger.debug(f"ACL: is latest-> {is_latest}")
+        cli_live_acl = ""
+        if self.acl:
+            if is_latest:
+                cli_live_acl = f" --creds 'user={username};password={password}' "
+            else:
+                cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
+                                                                                            f" --password {password} "
+        return cli_live_acl
 
     def read_config(self):
         """
@@ -288,79 +307,6 @@ class DgraphCLI:
             self.tls = True
         if self.cfg['tls']['mutual_tls']['is_enabled']:
             self.tls_mutual = True
-
-    def build_zero_cli(self, **kwargs):
-        """
-        Method to generate zero commands based on conf.
-        :param kwargs:
-            offset: offset value to initialize dgraph
-        :return:
-        """
-        cli_name = "zero"
-        cli_command = "dgraph " + cli_name + " "
-        appender = ""
-
-        is_latest = self.set_dgraph_version()
-
-        args_appender = ""
-        logger.debug(f"offset value: {self.offset}")
-        args_appender = args_appender + f" -o {self.offset}"
-
-        # Configure tls and mtls
-        if is_latest:
-            tls_str = self.get_tls_certs_latest("zero")
-        else:
-            tls_str = self.get_tls_certs("zero")
-        appender = appender + tls_str
-
-        appender = appender + args_appender
-
-        cli_command = cli_command + appender + " 2>&1"
-        return cli_command
-
-    def build_alpha_cli(self, bulk_path=None, **kwargs):
-        """
-        Method to generate alpha commands based on conf.
-        \n accepts one param for bulk data initializing
-        :param bulk_path: <bulk loader data path>
-        :return:
-        """
-
-        cli_name = "alpha"
-        appender = ""
-        is_latest = self.set_dgraph_version()
-
-        args_appender = ""
-        logger.debug(f"offset value: {self.offset}")
-        args_appender = args_appender + f" -o {self.offset}"
-        for key, value in kwargs.items():
-            if key == "ludicrous_mode" and value == "enabled":
-                args_appender = args_appender + self.get_ludicrous_command(is_latest)
-
-        cli_command = f"dgraph {cli_name} {self.get_cache_command(is_latest)} " \
-                      f"--zero={self.zero_server_name}:{self.zero_addr}"
-
-        cli_command = cli_command + self.get_security_command(is_latest)
-
-        if bulk_path:
-            appender = appender + f' --postings "{bulk_path}" '
-        if self.acl:
-            appender = appender + self.get_acl_command(is_latest)
-        if self.enc:
-            appender = appender + self.get_encryption_command(is_latest)
-
-        # Configure tls and mtls
-        if is_latest:
-            tls_str = self.get_tls_certs_latest("alpha")
-        else:
-            tls_str = self.get_tls_certs("alpha")
-
-        appender = appender + tls_str
-
-        appender = appender + args_appender
-
-        cli_command = cli_command + appender + "  -v=2  2>&1"
-        return cli_command
 
     def store_dgraph_details(self):
         """
@@ -408,6 +354,19 @@ class DgraphCLI:
                          " from master branch.")
             return True
 
+    @staticmethod
+    def check_if_latest_branch(dgraph_branch):
+        """
+        Method to check if the branch is of latest build.
+        :param dgraph_branch:
+        :return:
+        """
+
+        if dgraph_branch == "master" or dgraph_branch == "":
+            return True
+        else:
+            return False
+
     def set_dgraph_version(self, version=None, branch=None):
         """
         Method to check and set dgraph version
@@ -420,32 +379,176 @@ class DgraphCLI:
                 version = branch
             else:
                 version = self.get_dgraph_version_details("Dgraph version")
-            is_latest = True if self.check_version(version) or branch == "master" or branch == "" \
+                branch = self.check_if_latest_branch(branch)
+            is_latest = True if self.check_version(version) or branch \
                 else False
         else:
             logger.debug("Dgraph docker setup is executed.")
-            is_latest = True if self.check_version(version) or branch == "master" \
+            branch = self.check_if_latest_branch(branch)
+            is_latest = True if self.check_version(version) or branch \
                 else False
         logger.debug(f"check version if latest: {is_latest}")
         return is_latest
 
-    def get_creds_command_for_acl_login(self, is_latest, operation="default", username="groot", password="password"):
+    def build_zero_cli(self, offset=None, is_latest_check=None, **kwargs):
         """
-        Method to get command for Acl login
-        :param is_latest: <dgraph_version>
-        :param operation: <dgraph command: live, bulk, inc>
-        :param username: <acl_username>
-        :param password: <acl_password>
+        Method to generate zero commands based on conf.
+        :param is_latest_check:
+        :param offset:
+        :param kwargs:
+            offset: offset value to initialize dgraph
+        :return:
         """
-        logger.debug(f"ACL: is latest-> {is_latest}")
-        cli_live_acl = ""
+        cli_name = "zero"
+        cli_command = "dgraph " + cli_name + " "
+        appender = ""
+
+        if is_latest_check:
+            is_latest = is_latest_check
+        else:
+            is_latest = self.set_dgraph_version()
+        args_appender = ""
+        logger.debug(f"offset value: {self.offset}")
+        args_appender = args_appender + f" -o {self.offset}"
+
+        # Configure tls and mtls
+        if is_latest:
+            tls_str = self.get_tls_certs_latest("zero")
+        else:
+            tls_str = self.get_tls_certs("zero")
+        appender = appender + tls_str
+
+        appender = appender + args_appender
+
+        cli_command = cli_command + appender + " 2>&1"
+        return cli_command
+
+    def build_docker_zero_and_alpha_cli_command(self, container_name, dgraph_version, zero_count=1, alpha_count=1,
+                                                bulk_path=None):
+        """
+        Method to build zero and alpha cli command for docker
+        :param bulk_path:
+        :param alpha_count:
+        :param zero_count: No of alpha's
+        :param container_name: name of the docker container
+        :param dgraph_version: dgraph version of the docker build
+
+        :return:
+        """
+        is_latest_version = self.set_dgraph_version(version=dgraph_version)
+        zero_services = []
+        zero_ports = ""
+        zero_ports_conf = {}
+
+        for i in range(zero_count):
+            zero_ports_list = []
+            grpc_port = 5080 + self.offset + i
+            http_port = 6080 + self.offset + i
+            zero_ports += f" -p {grpc_port}:{grpc_port} " \
+                          f" -p {http_port}:{http_port} "
+            zero_ports_list.append(grpc_port)
+            zero_ports_list.append(http_port)
+            zero_ports_list.append(self.offset + i)
+            zero_ports_conf = {i: zero_ports_list}
+
+        alpha_ports = ""
+        alpha_ports_conf = {}
+        for j in range(alpha_count):
+            alpha_ports_list = []
+            grpc_port = 7080 + self.offset
+            http_port = 8080 + self.offset
+            alpha_ports += f" -p {grpc_port}:{grpc_port} " \
+                           f" -p {http_port}:{http_port} "
+            alpha_ports_list.append(grpc_port)
+            alpha_ports_list.append(http_port)
+            alpha_ports_list.append(self.offset + i)
+            alpha_ports_conf = {j: alpha_ports_list}
+
+        ports = zero_ports + alpha_ports
+
+        for zero in range(zero_count):
+            zero_cli_command = self.build_zero_cli(offset=self.offset + zero,
+                                                   is_latest_check=is_latest_version)
+            docker_zero_cli_command = f"docker run --name {container_name} {ports} "
+            volume_mounts = f" -v {self.curr_path}results:/dgraph:rw " \
+                            f" -v {self.curr_path}export:{self.curr_path}export:rw " \
+                            f" -v {self.curr_path}backup:{self.curr_path}backup:rw " \
+                            f" -v {self.curr_path}conf/dgraph/acl:{self.curr_path}conf/dgraph/acl:ro " \
+                            f" -v {self.curr_path}conf/dgraph/encryption:{self.curr_path}conf/dgraph/encryption:ro " \
+                            f" -v {self.curr_path}conf/dgraph/mTLS/tls:{self.curr_path}conf/dgraph/mTLS/tls:ro " \
+                            f" -v {self.curr_path}test_data/datasets:{self.curr_path}test_data/datasets:ro "
+            docker_zero_cli_command += volume_mounts + f" dgraph/dgraph:{dgraph_version} "
+            docker_zero_cli_command += zero_cli_command
+            zero_services.append(docker_zero_cli_command)
+        alpha_services = []
+        for alpha in range(alpha_count):
+            alpha_cli_command = self.build_alpha_cli(bulk_path=bulk_path,
+                                                     is_latest_check=is_latest_version,
+                                                     zero_address=5080 + self.offset + alpha)
+            docker_alpha_cli_command = f" docker exec -w /dgraph {container_name}   "
+            docker_alpha_cli_command += alpha_cli_command
+            alpha_services.append(docker_alpha_cli_command)
+
+        services = {"zeros": zero_services,
+                    "alphas": alpha_services,
+                    "zero_ports": zero_ports_conf,
+                    "alpha_ports": alpha_ports_conf
+                    }
+        return services
+
+    def build_alpha_cli(self, bulk_path=None, offset=None, zero_address=None, is_latest_check=None, **kwargs):
+        """
+        Method to generate alpha commands based on conf.
+        \n accepts one param for bulk data initializing
+        :param zero_address:
+        :param is_latest_check:
+        :param offset:
+        :param bulk_path: <bulk loader data path>
+        :return:
+        """
+
+        cli_name = "alpha"
+        appender = ""
+        if is_latest_check:
+            is_latest = is_latest_check
+        else:
+            is_latest = self.set_dgraph_version()
+
+        args_appender = ""
+        logger.debug(f"offset value: {self.offset}")
+        args_appender = args_appender + f" -o {self.offset}"
+        for key, value in kwargs.items():
+            if key == "ludicrous_mode" and value == "enabled":
+                args_appender = args_appender + self.get_ludicrous_command(is_latest)
+
+        if zero_address:
+            cli_command = f"dgraph {cli_name} {self.get_cache_command(is_latest)} " \
+                          f"--zero={self.zero_server_name}:{zero_address}"
+        else:
+            cli_command = f"dgraph {cli_name} {self.get_cache_command(is_latest)} " \
+                          f"--zero={self.zero_server_name}:{self.zero_addr}"
+
+        cli_command = cli_command + self.get_security_command(is_latest)
+
+        if bulk_path:
+            appender = appender + f' --postings "{bulk_path}" '
         if self.acl:
-            if is_latest:
-                cli_live_acl = f" --creds 'user={username};password={password}' "
-            else:
-                cli_live_acl = f"  -u {username} -p {password} " if operation != "inc" else f"  --user {username}" \
-                                                                                            f" --password {password} "
-        return cli_live_acl
+            appender = appender + self.get_acl_command(is_latest)
+        if self.enc:
+            appender = appender + self.get_encryption_command(is_latest)
+
+        # Configure tls and mtls
+        if is_latest:
+            tls_str = self.get_tls_certs_latest("alpha")
+        else:
+            tls_str = self.get_tls_certs("alpha")
+
+        appender = appender + tls_str
+
+        appender = appender + args_appender
+
+        cli_command = cli_command + appender + "  -v=2  2>&1"
+        return cli_command
 
     def build_loader_command(self, rdf_file, schema_file, loader_type,
                              latest_version_check=None, docker_string=None):
@@ -477,8 +580,8 @@ class DgraphCLI:
         docker_location = None
         if docker_string:
             cli_command = docker_string + cli_command
-            self.zero_server_name = "zero0"
-            docker_location = "/Automation/"
+            # self.zero_server_name = "zero"
+            # docker_location = "/Automation/"
 
         # Building command for live loader
         if loader_type == "live":
@@ -511,14 +614,6 @@ class DgraphCLI:
         cli_command = cli_command + mtls_certs + " -v 2 "
         return cli_command
 
-    @staticmethod
-    def check_is_latest_version(dgraph_branch):
-
-        if dgraph_branch == "release":
-            return False
-        else:
-            return True
-
     def build_increment_cli_command(self, latest_version_check=None, docker_string=None, alpha_offset: int = 0):
         """
         Method to generate command for increment operation.
@@ -543,7 +638,7 @@ class DgraphCLI:
         docker_location = None
         if docker_string:
             cli_command = docker_string + " dgraph"
-            docker_location = "/Automation/"
+            # docker_location = "/Automation/"
         else:
             cli_command = "dgraph"
         cli_command = f"{cli_command} increment  --alpha {self.alpha_server_name}:{self.alpha_addr + alpha_offset} " \

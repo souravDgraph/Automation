@@ -60,36 +60,98 @@ Start Dgraph Ludicrous Mode
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
-Start Dgraph In Docker
-    [Arguments]     ${folder_name}
-    [Documentation]    Start Dgraph alpha and Zero process in Helm with cwd pointing to results folder.
+
+Start Dgraph n-node In Docker
+    [Documentation]  Keyword to start dgraph in docker setup.
+    [Arguments]     ${no_of_alphas}     ${no_of_zeros}    ${dgraph_version}     ${container_name}
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
-    ${result_docker}=    Process.Run Process    docker    --version    alias=docker    stdout=docker.txt    cwd=results    shell=True
-    log    ${result_docker.stdout}
-    ${result_docker_compose}=    Process.start Process    docker-compose    --version    alias=docker_compose    stdout=docker_compose.txt      stderr=docker_compose_err.txt    cwd=results    shell=True
-    OperatingSystem.Create Directory    ${dir_path}/data
-    Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    up    alias=dc_up    cwd=results    shell=True    stdout=docker_compose_up.txt
-    Process Should Be Running    dc_up
-    Wait For Process    timeout=40 s    on_timeout=continue
-    Set Dgraph Version from docker  ${folder_name}
+    ${service_json}   get zero and alpha docker cli command     container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=${no_of_zeros}   alpha_count=${no_of_alphas}
+    @{zeros_list}   Get From Dictionary     ${service_json}     zeros
+    @{alphas_list}   Get From Dictionary     ${service_json}     alphas
+    FOR     ${zero_command}  IN      @{zeros_list}
+        ${result_docker}=    Start Process    ${zero_command}       alias=zero_${zero_count}   stdout=zero_${zero_count}.txt    stderr=zero_err_${zero_count}.txt    cwd=results    shell=True
+        Wait For Process    timeout=20 s    on_timeout=continue
+        ${zero_count}   Evaluate        ${zero_count} + 1
+        Set Suite Variable      ${zero_count}    ${zero_count}
+    END
+
+    FOR    ${alpha_command}   IN    @{alphas_list}
+        ${result_docker}=    Start Process     ${alpha_command}      alias=alpha_${alpha_count}   stdout=alpha_${alpha_count}.txt    stderr=alpha_err_${alpha_count}.txt    cwd=results    shell=True
+        Wait For Process    timeout=20 s    on_timeout=continue
+        ${alpha_count}  Evaluate        ${alpha_count} + 1
+        Set Suite Variable      ${alpha_count}    ${alpha_count}
+    END
+    Set Dgraph Version from docker      ${container_name}
+
+Start Dgraph 2-node In Docker with bulk data
+    [Documentation]  Keyword to start dgraph with alpha pointing to bulk loader data in docker setup.
+    [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    log    ${dir_path}
+    ${service_json}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=1
+    @{zeros_list}   Get From Dictionary     ${service_json}     zeros
+    @{alphas_list}   Get From Dictionary     ${service_json}     alphas
+    FOR     ${zero_command}  IN      @{zeros_list}
+        ${result_docker}=    Start Process    ${zero_command}       alias=zero_${zero_count}   stdout=zero_${zero_count}.txt    stderr=zero_err_${zero_count}.txt    cwd=results    shell=True
+        Wait For Process    timeout=20 s    on_timeout=continue
+        ${zero_count}   Evaluate        ${zero_count} + 1
+        Set Suite Variable      ${zero_count}    ${zero_count}
+    END
+
+    FOR    ${alpha_command}   IN    @{alphas_list}
+        ${result_docker}=    Start Process     ${alpha_command}      alias=alpha_${alpha_count}   stdout=alpha_${alpha_count}.txt    stderr=alpha_err_${alpha_count}.txt    cwd=results    shell=True
+        Wait For Process    timeout=20 s    on_timeout=continue
+        ${alpha_count}  Evaluate        ${alpha_count} + 1
+        Set Suite Variable      ${alpha_count}    ${alpha_count}
+    END
+    Set Dgraph Version from docker      ${container_name}
+
+Start Dgraph 2-node In Docker
+    [Documentation]  Keyword to start dgraph in 2-node docker setup.
+    [Arguments]    ${dgraph_version}     ${container_name}
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    log    ${dir_path}
+    ${service_json}   get zero and alpha docker cli command     container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=1
+    @{zeros_list}   Get From Dictionary     ${service_json}     zeros
+    @{alphas_list}   Get From Dictionary     ${service_json}     alphas
+    FOR     ${zero_command}  IN      @{zeros_list}
+        ${result_docker}=    Start Process    ${zero_command}       alias=zero_${zero_count}   stdout=zero_${zero_count}.txt    stderr=zero_err_${zero_count}.txt    cwd=results    shell=True
+        Wait For Process    timeout=20 s    on_timeout=continue
+        ${zero_count}   Evaluate        ${zero_count} + 1
+        Set Suite Variable      ${zero_count}    ${zero_count}
+    END
+
+    FOR    ${alpha_command}   IN    @{alphas_list}
+        ${result_docker}=    Start Process     ${alpha_command}      alias=alpha_${alpha_count}   stdout=alpha_${alpha_count}.txt    stderr=alpha_err_${alpha_count}.txt    cwd=results    shell=True
+        Wait For Process    timeout=20 s    on_timeout=continue
+        ${alpha_count}  Evaluate        ${alpha_count} + 1
+        Set Suite Variable      ${alpha_count}    ${alpha_count}
+    END
+    Set Dgraph Version from docker      ${container_name}
+
 
 End Docker Execution
-    [Arguments]     ${folder_name}      ${is_clear_folder}
+    [Documentation]  Keyword to end docker execution
+    [Arguments]     ${container_name}
     Terminate All Processes
-    ${dir_path}=    normalize path    ${CURDIR}/..
-    Process.start Process    docker-compose    -f    ${dir_path}/conf/${folder_name}/docker-compose.yml    down    alias=dc_down    cwd=results    shell=True    stdout=docker_compose_down.txt     stderr=docker_compose_down_err.txt
-    Process Should Be Running    dc_down
+    Process.start Process    docker    stop    ${container_name}       alias=dc_stop    cwd=results    shell=True    stdout=dc_stop.txt     stderr=dc_stop_err.txt
     Wait For Process    timeout=20 s    on_timeout=continue
-    ${backup_folder_name}      Backup alpha and zero logs
-    Backup directories created while execution      ${backup_folder_name}
-    @{dir}    Create List    p    t    w    out    alpha    zero0   alpha0
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up list of folders in results dir    @{dir}
+    Process.start Process    docker    rm    ${container_name}       alias=dc_down    cwd=results    shell=True    stdout=docker_compose_down.txt     stderr=docker_compose_down_err.txt
+    Wait For Process    timeout=40 s    on_timeout=continue
+    Process Should Be Stopped   dc_down
+    @{zero_context}    Create List    All done. Goodbye!    Got connection request
+    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
+    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
+    @{alpha_init_err_context}  Create List     Dgraph Version  Dgraph codename
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_init_err_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initlization failed.
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha   @{alpha_error_context}
+    Run Keyword And Return If      ${passed}       Fail     Captured few errors in aplpha
+
 
 Start Dgraph Zero
-    [Arguments]    ${platform}
     [Documentation]    Start Dgraph Zero process
-    Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/   shell=True    stdout=zero_${zero_count}.txt    stderr=zero_${zero_count}_err.txt
     Process Should Be Running    zero
@@ -98,10 +160,8 @@ Start Dgraph Zero
     Set Suite Variable      ${zero_count}    ${zero_count}
 
 Start Dgraph Alpha
-    [Arguments]    ${platform}  ${is_ludicrous_mode}
+    [Arguments]     ${is_ludicrous_mode}
     [Documentation]    Start Dgraph alpha process.
-    # Dgraph alpha and zero command
-    Run Keyword And Return If    '${platform}' == 'docker'    Start Dgraph In Docker
     ${alpha_command}    Set Variable If   ${is_ludicrous_mode}   Generate Dgraph Alpha Cli Command     ludicrous_mode=enabled       Generate Dgraph Alpha Cli Command
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True    stderr=alpha_${alpha_count}_err.txt
     Process Should Be Running    alpha
@@ -146,6 +206,13 @@ End All Process
 Terminate and Create Backup of Dgraph Execution
     [Arguments]  ${is_clear_folder}
     Run Keyword And Continue On Failure    End All Process
+    ${backup_folder_name}      Backup alpha and zero logs
+    Backup directories created while execution      ${backup_folder_name}
+    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+
+Terminate Docker Execution and Create Backup of Dgraph Execution
+    [Arguments]     ${container_name}      ${is_clear_folder}
+    Run Keyword And Continue On Failure    END DOCKER EXECUTION     ${container_name}
     ${backup_folder_name}      Backup alpha and zero logs
     Backup directories created while execution      ${backup_folder_name}
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
@@ -212,21 +279,21 @@ Get Dgraph Docker Branch Details
     [Return]    ${value}
 
 Set Dgraph Version from docker
-    [Arguments]     ${folder_name}
+    [Arguments]     ${container_name}
     [Documentation]     Keyword to get the dgraph version from docker
-    ${docker_process}=     Run Process   docker       exec    ${folder_name}_zero0_1   dgraph  version     alias=version   stdout=dgraph_version.txt    shell=True    cwd=results
+    ${docker_process}=     Run Process   docker       exec    ${container_name}   dgraph  version     alias=version   stdout=dgraph_version.txt    shell=True    cwd=results
     ${version}=     Get Dgraph Docker Version Details
     ${branch}=      Get Dgraph Docker Branch Details
     ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
     ...     ELSE    Set Variable    ${version}
     ${check}=   Set Execution To Docker     ${version}      ${branch}
     Set Suite Variable      ${is_latest_global_check}        ${check}
-    Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
+    Set Suite Variable      ${docker_exe_string}    docker exec ${container_name}
 
 Execute Live Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
-    [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
-    ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
+    [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" perform live loader.
+    ...    rdf_filename, schema_filename
     ${dir_path}=    normalize path    ${CURDIR}/..
     Trigger Loader Process      live     ${rdf_filename}    ${schema_filename}    live
     Verify process to be stopped    live
@@ -241,16 +308,27 @@ Execute Bulk Loader with rdf and schema parameters
     ${dir_path}=    normalize path    ${CURDIR}/..
     Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk
     Verify process to be stopped    bulk
-    ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    100.00%
+    ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    Total:
     Log    ${loader_Text_File_Content}
     Verify Bulk Process     ${loader_Text_File_Content}
+
+Execute Bulk Loader for Docker with rdf and schema parameters
+    [Arguments]    ${dgraph_version}     ${container_name}      ${rdf_filename}    ${schema_filename}
+    [Documentation]    Keyword to accept two params "rdf_filename","schema_filename" perform bulk loader.
+    ...    rdf_filename, schema_filename"bulk"
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk
+    Verify process to be stopped    bulk
+    ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    Total:
+    Log    ${loader_Text_File_Content}
+    Verify Bulk Process for docker     ${dgraph_version}     ${container_name}       ${loader_Text_File_Content}
 
 Trigger Loader Process
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
     log     ${docker_exe_string}
-    ${path}=    Set Variable If      '${docker_exe_string}' != ''   /Automation     ${dir_path}
+    ${path}=    Set Variable     ${dir_path}
     ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest_global_check}  docker_string=${docker_exe_string}      
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
@@ -272,25 +350,35 @@ Monitor Live loader Process
     ${check_2}=  Run Keyword And Return Status   Grep and Verify file Content in results folder    ${loader_alias}    Please retry operation
     Run Keyword If  ${passed} or ${check_2}  Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${loader_name}
 
+Verify Bulk Process for docker
+    [Arguments]     ${dgraph_version}     ${container_name}     ${loader_Text_File_Content}
+    [Documentation]     Keyword to verify bulk loader output files generated along with
+     ...    altering zero and alpha instances.
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    Should Contain    ${loader_Text_File_Content}    Total:
+    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
+    End Docker Execution    ${container_name}
+    Start Dgraph 2-node In Docker with bulk data    ${dgraph_version}     ${container_name}       ${dir_path}/results/out/0/p
+    Clean up bulk folders
+
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
     [Documentation]     Keyword to verify bulk loader output files generated along with
      ...    altering zero and alpha instances.
     ${dir_path}=    normalize path    ${CURDIR}/..
-    Should Contain    ${loader_Text_File_Content}    100.00%
+    Should Contain    ${loader_Text_File_Content}    Total:
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     END ZERO PROCESS
     End Alpha Process
     Post Execution Verify Zero contents     true
     Post Execution Verify Alpha contents     true
-    Start Dgraph Zero   local
+    Start Dgraph Zero
     Start Dgraph Alpha for bulk loader    ${dir_path}/results/out/0/p       ${global_is_ludicrous_mode}
     END ZERO PROCESS
     End Alpha Process
     Post Execution Verify Zero contents     true
     Post Execution Verify Alpha contents     true
     Clean up bulk folders
-
 
 Execute Parallel Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}
@@ -312,7 +400,7 @@ Execute Parallel Loader with rdf and schema parameters
         END
         ${alpha_process_check}=    Is Process Running    alpha
         Verify process to be stopped    ${loader_alias}
-        ${grep_context}=    Set Variable If    "${i}"=="bulk"    100.00%    N-Quads processed per second
+        ${grep_context}=    Set Variable If    "${i}"=="bulk"    Total:    N-Quads processed per second
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    ${grep_context}
         Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    ${grep_context}
         ...    ELSE     Verify Bulk Process     ${loader_Text_File_Content}
@@ -347,15 +435,15 @@ Execute Increment Command
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
         ${inc_command}  Get dgraph increment command    is_latest_version=${is_latest_global_check}  docker_string=${docker_exe_string}      alpha_offset=${alpha_offset}
         ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results/inc_logs    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
-        Wait For Process    ${inc_alias}    timeout=10 s
+        Wait For Process    ${inc_alias}    timeout=20 s
     END
     FOR    ${i}    IN RANGE    ${num_threads}
         ${dir_path}=    normalize path    ${CURDIR}/..
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
         Terminate Process   ${inc_alias}
         Sleep   5s
-        ${grep_file}=    Grep File    ${dir_path}/results/inc_logs/${inc_alias}.txt    1
-        Should Contain    ${grep_file}    1
+        ${grep_file}=    Grep File    ${dir_path}/results/inc_logs/${inc_alias}.txt    Total
+        Should Contain    ${grep_file}    Total
     END
 
 Create NFS Backup
@@ -460,7 +548,7 @@ Perform a restore on backup by older dgraph versions
 
 Health Check for Restore Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Connect Request Server
+    Wait Until Keyword Succeeds    20x    30 sec       Connect Request Server
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed
@@ -688,7 +776,7 @@ Backup alpha and zero logs
 Backup directories created while execution
     [Arguments]       ${direc_name}
     [Documentation]     Keyword to backup execution time directories
-    @{dirs}     Create List     w   zw  p   t  out  alpha
+    @{dirs}     Create List     w   zw  p   t  out  alpha   tmp
     FOR  ${i}  IN    @{dirs}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
         Run Keyword If  ${passed}   Move Directory   results/${i}   results/${direc_name}
