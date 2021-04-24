@@ -258,7 +258,7 @@ Execute Live Loader with rdf and schema parameters
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
     ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
-    Trigger Loader Process      live     ${rdf_filename}    ${schema_filename}    live    ${is_learner}
+    Trigger Loader Process      live     ${rdf_filename}    ${schema_filename}    live    is_learner=${is_learner}
     Verify process to be stopped    live
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/live.txt    N-Quads processed per second
     Log    ${loader_Text_File_Content}
@@ -276,7 +276,7 @@ Execute Bulk Loader with rdf and schema parameters
     Verify Bulk Process     ${loader_Text_File_Content}
 
 Trigger Loader Process
-    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${is_learner}
+    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${is_learner}=None
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
     log     ${docker_exe_string}

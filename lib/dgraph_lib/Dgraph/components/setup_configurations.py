@@ -483,7 +483,7 @@ class DgraphCLI:
             self.zero_server_name = "zero0"
             docker_location = "/Automation/"
 
-        if is_learner is not None:
+        if is_learner != "None":
             self.alpha_addr += 1
 
         # Building command for live loader
