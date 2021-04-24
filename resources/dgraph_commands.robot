@@ -12,6 +12,7 @@ ${is_latest_global_check}
 ${docker_exe_string}
 ${zero_count}   0
 ${alpha_count}  0
+${alpha_learner_count}  0
 ${global_is_ludicrous_mode}
 
 *** Keywords ***
@@ -30,12 +31,41 @@ Start Dgraph
     ${check}=   set dgraph version
     Set Suite Variable      ${is_latest_global_check}    ${check}
     ${zero_count}   Evaluate        ${zero_count} + 1
-    ${alpha_count}  Evaluate        ${alpha_count} + 1
     Set Suite Variable      ${zero_count}    ${zero_count}
     Set Suite Variable      ${alpha_count}    ${alpha_count}
     Set Suite Variable      ${global_is_ludicrous_mode}    False
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
+
+Start Dgraph with learner node
+    [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
+    # Dgraph alpha and zero command
+    clean up dgraph folders
+    ${zero_command}    Generate Dgraph Zero Cli Command
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${zero_count}.txt      stderr=zero_${zero_count}_err.txt
+    Process Should Be Running    zero
+    Wait For Process    timeout=20 s    on_timeout=continue
+    ${alpha_command}    Generate Dgraph Alpha Cli Command
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${alpha_count}.txt    cwd=results/    shell=True       stderr=alpha_${alpha_count}_err.txt
+    Process Should Be Running    alpha
+    Wait For Process    timeout=20 s    on_timeout=continue
+    ${alpha_count}  Evaluate        ${alpha_count} + 1
+    ${alpha_command_learner}    Generate Dgraph Alpha Cli Command    learner="learner=true; group=1"
+    log    ${alpha_command_learner}
+    ${result_a}=    Process.start Process    ${alpha_command_learner}    alias=alpha_learner    stdout=alpha_learner_${alpha_learner_count}.txt    cwd=results/    shell=True       stderr=alpha_learner_${alpha_learner_count}_err.txt
+    Process Should Be Running    alpha_learner
+    Wait For Process    timeout=20 s    on_timeout=continue
+    ${check}=   set dgraph version
+    Set Suite Variable      ${is_latest_global_check}    ${check}
+    ${zero_count}   Evaluate        ${zero_count} + 1
+    ${alpha_learner_count}  Evaluate        ${alpha_learner_count} + 1
+    Set Suite Variable      ${zero_count}    ${zero_count}
+    Set Suite Variable      ${alpha_count}    ${alpha_count}
+    Set Suite Variable      ${alpha_learner_count}    ${alpha_learner_count}
+    Set Suite Variable      ${global_is_ludicrous_mode}    False
+    @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha_learner    @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph Ludicrous Mode
@@ -139,7 +169,7 @@ End All Process
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_init_err_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initialization failed.
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha   @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail     Captured few ereors in aplpha
+    Run Keyword And Return If      ${passed}       Fail     Captured few errors in alpha
     Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero        @{zero_context}
     Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha       @{alpha_context}
 
@@ -224,11 +254,11 @@ Set Dgraph Version from docker
     Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
 
 Execute Live Loader with rdf and schema parameters
-    [Arguments]    ${rdf_filename}    ${schema_filename}
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
     ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
-    Trigger Loader Process      live     ${rdf_filename}    ${schema_filename}    live
+    Trigger Loader Process      live     ${rdf_filename}    ${schema_filename}    live    ${is_learner}
     Verify process to be stopped    live
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/live.txt    N-Quads processed per second
     Log    ${loader_Text_File_Content}
@@ -246,12 +276,13 @@ Execute Bulk Loader with rdf and schema parameters
     Verify Bulk Process     ${loader_Text_File_Content}
 
 Trigger Loader Process
-    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
+    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${is_learner}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
     log     ${docker_exe_string}
+    log     ${is_latest_global_check}
     ${path}=    Set Variable If      '${docker_exe_string}' != ''   /Automation     ${dir_path}
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${is_latest_global_check}  docker_string=${docker_exe_string}      
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}    ${loader_name}    ${is_learner}    is_latest_version=${is_latest_global_check}    docker_string=${docker_exe_string}
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Verify Live loader trigger properly or not
@@ -567,6 +598,7 @@ Verify alpha and zero contents in results folder
     [Documentation]    Keyword for checking content in .txt files generated in results folder
     ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
     ${dir_path}=    normalize path    ${CURDIR}/..
+    ${count}=   Set Variable If     '${file_name}' == 'alpha_learner'   ${alpha_learner_count}
     ${count}=   Set Variable If     '${file_name}' == 'zero'   ${zero_count}   ${alpha_count}
     FOR     ${i}  IN RANGE   ${count}
         ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
