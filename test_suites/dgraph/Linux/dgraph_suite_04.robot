@@ -17,7 +17,7 @@ TC_01 Perform live load data.
      [Documentation]    Perform live load operation on dataset.
      ...    *Author*: Sourav
      [Tags]    regression     NIGHTLY
-     Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    true
+     Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    ${is_learner}=true
      [Teardown]    NONE
 
 TC_02 Perform NFS backup and restore data

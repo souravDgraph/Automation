@@ -254,7 +254,7 @@ Set Dgraph Version from docker
     Set Suite Variable      ${docker_exe_string}    docker exec ${folder_name}_alpha0_1
 
 Execute Live Loader with rdf and schema parameters
-    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}=None
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "loader_type" perform live/bulk loader.
     ...    rdf_filename, schema_filename ,loader_type- "live"/"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
