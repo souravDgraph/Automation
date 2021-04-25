@@ -16,14 +16,14 @@ ${schema_file}    1million.schema
 TC_01 Perform live load data.
      [Documentation]    Perform live load operation on dataset.
      ...    *Author*: Krishna, Sourav and Sankalan
-     [Tags]    regression   C698     NIGHTLY    CI
+     [Tags]    regression   NIGHTLY    CI
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
      [Teardown]    NONE
 
 TC_02 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
-     [Tags]    regression   C702    C700   WEEKLY
+     [Tags]    regression   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup      1
      log        ${is_latest_global_check}
