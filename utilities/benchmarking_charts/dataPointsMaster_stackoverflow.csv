@@ -1,6 +1,1 @@
 ##Date,Version,LiveLoaderTime,BulkLoaderTime    
-##date +%s,cat alpha_0.txt | grep "Dgraph version"| awk '{print $4}',cat live.txt | grep "Time spent"|  awk '{print $4}',cat bulk.txt| grep "Total:" | awk '{print $2}'       
-1619164607000,v21.03.0-4-g00ada8352,61h52m37.854594698s,12h36m50s
-1619274607000,v21.03.0-4-g00ada8352,61h02m37.854594698s,12h16m50s
-1619384607000,v21.03.0-4-g00ada8352,61h12m37.854594698s,12h26m50s
-1619494607000,v21.03.0-4-g00ada8352,61h32m37.854594698s,12h46m50s
