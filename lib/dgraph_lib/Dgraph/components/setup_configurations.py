@@ -332,6 +332,7 @@ class DgraphCLI:
                 -   Branch
         :return: <value>
         """
+        logger.debug(self.details.get(details_key))
         return self.details.get(details_key)
 
     @staticmethod
@@ -588,6 +589,9 @@ class DgraphCLI:
             cli_command = f"{cli_command} {loader_type} -s {schema_file} " \
                           f"-f {rdf_file} -a {self.alpha_server_name}:{self.alpha_addr} " \
                           f"-z {self.zero_server_name}:{self.zero_addr} "
+            branch = self.get_dgraph_version_details("Branch")
+            if branch == "master":
+                cli_command += " --force-namespace 0"
 
         # Building command for bulk loader
         elif loader_type == "bulk":
