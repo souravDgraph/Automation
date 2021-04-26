@@ -3,6 +3,7 @@
 
 <head>
     <title>Benchmarking Dgraph</title>
+    <meta http-equiv="refresh" content="300">
 
     <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
@@ -19,11 +20,18 @@
                         if (data.includes("h")) {
                             hr = parseFloat(data.split("h")[0])
                             timeInMin = hr * 60
+
+                            min = parseFloat(data.split("h")[1].split('m')[0])
+                            timeInMin += min
+                            sec = parseFloat(data.split("h")[1].split('m')[1])
+                            timeInMin += sec / 60
                         }
-                        min = parseFloat(data.split("h")[1].split('m')[0])
-                        timeInMin += min
-                        sec = parseFloat(data.split("h")[1].split('m')[1])
-                        timeInMin += sec / 60
+                        else {
+                            min = parseFloat(data.split('m')[0])
+                            timeInMin += min
+                            sec = parseFloat(data.split('m')[1])
+                            timeInMin += sec / 60
+                        }
                     }
                     else {
                         sec = data
@@ -147,9 +155,9 @@
 
                 chart.render();
             }
-            $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(seconds)") });
+            $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(minutes)") });
             $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
-            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(seconds)") });
+            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(minutes)") });
             $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
 
         }
