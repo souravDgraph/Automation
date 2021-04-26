@@ -148,9 +148,9 @@
                 chart.render();
             }
             $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(seconds)") });
-            // $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(seconds)") });
-            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(minutes)") });
-            // $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
+            $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
+            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(seconds)") });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
 
         }
     </script>
@@ -159,13 +159,13 @@
 
 <body>
     <h1>Dgraph Benchmark</h1>
-    <p> 21Million dataset benchmark is executed nightly,
-        and Stackoverflow benchmark is executed weekly.
-        These benchmarks are executed on dgus machines.</p>
-    <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;"></div>
-    <!-- <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;"></div> -->
-    <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;"></div>
-    <!-- <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;"></div> -->
+    <p> 21Million dataset benchmark is executed nightly.</p>
+    <p> Stackoverflow benchmark is executed weekly.</p>
+    <p> These benchmarks are executed on dgus machines.</p>
+    <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
 </body>
 
 </html>
