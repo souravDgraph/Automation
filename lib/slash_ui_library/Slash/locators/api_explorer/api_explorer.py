@@ -23,3 +23,8 @@ class ApiExplorerLocators:
     field_input_textbox = "xpath = //div[@data-arg-name='%s']//following-sibling::input"
     query_label = "xpath = //div[text()='%s']"
     remove_query_button = "xpath = //div[text()='%s']//descendant::button[1]"
+
+    #javascript
+    get_scroll_height = "return document.getElementsByClassName('CodeMirror-scroll')[2].scrollHeight"
+    set_scroll_top = 'document.getElementsByClassName("CodeMirror-scroll")[2].scrollTop=%s'
+    get_query_data = "return document.getElementsByClassName('CodeMirror-lines').valueOf()[2].innerText.toString()"

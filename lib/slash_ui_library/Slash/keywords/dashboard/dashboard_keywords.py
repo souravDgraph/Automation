@@ -285,6 +285,10 @@ class DashboardKeywords():
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.documentation,
                                 timeout=DashboardKeywords.timeout)
+        browser.switch_window("new")
+        browser.wait_until_page_contains_element(DashboardLocators.cloud_quick_start_label, 
+                                                    timeout=DashboardKeywords.timeout)
+        browser.switch_window("main")
 
     @staticmethod
     def click_avatar(browser_alias):
@@ -368,13 +372,13 @@ class DashboardKeywords():
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(DashboardLocators.active_subscription_label, timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.upcoming_invoice_label, timeout=DashboardKeywords.timeout)
-        total_amount_js = "return document.getElementsByClassName('css-s4rimg').valueOf()[0].innerText"
+        total_amount_js = DashboardLocators.get_total_amount
         total_amount_response = browser.execute_javascript(total_amount_js)
         total_amount_response = re.sub('\s+', ' ', total_amount_response)
-        billing_description_js = "return document.getElementsByClassName('css-xh0hol')[5].valueOf().innerText"
+        billing_description_js = DashboardLocators.get_billing_description
         billing_description_response = browser.execute_javascript(billing_description_js)
         billing_description_response = re.sub('\s+', ' ', billing_description_response)
-        billing_amount_js = "return document.getElementsByClassName('css-19eb4m4').valueOf()[0].innerText"
+        billing_amount_js = DashboardLocators.get_billing_amount
         billing_amount_response = browser.execute_javascript(billing_amount_js)
         billing_amount_response = re.sub('\s+', ' ', billing_amount_response)
         if(total_amount!=total_amount_response or billing_description!=billing_description_response or billing_amount!=billing_amount_response):

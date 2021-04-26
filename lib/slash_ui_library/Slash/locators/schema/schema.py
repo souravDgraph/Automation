@@ -50,4 +50,7 @@ class SchemaLocators:
     drop_button = "xpath = //button[text()='Drop']"
     drop_data_label = "xpath = //h3[text()='Drop Data']"
     remove_field_button = "xpath = //button[text()='Remove Field']"
+
+    # Javascript
+    get_schema = "return document.getElementsByClassName('CodeMirror-code').valueOf()[0].textContent"
     

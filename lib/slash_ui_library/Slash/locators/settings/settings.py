@@ -58,3 +58,8 @@ class SettingsLocators:
     backup_created_at = "xpath = //tbody/tr[1]//div[contains(text(),'%s')]"
     backup_clone_button = "xpath = //tbody/tr[1]//button[text()='Clone']"
     label_type = "xpath = //div[text()='Type']"
+
+    # Javascript
+    get_button_top = "return document.getElementsByClassName('css-pgsj7')[2].offsetTop"
+    get_button_left = "return document.getElementsByClassName('css-pgsj7')[2].offsetLeft"
+    get_backups = "return document.getElementsByTagName('tbody').valueOf()[0].innerText"

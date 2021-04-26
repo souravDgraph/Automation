@@ -62,6 +62,7 @@ class DashboardLocators:
     upcoming_invoice_label = "xpath = //h3[text()='Upcoming invoice']"
     billing_button = "xpath = //button[text()='Billing']"
     billing_label = "xpath = //h3[text()='Billing']"
+    cloud_quick_start_label = "xpath = //h1[text()='Dgraph Cloud Quick Start']"
 
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"
@@ -73,3 +74,8 @@ class DashboardLocators:
 
     backends_list = "xpath = //button[@aria-haspopup='listbox']"
     backend_selection = "xpath = //li/div[text()='RC3']"
+
+    # Javascript 
+    get_total_amount = "return document.getElementsByClassName('css-s4rimg').valueOf()[0].innerText"
+    get_billing_description = "return document.getElementsByClassName('css-xh0hol')[5].valueOf().innerText"
+    get_billing_amount = "return document.getElementsByClassName('css-19eb4m4').valueOf()[0].innerText"

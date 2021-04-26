@@ -194,8 +194,8 @@ class SettingsKeywords:
         browser = BrowserKeywords.switch_browser(browser_alias)
         time.sleep(5)
         browser.wait_until_page_contains_element(SettingsLocators.okay_button, timeout=SettingsKeywords.timeout)
-        button_top = browser.execute_javascript("return document.getElementsByClassName('css-pgsj7')[2].offsetTop")
-        button_left = browser.execute_javascript("return document.getElementsByClassName('css-pgsj7')[2].offsetLeft")
+        button_top = browser.execute_javascript(SettingsLocators.get_button_top)
+        button_left = browser.execute_javascript(SettingsLocators.get_button_left)
         browser.click_element_at_coordinates(SettingsLocators.cancel_button, button_left, button_top)
         browser.wait_until_page_contains_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
 
@@ -287,7 +287,7 @@ class SettingsKeywords:
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.wait_until_page_contains_element(SettingsLocators.label_type, timeout=SettingsKeywords.timeout)
-        list_backups = "return document.getElementsByTagName('tbody').valueOf()[0].innerText"
+        list_backups = SettingsLocators.get_backups
         backups_list = browser.execute_javascript(list_backups)
         if(backups_list!=""):
             return True

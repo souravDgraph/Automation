@@ -60,21 +60,25 @@ class SchemaKeywords:
                                                     timeout=SchemaKeywords.timeout)
     
     @staticmethod
-    def deploy_schema(browser_alias):
+    def deploy_schema(browser_alias, schema):
         """
         click deploy schema button
         | browser_alias |  alias of the browser |
+        | schema | schema for the backend |
 
         Example:
-        | Deploy Schema | Browser_1 |
+        | Deploy Schema | Browser_1 | type User  {  id: ID!   name: String } |
 
         Return:
-            None
+            Boolean (True or False)
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(SchemaLocators.deploy_button, timeout=SchemaKeywords.timeout)
-        browser.wait_until_element_is_visible(SchemaLocators.okay_button, timeout=SchemaKeywords.timeout)
-        browser.click_element(SchemaLocators.okay_button, timeout=SchemaKeywords.timeout)
+        if schema==SchemaKeywords.get_deployed_schema(browser_alias):
+            browser.click_element(SchemaLocators.deploy_button, timeout=SchemaKeywords.timeout)
+            browser.wait_until_element_is_visible(SchemaLocators.okay_button, timeout=SchemaKeywords.timeout)
+            browser.click_element(SchemaLocators.okay_button, timeout=SchemaKeywords.timeout)
+            return True
+        return False
 
     @staticmethod
     def add_type(browser_alias):
@@ -127,7 +131,7 @@ class SchemaKeywords:
             Schema
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        js_exe = "return document.getElementsByClassName('CodeMirror-code').valueOf()[0].textContent"
+        js_exe = SchemaLocators.get_schema
         schema = browser.execute_javascript(js_exe)
         schema = re.sub('[1-9,\u200b]', '', schema)
         logger.info(schema)

@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     This Suite contains the sanity test cases for Slash UI
-Suite Setup       Run Keywords     Setup     AND     Create Backend     
+Suite Setup       Run Keywords     Setup     AND     Create Backend     AND     Add And Deploy Schema     ${type_name}     ${field_name}      ${SCHEMA1}
 Suite Teardown    Run Keywords     Delete Backend    ${BACKEND_NAME}     AND    Close Browser    ${Browser_Alias}
 Library           Slash
 Variables         ../../../conf/slash/variables.py
@@ -12,6 +12,9 @@ ${card_number}     4242424242424242
 ${expiry_date}     424
 ${cvc}       242
 ${postal}      42424
+${type_name}     User
+${field_name}       name
+${backup_type}      incremental
 
 *** Test Cases ***
 User should be able to create backend and navigate to schema page
@@ -131,13 +134,6 @@ User should be able to add schema
     ...    Change Field Name
     ...    Deploy Schema
     Click Schema In Menu     ${Browser_Alias}
-    Click Switch To Ui Mode      ${Browser_Alias}
-    Add Type     ${Browser_Alias}
-    Change Type Name     ${Browser_Alias}      UntitledType0      User
-    Add Field     ${Browser_Alias}       User
-    Change Field Name      ${Browser_Alias}      User      untitledfield      name
-    Deploy Schema      ${Browser_Alias}
-    Click Switch To Text Mode     ${Browser_Alias}
     ${schema}=    Get Deployed Schema      ${Browser_Alias}
     Run Keyword If     '${schema}'!='${SCHEMA1}'    Fail
 
@@ -156,8 +152,9 @@ User should be able to edit and update schema
     Add Field     ${Browser_Alias}         User
     Change Field Name      ${Browser_Alias}      User      untitledfield      age
     Change Field Type       ${Browser_Alias}      User      age      String     Int
-    Deploy Schema      ${Browser_Alias}
     Click Switch To Text Mode     ${Browser_Alias}
+    ${is_schema_deployed}=     Deploy Schema      ${Browser_Alias}       ${SCHEMA2}
+    Run Keyword If      '${is_schema_deployed}'!='True'     Fail
     ${schema}=    Get Deployed Schema      ${Browser_Alias}
     Run Keyword If     '${schema}'!='${SCHEMA2}'    Fail
 
@@ -176,7 +173,9 @@ Drop unused fields from Schema
     Click Schema In Menu     ${Browser_Alias}
     Click Switch To Ui Mode      ${Browser_Alias}
     Remove Field      ${Browser_Alias}      User     age    
-    Deploy Schema      ${Browser_Alias}
+    Click Switch To Text Mode     ${Browser_Alias}
+    ${is_schema_deployed}=     Deploy Schema      ${Browser_Alias}       ${SCHEMA1}
+    Run Keyword If      '${is_schema_deployed}'!='True'     Fail
     Click Settings In Menu     ${Browser_Alias}
     Click Schema In Menu     ${Browser_Alias}
     Click Switch To Ui Mode      ${Browser_Alias}
@@ -197,7 +196,7 @@ Take Manual Backups
     ${date_time}=     Click Create Backup Button       ${Browser_Alias}
     Click General Tab      ${Browser_Alias}
     Click Backups Tab      ${Browser_Alias}
-    Verify Backup Created     ${Browser_Alias}     incremental     ${date_time}
+    Verify Backup Created     ${Browser_Alias}     ${backup_type}    ${date_time}
 
 List Backups
     [Documentation]
@@ -210,7 +209,7 @@ List Backups
     ${is_backup_listed}=    Verify List Backups     ${Browser_Alias}
     Run Keyword If    '${is_backup_listed}'!='True'    Fail
 
-Add Card And Verify Billing page
+Add Card And Verify Billing page with 0$ bill
     [Documentation]
     ...    List of tests covered
     ...
@@ -272,13 +271,13 @@ Should be able to query and return response
     ...    click execure query button
     ...    remove query button
     Click Api Explorer In Menu      ${Browser_Alias}
-    Select Query Type       ${Browser_Alias}        query
-    Click Add Query Type Button        ${Browser_Alias}       query
-    Expand Add Query        ${Browser_Alias}        query       User
-    Select Search Fields     ${Browser_Alias}        ${FIELD_NAMES}
+    Select Query Type       ${Browser_Alias}        mutation
+    Click Add Query Type Button        ${Browser_Alias}       mutation
+    Expand Add Query        ${Browser_Alias}        add       User
+    Add Value To Field        ${Browser_Alias}        name        user1
     Click Execute Query Button       ${Browser_Alias}
-    Click Remove Query Button        ${Browser_Alias}       query
-    Verify Query Data      ${QUERY_RESULT1}      User
+    Click Remove Query Button        ${Browser_Alias}       mutation
+    Verify Query Data      ${QUERY_RESULT2}      User
 
 Drop data from schema
     [Documentation]
@@ -333,3 +332,17 @@ Verify Query Data
     ${data}=    Get Query Result     ${Browser_Alias}
     Run Keyword If     ${data}!=${query_result}    Fail
     Click Remove Query Button        ${Browser_Alias}       query
+
+Add And Deploy Schema
+    [Arguments]      ${type_name}       ${field_name}      ${SCHEMA1} 
+    Click Schema In Menu     ${Browser_Alias}
+    Click Switch To Ui Mode      ${Browser_Alias}
+    Add Type     ${Browser_Alias}
+    Change Type Name     ${Browser_Alias}      UntitledType0      ${type_name}
+    Add Field     ${Browser_Alias}       ${type_name}
+    Change Field Name      ${Browser_Alias}      ${type_name}      untitledfield      ${field_name}
+    Click Switch To Text Mode      ${Browser_Alias}
+    ${is_schema_deployed}=     Deploy Schema      ${Browser_Alias}       ${SCHEMA1}
+    Run Keyword If      '${is_schema_deployed}'!='True'     Fail
+    ${schema}=    Get Deployed Schema      ${Browser_Alias}
+    Run Keyword If     '${schema}'!='${SCHEMA1}'    Fail
