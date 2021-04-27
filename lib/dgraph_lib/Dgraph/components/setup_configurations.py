@@ -584,6 +584,7 @@ class DgraphCLI:
         loader_type = loader_type.lower()
         docker_location = None
         if docker_string:
+            logger.debug("Appending docker string")
             cli_command = docker_string + cli_command
 
         # Building command for live loader
@@ -597,7 +598,7 @@ class DgraphCLI:
 
         # Building command for bulk loader
         elif loader_type == "bulk":
-            cli_command = f"dgraph {loader_type} -s {schema_file} -f {rdf_file} " \
+            cli_command = f"{cli_command} {loader_type} -s {schema_file} -f {rdf_file} " \
                           f"--map_shards=2 --reduce_shards=1 " \
                           f"--http localhost:{8000 + self.offset}" \
                           f" --zero={self.zero_server_name}:{self.zero_addr} "
