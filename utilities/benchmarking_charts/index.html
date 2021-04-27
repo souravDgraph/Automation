@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Chart using XML Data</title>
+    <title>Benchmarking Dgraph</title>
 
     <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
@@ -33,6 +33,33 @@
                 return timeInMin;
             }
 
+            function convertTimeToSec(points, index) {
+                let timeInSec = 0
+                if (!(String(points[0]).includes("##") || String(points[2]) == "undefined")) {
+                    let data = String(points[index])
+                    var hr = min = sec = ""
+                    if (data.includes("h") && data.includes("m")) {
+                        hr = parseFloat(data.split("h")[0])
+                        timeInSec = hr * 3600
+                        min = parseFloat(data.split("h")[1].split('m')[0])
+                        timeInSec += min * 60
+                        sec = parseFloat(data.split("h")[1].split('m')[1])
+                        timeInSec += sec
+                    }
+                    else if (data.includes("m") && !data.includes("h")) {
+                        min = parseFloat(data.split('m')[0])
+                        timeInSec = min * 60
+                        sec = parseFloat(data.split('m')[1])
+                        timeInSec += sec
+                    }
+                    else {
+                        sec = data
+                        timeInSec = parseFloat(sec)
+                    }
+                }
+                return timeInSec;
+            }
+
             function getLiveLoaderDataFromCSV(csv, yAxisTitle) {
                 var dataPoints = csvLines = points = [];
                 csvLines = csv.split(/[\r?\n|\r|\n]+/);
@@ -49,7 +76,7 @@
                         } else {
                             dataPoints.push({
                                 x: parseInt(points[0]),
-                                y: parseFloat(points[2])
+                                y: convertTimeToSec(points, 2)
                             });
                         }
                     }
@@ -72,73 +99,73 @@
                         } else {
                             dataPoints.push({
                                 x: parseInt(points[0]),
-                                y: parseFloat(points[3])
+                                y: convertTimeToSec(points, 3)
                             });
                         }
                     }
                 return dataPoints;
             }
 
-                function getChartFromCSV(csv, chartName, yAxisTitle) {
-                    var chart = new CanvasJS.Chart(chartName, {
-                        zoomEnabled: true,
-                        animationEnabled: true,
-                        theme: "light2",
-                        title: {
-                            text: chartName,
-                        },
-                        axisX: {
-                            title: "Date"
-                        },
-                        axisY: {
-                            title: yAxisTitle
-                        },
-                        toolTip: {
-                            shared: false
-                        },
-                        legend: {
-                            cursor: "pointer",
-                            fontSize: 16
-                        },
-                        data: [{
-                            type: "line",
-                            showInLegend: true,
-                            xValueType: "dateTime",
-                            yValueType: "Time",
-                            axisYIndex: 1, //Defaults to Zero
-                            name: "Live Loader",
-                            dataPoints: getLiveLoaderDataFromCSV(csv, yAxisTitle)
-                        }, {
-                            type: "line",
-                            showInLegend: true,
-                            xValueType: "dateTime",
-                            axisYIndex: 1, //Defaults to Zero
-                            name: "Bulk Loader",
-                            dataPoints: getBulkLoaderDataFromCSV(csv, yAxisTitle)
-                        }]
-                    });
+            function getChartFromCSV(csv, chartName, yAxisTitle) {
+                var chart = new CanvasJS.Chart(chartName, {
+                    zoomEnabled: true,
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: chartName,
+                    },
+                    axisX: {
+                        title: "Date"
+                    },
+                    axisY: {
+                        title: yAxisTitle
+                    },
+                    toolTip: {
+                        shared: false
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        fontSize: 16
+                    },
+                    data: [{
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader",
+                        dataPoints: getLiveLoaderDataFromCSV(csv, yAxisTitle)
+                    }, {
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader",
+                        dataPoints: getBulkLoaderDataFromCSV(csv, yAxisTitle)
+                    }]
+                });
 
-                    chart.render();
-                }
-                $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(seconds)") });
-                $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(seconds)") });
-                $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(minutes)") });
-                $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
-
+                chart.render();
             }
+            $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(seconds)") });
+            $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
+            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(seconds)") });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
+
+        }
     </script>
 
 </head>
 
 <body>
     <h1>Dgraph Benchmark</h1>
-    <p> 21Million dataset benchmark is executed nightly,
-        and Stackoverflow benchmark is executed weekly.
-        These benchmarks are executed on dgus machines.</p>
-    <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;"></div>
-    <!-- <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;"></div> -->
-    <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;"></div>
-    <!-- <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;"></div> -->
+    <p> 21Million dataset benchmark is executed nightly.</p>
+    <p> Stackoverflow benchmark is executed weekly.</p>
+    <p> These benchmarks are executed on dgus machines.</p>
+    <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
 </body>
 
 </html>
