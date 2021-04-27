@@ -258,19 +258,15 @@ Verify Live loader trigger properly or not
     [Documentation]  Keyword to verify live loader to trigger properly
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}
     ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
-    IF  ${status}==${FALSE}
-        ${result_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
-        Run Keyword If    ${result_check}        Monitor Live loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
+    ${tcp_error}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Error while dialing dial tcp
+    IF  ${status}==${FALSE} or ${tcp_error}
+        ${retry_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
+        Terminate Process   ${loader_alias}
+        Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
+        ${check}    Run Keyword And Return Status   Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
+        Return From Keyword If   ${check}
         ...     ELSE    FAIL    Some issue with live loader
     END
-
-Monitor Live loader Process
-    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}
-    [Documentation]  Keyword to monitor if live loader is triggered properly
-    Verify process to be stopped    ${loader_alias}
-    ${passed}=  Run Keyword And Return Status   Grep and Verify file Content in results folder    ${loader_alias}    Pending transactions found. Please retry operation
-    ${check_2}=  Run Keyword And Return Status   Grep and Verify file Content in results folder    ${loader_alias}    Please retry operation
-    Run Keyword If  ${passed} or ${check_2}  Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${loader_name}
 
 Verify Bulk Process
     [Arguments]     ${loader_Text_File_Content}
@@ -333,8 +329,8 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
         Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}       live
     END
     FOR    ${i}    IN RANGE    ${num_threads}
-        Verify Live loader trigger properly or not  ${loader_alias}    ${rdf_filename}    ${schema_filename}    live
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
+        Verify Live loader trigger properly or not  ${loader_alias}    ${rdf_filename}    ${schema_filename}    live
         Verify process to be stopped    ${loader_alias}
         Grep and Verify file Content in results folder    ${loader_alias}    N-Quads processed per second
     END
