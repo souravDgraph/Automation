@@ -40,7 +40,7 @@ Nightly | CI  |  Weekely  | Docker
   * Slash
   * Common
   * CustomTestRailListener
-* To setup-docker compose file goto utilities dir->  `python3 create_docker_yml.py -v master -c disabled`
+* To run dgraph using docker file goto test_suites/dgraph/docker dir->
   * Setup supports
     * 2node - ( 1 zero and 1 alpha )
     * 4node - ( 1 zero and 3 alpha )
