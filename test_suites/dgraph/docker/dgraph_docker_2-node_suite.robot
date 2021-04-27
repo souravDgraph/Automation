@@ -45,7 +45,7 @@ TC_04 Docker - Perform NFS backup and restore data
      Clear Backup Folders   true
      [Teardown]    NONE
 
-TC_02 Docker - Import a big dataset with the Bulk loader - Ubuntu or CentOS
+TC_05 Docker - Import a big dataset with the Bulk loader - Ubuntu or CentOS
     [Documentation]    Verify the logs for successful execution of big dataset in bulk loader
     ...    *Author*: Krishna, Sourav, Vivetha and Sankalan
     [Tags]    regression    C698  CI

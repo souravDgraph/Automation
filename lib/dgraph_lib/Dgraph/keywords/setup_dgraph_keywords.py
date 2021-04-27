@@ -109,7 +109,7 @@ class SetupDgraphKeywords:
         inc_command = self.dgraph_cli.build_increment_cli_command(is_latest_version, docker_string, alpha_offset)
         return inc_command
 
-    def get_acl_value(self):
+    def get_acl_value(self, is_docker=False):
         """
         Method to get ACL prop from config file.
         \n:return: true | false
@@ -117,10 +117,10 @@ class SetupDgraphKeywords:
         Example:
         | Get acl value |
         """
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker=is_docker)
         return self.dgraph_cli.get_acl()
 
-    def get_tls_value(self):
+    def get_tls_value(self, is_docker=False):
         """
         Method to get TLS prop from config file.
         \n:return: true | false
@@ -128,10 +128,10 @@ class SetupDgraphKeywords:
         Example:
         | Get tls value |
         """
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker)
         return self.dgraph_cli.get_tls()
 
-    def get_enc_value(self):
+    def get_enc_value(self, is_docker=False):
         """
         Method to get ENC prop from config file.
         \n:return: true | false
@@ -139,23 +139,23 @@ class SetupDgraphKeywords:
         Example:
         | Get enc value |
         """
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker)
         return self.dgraph_cli.get_enc()
 
-    def get_tls_certificates(self):
+    def get_tls_certificates(self, is_docker=False):
         """
         Method to get tls and mtls certificates depending on config file.
         :return: <list of certs for tls and mtls>
         """
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker)
         return self.dgraph_cli.get_tls_certs()
 
-    def get_enc_file(self):
+    def get_enc_file(self, is_docker=False):
         """
         Method to get the encryption file.
         :return:<encryption file>
         """
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker=is_docker)
         self.dgraph_cli.get_enc()
 
     @staticmethod

@@ -417,7 +417,7 @@ Execute Multiple Parallel Live Loader with rdf and schema parameters
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" and "num_threads" perform multiple parallel live loading.
     ...    rdf_filename, schema_filename , num_threads
     ${dir_path}=    normalize path    ${CURDIR}/..
-    ${value}=    Get Tls Value
+    ${value}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
     FOR    ${i}    IN RANGE    ${num_threads}
         Log    Running thread -- ${i}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
@@ -513,13 +513,13 @@ Perform a restore on backup latest versions
     ${type}     Get Value From Json     ${json_file}    $..type
     ${enc}     Get Value From Json     ${json_file}    $..encrypted
     Lists Should Be Equal   ${inc_list}     ${type}
-    ${tls_check}=    Get Tls Value
-    ${enc_check}=    Get Enc Value
+    ${tls_check}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
+    ${enc_check}=    Get Enc Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
     Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
+    ${dgraph_command}   Set Variable IF  '${docker_exe_string}'!='${EMPTY}'     ${docker_exe_string} dgraph     dgraph
+    ${cmd}  Catenate   ${dgraph_command}   restore -p ${backup_path} -l ${backup_path} -z localhost:5080
     ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${backup_path}
-    ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${backup_path}    -l    ${backup_path}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
-    ...    AND    Process Should Be Running    zero
-    ...    AND    Process Should Be Running    alpha
+    ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results     shell=True
     ...    AND    Process Should Be Running    restore
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
@@ -533,14 +533,14 @@ Perform a restore on backup by older dgraph versions
     ${root_dir}=    normalize path    ${CURDIR}/..
     ${path}=    Join Path    ${root_dir}/backup
     @{dirs_backup}=    List Directories In Directory    ${path}
+    ${dgraph_command}   Set Variable IF  '${docker_exe_string}'!='${EMPTY}'     ${docker_exe_string} dgraph     dgraph
+    ${cmd}  Catenate   ${dgraph_command}   restore -p ${backup_path} -l ${backup_path} -z localhost:5080
     FOR     ${i}  IN    ${dirs_backup}
         ${restore_dir}=    Set Variable    ${i}[0]
         ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
-        ${tls_check}=    Get Tls Value
+        ${tls_check}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
         ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${restore_dir}
-        ...    ELSE    Run Keywords    Start Process    dgraph    restore    -p    ${restore_dir}    -l    ${restore_dir}    -z    localhost:5080    alias=restore    stdout=restorebackup.txt    cwd=results
-        ...    AND    Process Should Be Running    zero
-        ...    AND    Process Should Be Running    alpha
+        ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results    shell=True
         ...    AND    Process Should Be Running    restore
         ...    AND    Wait For Process    restore
         ...    AND    Process Should Be Stopped    restore
