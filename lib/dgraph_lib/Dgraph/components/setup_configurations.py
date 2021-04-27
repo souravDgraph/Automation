@@ -12,7 +12,7 @@ class DgraphCLI:
     Class to generate the cli-commands based on configurations.
     """
 
-    def __init__(self):
+    def __init__(self, is_docker=None):
         # declaring variables
         self.cfg = {}
         self.acl = False
@@ -35,7 +35,11 @@ class DgraphCLI:
         DgraphCLI.read_config(self)
 
         # Checking for dgraph version for execution
-        self.store_dgraph_details()
+        if is_docker:
+            logger.debug("Execution triggered in docker")
+        else:
+            logger.debug("Execution triggered in local")
+            self.store_dgraph_details()
 
         logger.info("Dgraph Configurations are ready to load.")
 
@@ -564,12 +568,12 @@ class DgraphCLI:
         """
         logger.debug(f"Externally passed version check: {latest_version_check}")
 
-        # Checking the dgraph version locally..
-        is_latest_version = self.set_dgraph_version()
-
         # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
             is_latest_version = latest_version_check
+        else:
+            # Checking the dgraph version locally..
+            is_latest_version = self.set_dgraph_version()
 
         logger.debug(f"Is dgraph latest version? {is_latest_version}")
 
@@ -581,8 +585,6 @@ class DgraphCLI:
         docker_location = None
         if docker_string:
             cli_command = docker_string + cli_command
-            # self.zero_server_name = "zero"
-            # docker_location = "/Automation/"
 
         # Building command for live loader
         if loader_type == "live":
@@ -627,12 +629,13 @@ class DgraphCLI:
         """
         logger.debug(f"Externally passed version check: {latest_version_check}")
 
-        # Checking the dgraph version locally..
-        is_latest_version = self.set_dgraph_version()
-
         # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
+            # Docker or passed from external command
             is_latest_version = latest_version_check
+        else:
+            # Checking the dgraph version locally..
+            is_latest_version = self.set_dgraph_version()
 
         logger.debug(f"dgraph is latest version: {is_latest_version}")
 
@@ -642,7 +645,6 @@ class DgraphCLI:
         docker_location = None
         if docker_string:
             cli_command = docker_string + " dgraph"
-            # docker_location = "/Automation/"
         else:
             cli_command = "dgraph"
         cli_command = f"{cli_command} increment  --alpha {self.alpha_server_name}:{self.alpha_addr + alpha_offset} " \

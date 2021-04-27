@@ -24,27 +24,33 @@ class CustomRequestKeywords:
     Custom Request Keywords Class.
     """
 
-    def connect_request_server(self, url=None, offset=0):
+    def connect_request_server(self, url=None, offset=0, is_docker=None):
         """
         Method to connect to url to perform backup.
-        :param offset:
-        :param url:
+        :param is_docker: is execution on docker
+        :param offset: offset value for execution
+        :param url: url of the excution
         :return: the instance of RequestHandler object
 
         Example:
-        | connect_request_server | url=None
+        | connect_request_server | url=None | offset | is_docker
         | connect_request_server | url=https://localhost:8080
+        | connect_request_server | url=https://localhost:8080 | 100 | True
         """
         self.headers = constants.COMMON_HEADER
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker=is_docker)
         self.cert = None
+        if offset != 0:
+            self.dgraph_cli.offset = offset
+        else:
+            offset = self.dgraph_cli.offset
         if url is not None:
             self.req_handler = RequestHandler(url)
         else:
             if self.dgraph_cli.get_tls():
-                url = f"https://localhost:{8080 + self.dgraph_cli.offset}"
+                url = f"https://localhost:{8080 + offset}"
             else:
-                url = f"http://localhost:{8080+ self.dgraph_cli.offset}"
+                url = f"http://localhost:{8080+ offset}"
             self.req_handler = RequestHandler(url)
 
         logger.info("Requested URL: " + url)

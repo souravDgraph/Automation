@@ -13,6 +13,7 @@ ${docker_exe_string}
 ${zero_count}   0
 ${alpha_count}  0
 ${global_is_ludicrous_mode}
+${GLOBAL_IS_DOCKER_EXE}     ${FALSE}
 
 *** Keywords ***
 Start Dgraph
@@ -83,6 +84,7 @@ Start Dgraph n-node In Docker
         Set Suite Variable      ${alpha_count}    ${alpha_count}
     END
     Set Dgraph Version from docker      ${container_name}
+    Set Suite Variable  ${GLOBAL_IS_DOCKER_EXE}     ${TRUE}
 
 Start Dgraph 2-node In Docker with bulk data
     [Documentation]  Keyword to start dgraph with alpha pointing to bulk loader data in docker setup.
@@ -106,6 +108,7 @@ Start Dgraph 2-node In Docker with bulk data
         Set Suite Variable      ${alpha_count}    ${alpha_count}
     END
     Set Dgraph Version from docker      ${container_name}
+    Set Suite Variable  ${GLOBAL_IS_DOCKER_EXE}     ${TRUE}
 
 Start Dgraph 2-node In Docker
     [Documentation]  Keyword to start dgraph in 2-node docker setup.
@@ -129,6 +132,7 @@ Start Dgraph 2-node In Docker
         Set Suite Variable      ${alpha_count}    ${alpha_count}
     END
     Set Dgraph Version from docker      ${container_name}
+    Set Suite Variable  ${GLOBAL_IS_DOCKER_EXE}     ${TRUE}
 
 
 End Docker Execution
@@ -453,7 +457,7 @@ Create NFS Backup
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
     FOR    ${i}    IN RANGE    ${no_of_backups}
-        connect request server      
+        connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
         Verify file exists in a directory with parent folder name    ${backup_path}
@@ -464,7 +468,7 @@ Create NFS Backup
 
 Health Check for Backup Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Connect Request Server
+    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}
     Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
 
 Check if backup is completed
@@ -489,7 +493,7 @@ Export NFS data using admin endpoint
     ${root_path}=    normalize path    ${CURDIR}/..
     ${export_path}=    Join Path    ${root_path}/export
     Run Keyword If    '${is_clear_folder}' == 'true'    clear all the folder in a directory    ${export_path}
-    connect request server      
+    connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}
     ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
     log    ${res.text}
     Verify file exists in a directory with parent folder name    ${export_path}
@@ -498,7 +502,7 @@ Export NFS data using admin endpoint
 Perform a restore on backup latest versions
     [Arguments]  ${increment_size}
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
-    Connect request server
+    Connect request server  is_docker=${GLOBAL_IS_DOCKER_EXE}
     @{inc_list}     Create List     full
     FOR    ${i}    IN RANGE    ${increment_size}
         Append To List  ${inc_list}     incremental
@@ -525,7 +529,7 @@ Perform a restore on backup latest versions
 
 Perform a restore on backup by older dgraph versions
     [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
-    Connect request server
+    Connect request server  is_docker=${GLOBAL_IS_DOCKER_EXE}
     ${root_dir}=    normalize path    ${CURDIR}/..
     ${path}=    Join Path    ${root_dir}/backup
     @{dirs_backup}=    List Directories In Directory    ${path}
@@ -548,7 +552,7 @@ Perform a restore on backup by older dgraph versions
 
 Health Check for Restore Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Wait Until Keyword Succeeds    20x    30 sec       Connect Request Server
+    Wait Until Keyword Succeeds    20x    30 sec       Connect Request Server   is_docker=${GLOBAL_IS_DOCKER_EXE}
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed
@@ -708,14 +712,14 @@ Monitor health and state check
 
 Monitor health check
     [Documentation]   Keyword to check the health of the connection.
-    connect request server
+    connect request server  is_docker=${GLOBAL_IS_DOCKER_EXE}
     ${response}=    Health status Check    /health
     log     ${response}
     Run Keyword If      "${response}" != "healthy"      Fail    Health check is un-healthy
 
 Monitor State Check
     [Documentation]  Keyword to check the state of the process.
-    connect request server      
+    connect request server    is_docker=${GLOBAL_IS_DOCKER_EXE}
     ${state_resposne}=  State Check     /state
     ${leader}=    Get Value From Json   ${state_resposne}   $..members..leader
     ${am_dead}=    Get Value From Json   ${state_resposne}   $..members..amDead

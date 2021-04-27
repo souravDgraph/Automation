@@ -63,12 +63,13 @@ class SetupDgraphKeywords:
         :param dgraph_version: version of dgraph for docker image
         :return: <list of services for alpha and zero>
         """
-        self.dgraph_cli = DgraphCLI()
-        alpha_zero_docker_cli_command_list = self.dgraph_cli.build_docker_zero_and_alpha_cli_command(zero_count=zero_count,
-                                                                                               alpha_count=alpha_count,
-                                                                                               bulk_path=bulk_path,
-                                                                                               container_name=container_name,
-                                                                                               dgraph_version=dgraph_version)
+        self.dgraph_cli = DgraphCLI(is_docker=True)
+        alpha_zero_docker_cli_command_list = self.dgraph_cli.build_docker_zero_and_alpha_cli_command(
+            zero_count=zero_count,
+            alpha_count=alpha_count,
+            bulk_path=bulk_path,
+            container_name=container_name,
+            dgraph_version=dgraph_version)
         return alpha_zero_docker_cli_command_list
 
     def get_dgraph_loader_command(self, rdf_file, schema_file, loader_type, is_latest_version=None,
@@ -187,5 +188,5 @@ class SetupDgraphKeywords:
         """
         Method to set DgaphCLI to docker mode.
         """
-        self.dgraph_cli = DgraphCLI()
+        self.dgraph_cli = DgraphCLI(is_docker=True)
         return self.dgraph_cli.set_dgraph_version(version, branch)
