@@ -155,14 +155,71 @@
 
                 chart.render();
             }
+
+            function getCombinedChartFromCSV(csvMaster, csv21, chartName, yAxisTitle) {
+                var chart = new CanvasJS.Chart(chartName, {
+                    zoomEnabled: true,
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: chartName,
+                    },
+                    axisX: {
+                        title: "Date"
+                    },
+                    axisY: {
+                        title: yAxisTitle
+                    },
+                    toolTip: {
+                        shared: false
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        fontSize: 16
+                    },
+                    data: [{
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader Master",
+                        dataPoints: getLiveLoaderDataFromCSV(csvMaster, yAxisTitle)
+                    }, {
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader Master",
+                        dataPoints: getBulkLoaderDataFromCSV(csvMaster, yAxisTitle)
+                    }, {
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader 21.03",
+                        dataPoints: getLiveLoaderDataFromCSV(csv21, yAxisTitle)
+                    }, {
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader 21.03",
+                        dataPoints: getBulkLoaderDataFromCSV(csv21, yAxisTitle)
+                    }]
+                });
+
+                chart.render();
+            }
             $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(minutes)") });
             $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
             $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(minutes)") });
             $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
-
+            $.get("dataPointsMaster_21mil.csv", function (data1) { $.get("dataPoints21_03_21mil.csv", function (data2) { getCombinedChartFromCSV(data1, data2, "Combined_21mil", "Time(minutes)") }) });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data1) { $.get("dataPoints21_03_stackoverflow.csv", function (data2) { getCombinedChartFromCSV(data1, data2, "Combined_stackoverflow", "Time(minutes)") }) });
         }
     </script>
-
 </head>
 
 <body>
@@ -172,8 +229,10 @@
     <p> These benchmarks are executed on dgus machines.</p>
     <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
     <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Combined_21mil" style="width: 90%; height: 300px;display: inline-block;padding-left:10px;"></div>
     <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
     <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Combined_stackoverflow" style="width: 90%; height: 300px;display: inline-block;padding-left:10px;"></div>
 </body>
 
 </html>
