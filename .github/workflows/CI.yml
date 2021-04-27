@@ -62,14 +62,8 @@ jobs:
           cd ${{ github.workspace }}/Automation_workspace/utilities
           ls -alh
           python3 env_setup.py -l All -c enabled -o 20
-        
-      - name: Configuring docker-compose file
-        run: |
-          echo ${{ github.workspace }}
-          cd ${{ github.workspace }}/Automation_workspace/utilities
-          ls -alh
-          python3 create_docker_yml.py -v master -c enabled
-        
+      
+      
       # Download Dgraph Repo
       - name: Check out Dgraph repo
         uses: actions/checkout@master
@@ -93,6 +87,7 @@ jobs:
          run: |
            echo ${{ github.workspace }}
            cd ${{ github.workspace }}/Automation_workspace
+           dgraph version
            cat conf/dgraph/conf_dgraph.json
          
       - name: Run Robot Framework Testcases
