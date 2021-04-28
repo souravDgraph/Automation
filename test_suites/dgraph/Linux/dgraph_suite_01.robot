@@ -26,8 +26,7 @@ TC_02 Perform NFS backup and restore data
      [Tags]    regression   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup      1
-     log        ${is_latest_global_check}
-     Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    0
+     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    0
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   true
      [Teardown]    NONE
@@ -51,10 +50,9 @@ TC_05 Perform Increment backup and restore data
      [Tags]    regression   WEEKLY
      Clear Backup Folders   true
      Create NFS Backup    2
-     Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    1
+     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   true
-     [Teardown]    NONE
 
 TC_06 Perform parallel live loads.
      [Documentation]    Perform live load data.
