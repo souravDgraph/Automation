@@ -312,7 +312,7 @@ Execute Increment Command
         ${alpha_offset}    Set Variable If     ${i}>=1     ${alpha_offset}      0
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
         ${inc_command}  Get dgraph increment command    is_latest_version=${LATEST_VERSION_CHECK}   alpha_offset=${alpha_offset}
-        ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results/inc_logs    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
+        ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
         Wait For Process    ${inc_alias}    timeout=20 s
     END
     FOR    ${i}    IN RANGE    ${num_threads}
@@ -320,8 +320,7 @@ Execute Increment Command
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
         Terminate Process   ${inc_alias}
         Sleep   5s
-        ${grep_file}=    Grep File    ${dir_path}/results/inc_logs/${inc_alias}.txt    Total
-        Should Contain    ${grep_file}    Total
+        Grep and Verify file Content in results folder  ${inc_alias}  Total
     END
 
 Create NFS Backup

@@ -1,7 +1,7 @@
 """
 Custom Request Library for Dgraph
 """
-__all__ = ['CustomRequestKeywords']
+__all__ = ["CustomRequestKeywords"]
 __author__ = "Krishna Kaushik"
 __version__ = "1.0"
 __maintainer__ = "Krishna Kaushik"
@@ -24,12 +24,13 @@ class CustomRequestKeywords:
     Custom Request Keywords Class.
     """
 
-    def connect_request_server(self, url=None, offset=0, is_docker=None):
+    def connect_request_server(self, url=None, port=None, offset=0, is_docker=None):
         """
         Method to connect to url to perform backup.
         :param is_docker: is execution on docker
         :param offset: offset value for execution
         :param url: url of the excution
+        :param port: port of the server
         :return: the instance of RequestHandler object
 
         Example:
@@ -40,6 +41,7 @@ class CustomRequestKeywords:
         self.headers = constants.COMMON_HEADER
         self.dgraph_cli = DgraphCLI(is_docker=is_docker)
         self.cert = None
+        alpha_port = 8080
         if offset != 0:
             self.dgraph_cli.offset = offset
         else:
@@ -47,10 +49,14 @@ class CustomRequestKeywords:
         if url is not None:
             self.req_handler = RequestHandler(url)
         else:
-            if self.dgraph_cli.get_tls():
-                url = f"https://localhost:{8080 + offset}"
+            if port:
+                alpha_port = port
             else:
-                url = f"http://localhost:{8080+ offset}"
+                alpha_port += offset
+            if self.dgraph_cli.get_tls():
+                url = f"https://localhost:{alpha_port}"
+            else:
+                url = f"http://localhost:{alpha_port}"
             self.req_handler = RequestHandler(url)
 
         logger.info("Requested URL: " + url)
@@ -59,7 +65,7 @@ class CustomRequestKeywords:
             self.cert = self.get_certs()
             logger.info("TLS is configured.")
         if self.dgraph_cli.get_acl():
-            self.headers = self.login('/admin')
+            self.headers = self.login("/admin")
 
     def login(self, appender):
         """
@@ -72,12 +78,17 @@ class CustomRequestKeywords:
         """
         query = constants.LOGIN_BODY
         variables = None
-        login_response = self.req_handler.post(appender=appender, headers=self.headers, query=query,
-                                               variables=variables, cert=self.cert)
-        jwt_token = login_response.json()['data']['login']['response']['accessJWT']
+        login_response = self.req_handler.post(
+            appender=appender,
+            headers=self.headers,
+            query=query,
+            variables=variables,
+            cert=self.cert,
+        )
+        jwt_token = login_response.json()["data"]["login"]["response"]["accessJWT"]
         return_header = {
-            'X-Dgraph-AccessToken': jwt_token,
-            'Content-Type': 'application/json'
+            "X-Dgraph-AccessToken": jwt_token,
+            "Content-Type": "application/json",
         }
         logger.info("login Successful")
         return return_header
@@ -106,10 +117,14 @@ class CustomRequestKeywords:
         headers = self.headers
         response = None
         try:
-            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+            response = self.req_handler.get(
+                appender=appender, headers=headers, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
-        status = response.json()[0]['status']
+            raise Exception(
+                f"Something went wrong with the data params.. {json.dumps(response.json())}"
+            ) from err
+        status = response.json()[0]["status"]
         return status
 
     def health_check(self, appender):
@@ -126,9 +141,13 @@ class CustomRequestKeywords:
         headers = self.headers
         response = None
         try:
-            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+            response = self.req_handler.get(
+                appender=appender, headers=headers, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+            raise Exception(
+                f"Something went wrong with the data params.. {json.dumps(response.json())}"
+            ) from err
         return response.json()
 
     def state_check(self, appender):
@@ -145,9 +164,13 @@ class CustomRequestKeywords:
         headers = self.headers
         response = None
         try:
-            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+            response = self.req_handler.get(
+                appender=appender, headers=headers, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+            raise Exception(
+                f"Something went wrong with the data params.. {json.dumps(response.json())}"
+            ) from err
         state = response.json()
         return state
 
@@ -165,9 +188,13 @@ class CustomRequestKeywords:
         headers = self.headers
         response = None
         try:
-            response = self.req_handler.get(appender=appender, headers=headers, cert=cert)
+            response = self.req_handler.get(
+                appender=appender, headers=headers, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+            raise Exception(
+                f"Something went wrong with the data params.. {json.dumps(response.json())}"
+            ) from err
         state = response.json()
         return state
 
@@ -184,12 +211,16 @@ class CustomRequestKeywords:
         """
         cert = self.cert
         headers = self.headers
-        parameters = {'id': alpha_id, 'group': group}
+        parameters = {"id": alpha_id, "group": group}
         response = None
         try:
-            response = self.req_handler.get(appender=appender, headers=headers, parameters=parameters, cert=cert)
+            response = self.req_handler.get(
+                appender=appender, headers=headers, parameters=parameters, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the data params.. {json.dumps(response.json())}") from err
+            raise Exception(
+                f"Something went wrong with the data params.. {json.dumps(response.json())}"
+            ) from err
         return response
 
     def backup_using_admin(self, path):
@@ -206,17 +237,24 @@ class CustomRequestKeywords:
         cert = self.cert
         headers = self.headers
         query = constants.BACKUP_QUERY
-        variables = {'path': path}
+        variables = {"path": path}
         response = None
         appender = "/admin"
         try:
-            response = self.req_handler.post(appender=appender, headers=headers, query=query,
-                                             variables=variables, cert=cert)
+            response = self.req_handler.post(
+                appender=appender,
+                headers=headers,
+                query=query,
+                variables=variables,
+                cert=cert,
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the backup request.. {json.dumps(response.json())}") from err
+            raise Exception(
+                f"Something went wrong with the backup request.. {json.dumps(response.json())}"
+            ) from err
         # assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
         # assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
-        logger.info('Backup successfully initiated')
+        logger.info("Backup successfully initiated")
         return response.json()
 
     def restore_using_admin(self, path):
@@ -234,23 +272,29 @@ class CustomRequestKeywords:
         headers = self.headers
         query = constants.RESTORE_QUERY
         if self.dgraph_cli.enc:
-            variables = {
-                'path': path,
-                '$enc_file': self.dgraph_cli.get_enc_file()
-            }
+            variables = {"path": path, "$enc_file": self.dgraph_cli.get_enc_file()}
         else:
-            variables = {'path': path}
+            variables = {"path": path}
         response = None
         appender = "/admin"
 
         try:
-            response = self.req_handler.post(appender=appender, headers=headers, query=query,
-                                             variables=variables, cert=cert)
+            response = self.req_handler.post(
+                appender=appender,
+                headers=headers,
+                query=query,
+                variables=variables,
+                cert=cert,
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the restore request.. {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['restore']['code'], 'Success')
-        assert_equal(response.json()['data']['restore']['message'], 'Restore operation started.')
-        logger.info('Restore successfully started')
+            raise Exception(
+                f"Something went wrong with the restore request.. {json.dumps(response.json())}"
+            ) from err
+        assert_equal(response.json()["data"]["restore"]["code"], "Success")
+        assert_equal(
+            response.json()["data"]["restore"]["message"], "Restore operation started."
+        )
+        logger.info("Restore successfully started")
         return response
 
     def backup_using_admin_backup(self, path):
@@ -266,16 +310,20 @@ class CustomRequestKeywords:
         """
         cert = self.cert
         headers = self.headers
-        payload = {'destination': path}
+        payload = {"destination": path}
         response = None
         appender = "/admin/backup"
         try:
-            response = self.req_handler.post_request(appender=appender, headers=headers, body=payload, cert=cert)
+            response = self.req_handler.post_request(
+                appender=appender, headers=headers, body=payload, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the backup request... {json.dumps(response.json())}") from err
+            raise Exception(
+                f"Something went wrong with the backup request... {json.dumps(response.json())}"
+            ) from err
         # assert_equal(response.json()['data']['backup']['response']['code'], 'Success')
         # assert_equal(response.json()['data']['backup']['response']['message'], 'Backup completed.')
-        logger.info('Backup successfully completed')
+        logger.info("Backup successfully completed")
         return response.json()
 
     def restore_using_admin_backup(self, path):
@@ -291,16 +339,22 @@ class CustomRequestKeywords:
         """
         cert = self.cert
         headers = self.headers
-        payload = {'location': path}
+        payload = {"location": path}
         response = None
         appender = "/admin/backup"
         try:
-            response = self.req_handler.post_request(appender=appender, headers=headers, body=payload, cert=cert)
+            response = self.req_handler.post_request(
+                appender=appender, headers=headers, body=payload, cert=cert
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the restore request... {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['restore']['code'], 'Success')
-        assert_equal(response.json()['data']['restore']['message'], 'Restore operation started.')
-        logger.info('Restore successfully started')
+            raise Exception(
+                f"Something went wrong with the restore request... {json.dumps(response.json())}"
+            ) from err
+        assert_equal(response.json()["data"]["restore"]["code"], "Success")
+        assert_equal(
+            response.json()["data"]["restore"]["message"], "Restore operation started."
+        )
+        logger.info("Restore successfully started")
         return response
 
     def export_data_admin(self, appender, data_format):
@@ -316,16 +370,26 @@ class CustomRequestKeywords:
         cert = self.cert
         headers = self.headers
         query = constants.EXPORT_QUERY
-        variables = {'data_format': data_format}
+        variables = {"data_format": data_format}
         response = None
         try:
-            response = self.req_handler.post(appender=appender, headers=headers, query=query,
-                                             variables=variables, cert=cert)
+            response = self.req_handler.post(
+                appender=appender,
+                headers=headers,
+                query=query,
+                variables=variables,
+                cert=cert,
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the export request... {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['export']['response']['code'], 'Success')
-        assert_equal(response.json()['data']['export']['response']['message'], 'Export completed.')
-        logger.info('Export successfully completed')
+            raise Exception(
+                f"Something went wrong with the export request... {json.dumps(response.json())}"
+            ) from err
+        assert_equal(response.json()["data"]["export"]["response"]["code"], "Success")
+        assert_equal(
+            response.json()["data"]["export"]["response"]["message"],
+            "Export completed.",
+        )
+        logger.info("Export successfully completed")
         return response
 
     def export_nfs_data_admin(self, data_format, destination, appender="/admin"):
@@ -342,18 +406,24 @@ class CustomRequestKeywords:
         cert = self.cert
         headers = self.headers
         query = constants.EXPORT_NFS_QUERY
-        variables = {
-            'data_format': data_format,
-            'destination': destination
-        }
+        variables = {"data_format": data_format, "destination": destination}
         response = None
         try:
-            response = self.req_handler.post(appender=appender, headers=headers, query=query,
-                                             variables=variables, cert=cert)
+            response = self.req_handler.post(
+                appender=appender,
+                headers=headers,
+                query=query,
+                variables=variables,
+                cert=cert,
+            )
         except Exception as err:
-            raise Exception(f"Something went wrong with the export request... {json.dumps(response.json())}") from err
-        assert_equal(response.json()['data']['export']['response']['code'], 'Success')
-        assert_equal(response.json()['data']['export']['response']['message'], 'Export completed.')
-        logger.info('Export successfully completed')
+            raise Exception(
+                f"Something went wrong with the export request... {json.dumps(response.json())}"
+            ) from err
+        assert_equal(response.json()["data"]["export"]["response"]["code"], "Success")
+        assert_equal(
+            response.json()["data"]["export"]["response"]["message"],
+            "Export completed.",
+        )
+        logger.info("Export successfully completed")
         return response
-
