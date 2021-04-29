@@ -133,6 +133,7 @@ results/alpha_zero_logs/**
 results/inc_logs/**
 !results/inc_logs/.gitkeep
 !results/alpha_zero_logs/.keep
+!results/compose
 
 # backup folder
 backup/*
