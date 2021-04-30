@@ -504,17 +504,17 @@ Clear all the folder in a directory
 Create Backup Folder
     [Documentation]     Keyword to create backup dir for execution
     ${datetime} =	Get Current Date      result_format=%d-%m-%Y-%H-%M-%S
-    Set Suite Variable  ${GLOBAL_BACKUP_DIR_FOLDER}     results/exe_logs_${datetime}
+    Run Keyword If    '${GLOBAL_BACKUP_DIR_FOLDER}'=='${EMPTY}'    Set Suite Variable  ${GLOBAL_BACKUP_DIR_FOLDER}     exe_logs_${datetime}
 
 Backup alpha and zero logs
     [Documentation]     Kewyword to backup all the logs
-    Move Files      results/*.txt	   ${GLOBAL_BACKUP_DIR_FOLDER}
+    Move Files      results/*.txt	   results/${GLOBAL_BACKUP_DIR_FOLDER}
 
 Backup Yaml File
     [Documentation]     Kewyword to backup yaml file
-    ${passed}   Run Keyword and Return Status   File Should Exist      results/docker_compose.yml
+    ${passed}   Run Keyword and Return Status   File Should Exist      results/docker-compose.yml
     IF  ${passed}
-        Move File      results/docker-compose.yml	   ${GLOBAL_BACKUP_DIR_FOLDER}/docker-compose_${GLOBAL_YAML_COUNTER}.yml
+        Move File      results/docker-compose.yml	   results/${GLOBAL_BACKUP_DIR_FOLDER}/docker-compose_${GLOBAL_YAML_COUNTER}.yml
         ${GLOBAL_YAML_COUNTER}  Evaluate    ${GLOBAL_YAML_COUNTER} + 1
         Set Suite Variable      ${GLOBAL_YAML_COUNTER}      ${GLOBAL_YAML_COUNTER}
     END

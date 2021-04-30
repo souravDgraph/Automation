@@ -245,7 +245,7 @@ class DgraphCLI:
         logger.debug("Appending encryption..")
         enc_path = self.curr_path + self.cfg["enc"]["location"]
         if is_latest:
-            enc = f' --encryption "key-file={enc_path}" '
+            enc = f' --encryption "key-file={enc_path};" '
         else:
             enc = f" --encryption_key_file {enc_path} "
 
@@ -557,22 +557,12 @@ class DgraphCLI:
             extra_zero_flags.append(f"{tls_zero_str}")
 
         alpha_flags = ""
-        i = 0
         for flag in extra_alpha_flags:
-            if i > 0:
-                alpha_flags += f";{flag}"
-            else:
-                alpha_flags += f"{flag}"
-            i += 1
+            alpha_flags += f" {flag}"
 
         zero_flags = ""
-        i = 0
         for flag in extra_zero_flags:
-            if i > 0:
-                zero_flags += f";{flag}"
-            else:
-                zero_flags += f"{flag}"
-            i += 1
+            zero_flags += f"{flag}"
 
         appenders += (
             f" --extra_alpha_flags='{alpha_flags}'  --extra_zero_flags='{zero_flags}'"
