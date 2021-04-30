@@ -12,11 +12,10 @@ ${rdf_file}        1million.rdf.gz
 ${schema_file}     1million.schema
 ${alpha-node}      1
 ${zero-node}      1
-
+${dgraph_docker_version}      master
 # alpha container to interact and perform all the dgraph operations on
 ${container_name}   alpha1
 
-${dgraph_docker_version}   master
 
 *** Test Cases ***
 TC_01 Docker - Perform parallel Live and Bulk Load.

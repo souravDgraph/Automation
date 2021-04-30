@@ -11,14 +11,16 @@ Library           DateTime
 ${DGRAPH_LATEST_VERSION_CHECK}
 ${DOCKER_STRING}
 ${DOCKER_COMPOSE_UP_COUNT}   0
-${ALPHA_COUNT}  0
 ${GLOBAL_IS_DOCKER_EXE}     ${FALSE}
+${GLOBAL_BACKUP_DIR_FOLDER}
+${GLOBAL_YAML_COUNTER}  1
 
 *** Keywords ***
 
 Start Dgraph n-node In Docker
     [Documentation]  Keyword to start dgraph in docker setup.
     [Arguments]     ${no_of_alphas}     ${no_of_zeros}    ${dgraph_version}     ${container_name}
+    Create Backup Folder
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
     ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=${no_of_zeros}   alpha_count=${no_of_alphas}
@@ -31,10 +33,11 @@ Start Dgraph n-node In Docker
 Start Dgraph 2-node In Docker with bulk data
     [Documentation]  Keyword to start dgraph with alpha pointing to bulk loader data in docker setup.
     [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}
+    Create Backup Folder
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
     ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=1
-    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=results    shell=True
+    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=utilities    shell=True
     ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up_${DOCKER_COMPOSE_UP_COUNT}.txt    stderr=docker_compose_up_err_${DOCKER_COMPOSE_UP_COUNT}.txt    cwd=results    shell=True
     Wait For Process    timeout=30 s    on_timeout=continue
     Set Dgraph Version from docker      ${container_name}
@@ -65,8 +68,9 @@ End Docker Execution
 Terminate Docker Execution and Create Backup of Dgraph Execution
     [Arguments]     ${container_name}      ${is_clear_folder}
     Run Keyword And Continue On Failure    END DOCKER EXECUTION     ${container_name}
-    ${backup_folder_name}      Backup alpha and zero logs
-    Backup directories created while execution      ${backup_folder_name}
+    Backup alpha and zero logs
+    Backup Yaml File
+    Backup directories created while execution
     Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
 
 Monitor health and state check
@@ -174,8 +178,9 @@ Docker Verify Bulk Process
     Should Contain    ${loader_Text_File_Content}    Total:
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
     End Docker Execution  ${container_name}
-    clean up a perticular folders  zero1
-    clean up a perticular folders  alpha1
+    @{dirs}     Create List     alpha1  zero1
+    Backup Custom Directories Created While Execution  @{dirs}  
+    Backup Yaml File
     Start Dgraph 2-node In Docker with bulk data    ${dgraph_version}     ${container_name}       ${dir_path}/results/out/0/p
     ${compose_file_number}   Evaluate    ${DOCKER_COMPOSE_UP_COUNT} - 1 
     Verify file Content in results folder  docker_compose_up_${compose_file_number}  ${dir_path}/results/out/0/p
@@ -438,17 +443,6 @@ Verify alpha and zero contents in results folder
         Should Contain Any    ${file_context}    @{context}
     END
 
-Verify alpha and zero contents in sepcific folder
-    [Arguments]    ${file_name}    ${folder_name}   @{context}
-    [Documentation]    Keyword for checking content in .txt files generated in results folder
-    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
-    ${dir_path}=    normalize path    ${CURDIR}/..
-    ${count}=   Set Variable If     '${file_name}' == 'zero'   ${ZERO_COUNT}   ${ALPHA_COUNT}
-    FOR     ${i}  IN RANGE   ${count}
-        ${file_context}=    Get File    ${dir_path}/results/${folder_name}/${file_name}_${i}.txt
-        Should Contain Any    ${file_context}    @{context}
-    END
-
 Verify file Content in results folder
     [Arguments]    ${file_name}    @{context}
     [Documentation]    Keyword for checking content in .txt files generated in results folder
@@ -507,17 +501,36 @@ Clear all the folder in a directory
     ${list_size}    Get Length    ${dirs}
     Run Keyword If    ${list_size}>0    Empty Directory    ${path}
 
+Create Backup Folder
+    [Documentation]     Keyword to create backup dir for execution
+    ${datetime} =	Get Current Date      result_format=%d-%m-%Y-%H-%M-%S
+    Set Suite Variable  ${GLOBAL_BACKUP_DIR_FOLDER}     results/exe_logs_${datetime}
+
 Backup alpha and zero logs
     [Documentation]     Kewyword to backup all the logs
-    ${datetime} =	Get Current Date      result_format=%d-%m-%Y-%H-%M-%S
-    Move Files      results/*.txt	   results/exe_logs_${datetime}
-    [Return]  exe_logs_${datetime}
+    Move Files      results/*.txt	   ${GLOBAL_BACKUP_DIR_FOLDER}
+
+Backup Yaml File
+    [Documentation]     Kewyword to backup yaml file
+    ${passed}   Run Keyword and Return Status   File Should Exist      results/docker_compose.yml
+    IF  ${passed}
+        Move File      results/docker-compose.yml	   ${GLOBAL_BACKUP_DIR_FOLDER}/docker-compose_${GLOBAL_YAML_COUNTER}.yml
+        ${GLOBAL_YAML_COUNTER}  Evaluate    ${GLOBAL_YAML_COUNTER} + 1
+        Set Suite Variable      ${GLOBAL_YAML_COUNTER}      ${GLOBAL_YAML_COUNTER}
+    END
 
 Backup directories created while execution
-    [Arguments]       ${direc_name}
     [Documentation]     Keyword to backup execution time directories
     @{dirs}     Create List     alpha1  zero1  out  alpha   tmp
     FOR  ${i}  IN    @{dirs}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
-        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${direc_name}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}
+    END
+
+Backup Custom Directories Created While Execution
+    [Arguments]       @{dirs_to_backup}  
+    [Documentation]     Keyword to backup execution time directories
+    FOR  ${i}  IN    @{dirs_to_backup}
+        ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}
     END

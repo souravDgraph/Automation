@@ -245,7 +245,7 @@ class DgraphCLI:
         logger.debug("Appending encryption..")
         enc_path = self.curr_path + self.cfg["enc"]["location"]
         if is_latest:
-            enc = f' --encryption "key-file={enc_path};" '
+            enc = f' --encryption "key-file={enc_path}" '
         else:
             enc = f" --encryption_key_file {enc_path} "
 
@@ -352,11 +352,12 @@ class DgraphCLI:
         :return:
         """
         p = Popen(
-            [docker_string + " dgraph", "version"],
+            f"{docker_string} dgraph version",
             stdin=PIPE,
             stdout=PIPE,
             stderr=PIPE,
             encoding="utf-8",
+            shell=True,
         )
         output, err = p.communicate()
         output = output.split("\n")
@@ -414,11 +415,11 @@ class DgraphCLI:
         else:
             return False
 
-    def set_dgraph_version(self, version=None, branch=None):
+    def set_dgraph_version(self, version=None, branch=None, is_docker=None):
         """
         Method to check and set dgraph version
         """
-        if version is None:
+        if version is None and is_docker is None:
             logger.info("dgraph local setup is executed.")
             branch = self.get_dgraph_version_details("Branch")
             if "release" in branch:
@@ -501,8 +502,13 @@ class DgraphCLI:
 
         :return:
         """
-        is_latest_version = self.set_dgraph_version(branch=dgraph_version)
+        logger.debug(dgraph_version)
+        is_latest_version = self.set_dgraph_version(
+            branch=dgraph_version, is_docker=True
+        )
         appenders = ""
+        extra_alpha_flags = []
+        extra_zero_flags = []
         alpha_mounts = []
         zero_mounts = []
         zero_mounts.append(f"{self.curr_path}results:{self.curr_path}results")
@@ -522,13 +528,13 @@ class DgraphCLI:
                 f"{self.curr_path}conf/dgraph/acl/hmac_secret_file:{self.curr_path}conf/dgraph/acl/hmac_secret_file"
             )
         if self.enc:
-            appenders += " --encryption "
+            extra_alpha_flags.append(
+                str(self.get_encryption_command(is_latest_version)).strip()
+            )
             alpha_mounts.append(
                 f"{self.curr_path}conf/dgraph/encryption:{self.curr_path}conf/dgraph/encryption"
             )
 
-        extra_alpha_flags = []
-        extra_zero_flags = []
         if bulk_path:
             extra_alpha_flags.append(f"-p={bulk_path}")
 

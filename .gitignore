@@ -133,7 +133,6 @@ results/alpha_zero_logs/**
 results/inc_logs/**
 !results/inc_logs/.gitkeep
 !results/alpha_zero_logs/.keep
-!results/compose
 
 # backup folder
 backup/*
@@ -142,6 +141,9 @@ backup/*
 # export folder
 export/**
 !export/.gitkeep
+
+# utilities folder
+utilities/*.txt
 
 #other files
 .DS_Store
