@@ -524,7 +524,7 @@ Backup directories created while execution
     @{dirs}     Create List     alpha1  zero1  out  alpha   tmp
     FOR  ${i}  IN    @{dirs}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
-        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}/${i}_${DOCKER_COMPOSE_UP_COUNT}
     END
 
 Backup Custom Directories Created While Execution
@@ -532,5 +532,5 @@ Backup Custom Directories Created While Execution
     [Documentation]     Keyword to backup execution time directories
     FOR  ${i}  IN    @{dirs_to_backup}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
-        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}/${i}_${DOCKER_COMPOSE_UP_COUNT}
     END
