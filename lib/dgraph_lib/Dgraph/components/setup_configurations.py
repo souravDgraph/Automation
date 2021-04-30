@@ -449,7 +449,7 @@ class DgraphCLI:
                 else:
                     branch = self.check_if_latest_branch(branch)
                     is_latest_branch = True if branch else False
-            elif version:
+            if version:
                 is_latest_version = True if self.check_version(version) else False
 
             is_latest = True if is_latest_version or is_latest_branch else False
