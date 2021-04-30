@@ -177,6 +177,7 @@ Docker Verify Bulk Process
     clean up a perticular folders  zero1
     clean up a perticular folders  alpha1
     Start Dgraph 2-node In Docker with bulk data    ${dgraph_version}     ${container_name}       ${dir_path}/results/out/0/p
+    End Docker Execution  ${container_name}
     Clean up bulk folders
 
 
