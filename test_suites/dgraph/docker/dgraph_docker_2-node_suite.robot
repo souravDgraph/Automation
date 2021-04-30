@@ -58,15 +58,26 @@ TC_06 Docker - Import a big dataset with the Bulk loader - Ubuntu or CentOS
     ...    *Author*: Krishna, Sourav, Vivetha and Sankalan
     [Tags]    regression    C698  CI
     Docker Execute Bulk Loader for Docker with rdf and schema parameters    ${dgraph_docker_version}   ${container_name}      ${rdf_file}    ${schema_file}     zero1
+    [Teardown]    NONE
 
-TC_07 Docker - Perform parallel live loads.
+TC_07 Docker - Perform Increment backup and restore on bulk data
+     [Documentation]    Perform NFS backup and restore data.
+     ...    *Author*: Krishna and Sankalan
+     [Tags]    regression   C702    C700   WEEKLY
+     Clear Backup Folders   true
+     Docker Create NFS Backup      3    alpha1
+     Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    0      alpha1      zero1
+     ...    ELSE    Docker Perform a restore on backup by older dgraph versions     alpha1      zero1
+     Clear Backup Folders   true
+
+TC_08 Docker - Perform parallel live loads.
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav, Krishna
      [Tags]    regression   WEEKLY  CI
      Docker Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2    zero1   alpha1
      [Teardown]    NONE
 
-TC_08 Docker - Perform Increment backup and restore data
+TC_09 Docker - Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav, Krishna
      [Tags]    regression   WEEKLY

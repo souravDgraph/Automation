@@ -177,9 +177,8 @@ Docker Verify Bulk Process
     clean up a perticular folders  zero1
     clean up a perticular folders  alpha1
     Start Dgraph 2-node In Docker with bulk data    ${dgraph_version}     ${container_name}       ${dir_path}/results/out/0/p
-    End Docker Execution  ${container_name}
-    Clean up bulk folders
-
+    ${compose_file_number}   Evaluate    ${DOCKER_COMPOSE_UP_COUNT} - 1 
+    Verify file Content in results folder  docker_compose_up_${compose_file_number}  ${dir_path}/results/out/0/p
 
 Docker Execute Parallel Loader with rdf and schema parameters
     [Arguments]    ${dgraph_version}   ${container_name}      ${rdf_filename}     ${schema_filename}    ${zero_host}    ${alpha_host}
