@@ -432,6 +432,8 @@ class DgraphCLI:
         else:
             logger.debug("Dgraph docker setup is executed.")
             is_latest = False
+            is_latest_version = False
+            is_latest_branch = False
             if branch:
                 check_version = None
                 if "release" in branch:
