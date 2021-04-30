@@ -66,7 +66,7 @@ TC_07 Docker - Perform Increment backup and restore on bulk data
      [Tags]    regression   C702    C700   WEEKLY
      Clear Backup Folders   true
      Docker Create NFS Backup      3    alpha1
-     Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    0      alpha1      zero1
+     Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    2      alpha1      zero1
      ...    ELSE    Docker Perform a restore on backup by older dgraph versions     alpha1      zero1
      Clear Backup Folders   true
 
