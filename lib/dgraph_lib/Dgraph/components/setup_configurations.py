@@ -346,6 +346,27 @@ class DgraphCLI:
                 self.details[key] = value
         logger.debug(self.details)
 
+    def store_dgraph_details_docker(self, docker_string):
+        """
+        Method to store dgraph version details.
+        :return:
+        """
+        p = Popen(
+            [docker_string + " dgraph", "version"],
+            stdin=PIPE,
+            stdout=PIPE,
+            stderr=PIPE,
+            encoding="utf-8",
+        )
+        output, err = p.communicate()
+        output = output.split("\n")
+        for line in output:
+            if ":" in line:
+                key = line.split(":")[0].strip()
+                value = line.split(":")[1].strip()
+                self.details[key] = value
+        logger.debug(self.details)
+
     def get_dgraph_version_details(self, details_key):
         """
         Method to get dgraph version details
@@ -409,8 +430,23 @@ class DgraphCLI:
             is_latest = True if self.check_version(version) or branch else False
         else:
             logger.debug("Dgraph docker setup is executed.")
-            branch = self.check_if_latest_branch(branch)
-            is_latest = True if self.check_version(version) or branch else False
+            is_latest = False
+            if branch:
+                version = None
+                if "release" in branch:
+                    branch = branch.split("/")[1]
+                    version = branch
+                elif "v2" in branch:
+                    version = branch
+
+                if version:
+                    is_latest = True if self.check_version(version) else False
+                else:
+                    branch = self.check_if_latest_branch(branch)
+                    is_latest = True if branch else False
+            elif version:
+                is_latest = True if self.check_version(version) else False
+
         logger.debug(f"check version if latest: {is_latest}")
         return is_latest
 
@@ -465,7 +501,7 @@ class DgraphCLI:
 
         :return:
         """
-        is_latest_version = self.set_dgraph_version(version=dgraph_version)
+        is_latest_version = self.set_dgraph_version(branch=dgraph_version)
         appenders = ""
         alpha_mounts = []
         zero_mounts = []
@@ -543,7 +579,7 @@ class DgraphCLI:
         zero_volumes = ""
         for mount in zero_mounts:
             zero_volumes += f" --zero_volume {mount}"
-        docker_command = f"compose --data_dir={self.curr_path}results --user -l=false {alpha_volumes} {zero_volumes} -z={zero_count} -a={alpha_count} {appenders} -o={self.offset} -t={dgraph_version} "
+        docker_command = f"compose --data_dir={self.curr_path}results --user -l=false {alpha_volumes} {zero_volumes} -z={zero_count} -a={alpha_count} {appenders} -o={self.offset} -t={dgraph_version} --out={self.curr_path}results/docker-compose.yml "
         return docker_command
 
     def build_alpha_cli(
@@ -653,6 +689,7 @@ class DgraphCLI:
         if docker_string:
             logger.debug("Appending docker string")
             cli_command = docker_string + cli_command
+            self.store_dgraph_details_docker(docker_string)
 
         if zero_host_name is None:
             zero_host_name = self.zero_server_name

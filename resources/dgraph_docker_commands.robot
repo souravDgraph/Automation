@@ -22,7 +22,7 @@ Start Dgraph n-node In Docker
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
     ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=${no_of_zeros}   alpha_count=${no_of_alphas}
-    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=conf    shell=True
+    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stderr=gen_file_err.txt   cwd=utilities    shell=True
     ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up.txt    stderr=docker_compose_up_err.txt    cwd=conf    shell=True
     Wait For Process    timeout=30 s    on_timeout=continue
     Set Dgraph Version from docker      ${container_name}
