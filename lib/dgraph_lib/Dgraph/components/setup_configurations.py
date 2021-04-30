@@ -433,20 +433,24 @@ class DgraphCLI:
             logger.debug("Dgraph docker setup is executed.")
             is_latest = False
             if branch:
-                version = None
+                check_version = None
                 if "release" in branch:
                     branch = branch.split("/")[1]
-                    version = branch
+                    check_version = branch
                 elif "v2" in branch:
-                    version = branch
+                    check_version = branch
 
-                if version:
-                    is_latest = True if self.check_version(version) else False
+                if check_version:
+                    is_latest_branch = (
+                        True if self.check_version(check_version) else False
+                    )
                 else:
                     branch = self.check_if_latest_branch(branch)
-                    is_latest = True if branch else False
+                    is_latest_branch = True if branch else False
             elif version:
-                is_latest = True if self.check_version(version) else False
+                is_latest_version = True if self.check_version(version) else False
+
+            is_latest = True if is_latest_version or is_latest_branch else False
 
         logger.debug(f"check version if latest: {is_latest}")
         return is_latest
