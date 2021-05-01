@@ -318,7 +318,7 @@ class DgraphCLI:
         cli_command = cli_command + appender + " 2>&1"
         return cli_command
 
-    def build_alpha_cli(self, bulk_path=None, **kwargs):
+    def build_alpha_cli(self, bulk_path=None, learner=None, **kwargs):
         """
         Method to generate alpha commands based on conf.
         \n accepts one param for bulk data initializing
@@ -331,6 +331,9 @@ class DgraphCLI:
         is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        if learner:
+            appender = appender + f' --raft {learner} ' + "-p alpha_learner_p -w alpha_learner_w"
+            self.offset += 1
         logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
         for key, value in kwargs.items():
@@ -448,7 +451,7 @@ class DgraphCLI:
                                                                                             f" --password {password} "
         return cli_live_acl
 
-    def build_loader_command(self, rdf_file, schema_file, loader_type,
+    def build_loader_command(self, rdf_file, schema_file, loader_type, is_learner,
                              latest_version_check=None, docker_string=None):
         """
         Method to build bulk/live loader cli command
@@ -480,6 +483,9 @@ class DgraphCLI:
             cli_command = docker_string + cli_command
             self.zero_server_name = "zero0"
             docker_location = "/Automation/"
+
+        if is_learner != "None":
+            self.alpha_addr += 1
 
         # Building command for live loader
         if loader_type == "live":

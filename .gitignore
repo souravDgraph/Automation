@@ -146,3 +146,4 @@ export/**
 .DS_Store
 .idea/
 
+test_data/datasets/21million.rdf.gz
