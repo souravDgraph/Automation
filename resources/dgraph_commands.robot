@@ -171,7 +171,7 @@ Terminate and Create Backup of Dgraph Execution
     Run Keyword And Continue On Failure    End All Process
     ${backup_folder_name}      Backup alpha and zero logs
     Backup directories created while execution      ${backup_folder_name}
-    Run Keyword If    '${is_clear_folder}' == 'true'    clean up dgraph folders
+    Run Keyword If    ${is_clear_folder}    clean up dgraph folders
 
 End Zero Process
     [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
@@ -343,8 +343,8 @@ Check if parallel process is triggered
     ${result_check}=    Run Keyword And Return Status   Grep and Verify file Content in results folder      ${loader_alias}    Please retry operation
     ${process_check}=    Is Process Running    ${loader_alias}
     log  ${loader_alias}
-    Run Keyword If    "${process_check}"=="True" and "${result_check}"=="True"    Terminate Process     ${loader_alias}
-    Run Keyword If  '${result_check}'=='True'  Run Keywords     Sleep   30s
+    Run Keyword If    ${process_check} and ${result_check}    Terminate Process     ${loader_alias}
+    Run Keyword If  ${result_check}  Run Keywords     Sleep   30s
     ...     AND     Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}   ${loader_name}    ${is_learner}
     ...     AND     Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}   ${loader_name}       ${is_learner}
 
@@ -402,7 +402,7 @@ Export NFS data using admin endpoint
     ...    Keyword to export dgraph data to either json/rdf format in local
     ${root_path}=    normalize path    ${CURDIR}/..
     ${export_path}=    Join Path    ${root_path}/export
-    Run Keyword If    '${is_clear_folder}' == 'true'    clear all the folder in a directory    ${export_path}
+    Run Keyword If    ${is_clear_folder}    clear all the folder in a directory    ${export_path}
     connect request server      
     ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
     log    ${res.text}
@@ -427,7 +427,7 @@ Perform a restore on backup latest versions
     ${enc_check}=    Get Enc Value
     Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
     ${cmd}  Catenate   dgraph   restore -p ${backup_path} -l ${backup_path} -z localhost:5080
-    ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${backup_path}
+    ${result_restore}=    Run Keyword If    ${tls_check}    Restore Using Admin    ${backup_path}
     ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results     shell=True
     ...    AND    Process Should Be Running    restore
     ...    AND    Wait For Process    restore
@@ -447,7 +447,7 @@ Perform a restore on backup by older dgraph versions
         ${restore_dir}=    Set Variable    ${i}[0]
         ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
         ${tls_check}=    Get Tls Value
-        ${result_restore}=    Run Keyword If    "${tls_check}" == "True"    Restore Using Admin    ${restore_dir}
+        ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${restore_dir}
         ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results    shell=True
         ...    AND    Process Should Be Running    restore
         ...    AND    Wait For Process    restore
@@ -584,7 +584,7 @@ Clear Backup Folders
     [Arguments]  ${is_clear_folder}
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
-    Run Keyword If    '${is_clear_folder}' == 'true'    clear all the folder in a directory    ${backup_path}
+    Run Keyword If    ${is_clear_folder}    clear all the folder in a directory    ${backup_path}
 
 clean up dgraph folders
     [Documentation]    Keyword to clear up the dgraph alpha and zero folder created.

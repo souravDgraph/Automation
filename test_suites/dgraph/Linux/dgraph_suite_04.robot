@@ -24,12 +24,12 @@ TC_02 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Create NFS Backup      1
      log        ${LATEST_VERSION_CHECK}
      Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    0
      ...    ELSE    Perform a restore on backup by older dgraph versions
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      [Teardown]    NONE
 
 TC_04 Perform parallel live and bulk load on data
@@ -42,11 +42,11 @@ TC_05 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Create NFS Backup    2
      Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
      ...    ELSE    Perform a restore on backup by older dgraph versions
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      [Teardown]    NONE
 
 TC_06 Perform parallel live loads.
@@ -60,5 +60,5 @@ TC_07 Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.
     ...    *Author*: Sourav
     [Tags]      regression   WEEKLY
-    Export NFS data using admin endpoint    json    true
+    Export NFS data using admin endpoint    json    ${TRUE}
     [Teardown]    NONE

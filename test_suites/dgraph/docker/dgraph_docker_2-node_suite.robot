@@ -2,8 +2,8 @@
 Documentation     Dgraph Docker Test Suite
 Suite Setup       Start Dgraph 2-node In Docker with bulk data    ${dgraph_docker_version}   ${container_name}    ${None}
 Test Setup      Monitor Health And State check
-Test Teardown    Retrigger Docker File       ${dgraph_docker_version}   ${container_name}    ${None}     True
-Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution    ${container_name}    true
+Test Teardown    Retrigger Docker File       ${dgraph_docker_version}   ${container_name}    ${None}     ${TRUE}
+Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution    ${container_name}   ${TRUE}
 Default Tags    docker
 Resource          ../../../resources/dgraph_docker_commands.robot
 
@@ -12,7 +12,7 @@ ${rdf_file}        1million.rdf.gz
 ${schema_file}     1million.schema
 ${alpha-node}      1
 ${zero-node}      1
-${dgraph_docker_version}      master
+${dgraph_docker_version}      v21.03-slash
 # alpha container to interact and perform all the dgraph operations on
 ${container_name}   alpha1
 
@@ -42,18 +42,18 @@ TC_04 Docker - Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.
     ...    *Author*: Krishna, Sourav and Sankalan
     [Tags]      regression   WEEKLY
-    Docker Export NFS data using admin endpoint    json    true   alpha1
+    Docker Export NFS data using admin endpoint    json    ${TRUE}   alpha1
     [Teardown]    NONE
 
 TC_05 Docker - Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Docker Create NFS Backup      1    alpha1
      Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    0      alpha1      zero1
      ...    ELSE    Docker Perform a restore on backup by older dgraph versions     alpha1      zero1
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
 
 TC_06 Docker - Import a big dataset with the Bulk loader - Ubuntu or CentOS
     [Documentation]    Verify the logs for successful execution of big dataset in bulk loader
@@ -66,11 +66,11 @@ TC_07 Docker - Perform Increment backup and restore on bulk data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Docker Create NFS Backup      3    alpha1
      Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    2      alpha1      zero1
      ...    ELSE    Docker Perform a restore on backup by older dgraph versions     alpha1      zero1
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
 
 TC_08 Docker - Perform parallel live loads.
      [Documentation]    Perform live load data.
@@ -83,8 +83,8 @@ TC_09 Docker - Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav, Krishna
      [Tags]    regression   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Docker Create NFS Backup    2      alpha1
      Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    1      alpha1      zero1
      ...    ELSE    Docker Perform a restore on backup by older dgraph versions      alpha1      zero1
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}

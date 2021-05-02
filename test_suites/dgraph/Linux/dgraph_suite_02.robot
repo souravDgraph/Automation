@@ -20,7 +20,7 @@ TC_01 Perform cross version backup and restore.
     Build Dgraph Version    ${prev_version}
     Start Dgraph
     Create NFS Backup    2
-    Terminate and Create Backup of Dgraph Execution     true
+    Terminate and Create Backup of Dgraph Execution     ${TRUE}
     Build Dgraph Version    ${current_version}
     Start Dgraph
     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
