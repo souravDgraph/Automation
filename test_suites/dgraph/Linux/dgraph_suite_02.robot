@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation     Dgraph Live Loading Test Suite
+Documentation     Dgraph Cross Version Backup and Restore Suite
 Suite Teardown    Terminate and Create Backup of Dgraph Execution    false
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
