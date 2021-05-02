@@ -157,7 +157,7 @@ Docker Execute Bulk Loader for Docker with rdf and schema parameters
     Log    ${loader_Text_File_Content}
     Docker Verify Bulk Process     ${dgraph_version}     ${container_name}       ${loader_Text_File_Content}
 
-Verify Live loader trigger properly or not
+Docker Verify Live loader trigger properly or not
     [Documentation]  Keyword to verify live loader to trigger properly
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
     ${dir_path}=    normalize path    ${CURDIR}/..
@@ -166,8 +166,11 @@ Verify Live loader trigger properly or not
     IF  ${status}==${FALSE} or ${tcp_error}
         ${retry_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
         Terminate Process   ${loader_alias}
-        Trigger Loader Process for Docker     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${zero_host}    ${alpha_host}       
-        ${check}    Run Keyword And Return Status   Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
+        Trigger Loader Process for Docker     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${zero_host}    ${alpha_host}
+        Wait For Process    ${loader_alias}    timeout=10 s
+        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
+        verify alpha and zero contents in results folder   docker_compose_up    @{alpha_error_context}
+        ${check}    Run Keyword And Return Status   Docker Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
         Return From Keyword If   ${check}
         ...     ELSE    FAIL    Some issue with live loader
     END
@@ -203,7 +206,7 @@ Docker Execute Parallel Loader with rdf and schema parameters
     FOR    ${i}    IN    @{loader_type}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
         IF  '${i}'=='live'
-            Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}    live   ${zero_host}    ${alpha_host}
+            Docker Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}    live   ${zero_host}    ${alpha_host}
         END
         Verify process to be stopped    ${loader_alias}
         ${grep_context}=    Set Variable If    "${i}"=="bulk"    Total:    N-Quads processed per second
@@ -225,7 +228,7 @@ Docker Execute Multiple Parallel Live Loader with rdf and schema parameters
         Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}       live    ${zero_host}    ${alpha_host}
     END
     FOR    ${i}    IN RANGE    ${num_threads}
-        Verify Live loader trigger properly or not  ${loader_alias}    ${rdf_filename}    ${schema_filename}    live    ${zero_host}    ${alpha_host}
+        Docker Verify Live loader trigger properly or not  ${loader_alias}    ${rdf_filename}    ${schema_filename}    live    ${zero_host}    ${alpha_host}
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    live    ${i}
         Verify process to be stopped    ${loader_alias}
         Grep and Verify file Content in results folder    ${loader_alias}    N-Quads processed per second

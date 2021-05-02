@@ -588,6 +588,7 @@ class DgraphCLI:
         self,
         bulk_path=None,
         offset=None,
+        learner=None,
         zero_address=None,
         is_latest_check=None,
         **kwargs,
@@ -610,6 +611,9 @@ class DgraphCLI:
             is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        if learner:
+            appender = appender + f' --raft {learner} ' + "-p alpha_learner_p -w alpha_learner_w"
+            self.offset += 1
         logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
         for key, value in kwargs.items():
@@ -656,6 +660,7 @@ class DgraphCLI:
         loader_type,
         latest_version_check=None,
         docker_string=None,
+        is_learner=None,
         zero_host_name=None,
         alpha_host_name=None,
         zero_address=None,
@@ -676,9 +681,6 @@ class DgraphCLI:
         # Updating dgraph version check if passed from external command
         if latest_version_check is not None:
             is_latest_version = latest_version_check
-        else:
-            # Checking the dgraph version locally..
-            is_latest_version = self.set_dgraph_version()
 
         logger.debug(f"Is dgraph latest version? {is_latest_version}")
 
@@ -704,6 +706,9 @@ class DgraphCLI:
 
         if alpha_address is None:
             alpha_address = self.alpha_addr
+
+        if is_learner != "None":
+            self.alpha_addr += 1
 
         # Building command for live loader
         if loader_type == "live":

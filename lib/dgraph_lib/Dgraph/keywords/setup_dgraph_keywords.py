@@ -35,11 +35,15 @@ class SetupDgraphKeywords:
         cli_command = self.dgraph_cli.build_zero_cli(**kwargs)
         return cli_command
 
-    def generate_dgraph_alpha_cli_command(self, bulk_path=None, **kwargs):
+    def generate_dgraph_alpha_cli_command(self, bulk_path=None, learner=None, zero_address=None,
+                                          is_latest_check=None, **kwargs):
         """
         Method to build CLI command for zero and alpha.
         To set the configurations head to-> conf/dgraph/conf_dgraph.json
-        :param cli_name: <zero | alpha>
+        :param learner:
+        :param is_latest_check:
+        :param zero_address:
+        :param bulk_path:
         kwargs:
             :param ludicrous_mode: enabled|disabled
         :return: cli_command <returns zero | alpha command>
@@ -49,16 +53,17 @@ class SetupDgraphKeywords:
         | Get dgraph cli command | alpha | ludicrous_mode=enabled
 
         """
-        cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, **kwargs)
+        cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, learner=learner, zero_address=zero_address,
+                                                      is_latest_check=is_latest_check, **kwargs)
         return cli_command
 
     def get_zero_and_alpha_docker_cli_command(
-        self,
-        container_name,
-        dgraph_version,
-        zero_count=1,
-        alpha_count=1,
-        bulk_path=None,
+            self,
+            container_name,
+            dgraph_version,
+            zero_count=1,
+            alpha_count=1,
+            bulk_path=None,
     ):
         """
         Method to generate zero docker cli command
@@ -82,21 +87,28 @@ class SetupDgraphKeywords:
         return alpha_zero_docker_cli_command_list
 
     def get_dgraph_loader_command(
-        self,
-        rdf_file,
-        schema_file,
-        loader_type,
-        is_latest_version=None,
-        docker_string=None,
-        zero_host_name=None,
-        alpha_host_name=None,
-        zero_address=None,
-        alpha_address=None,
-        out_dir=None,
+            self,
+            rdf_file,
+            schema_file,
+            loader_type,
+            is_latest_version=None,
+            docker_string=None,
+            is_learner=None,
+            zero_host_name=None,
+            alpha_host_name=None,
+            zero_address=None,
+            alpha_address=None,
+            out_dir=None,
     ):
         """
         Method to build CLI command for live | bulk loading
         To set the configurations head to-> conf/dgraph/conf_dgraph.json
+        :param out_dir:
+        :param alpha_address:
+        :param zero_address:
+        :param alpha_host_name:
+        :param is_learner:
+        :param zero_host_name:
         :param rdf_file: <path to rdf file>
         :param schema_file: <path to schema file>
         :param loader_type: <live | bulk>
@@ -110,28 +122,31 @@ class SetupDgraphKeywords:
 
         """
         loader_command = self.dgraph_cli.build_loader_command(
-            rdf_file,
-            schema_file,
-            loader_type,
-            is_latest_version,
-            docker_string,
-            zero_host_name,
-            alpha_host_name,
-            zero_address,
-            alpha_address,
-            out_dir,
+            rdf_file=rdf_file,
+            schema_file=schema_file,
+            loader_type=loader_type,
+            latest_version_check=is_latest_version,
+            docker_string=docker_string,
+            zero_host_name=zero_host_name,
+            alpha_host_name=alpha_host_name,
+            zero_address=zero_address,
+            alpha_address=alpha_address,
+            out_dir=out_dir,
+            is_learner=is_learner
         )
         return loader_command
 
     def get_dgraph_increment_command(
-        self,
-        is_latest_version=None,
-        docker_string=None,
-        alpha_host_name=None,
-        alpha_address=None,
+            self,
+            is_latest_version=None,
+            docker_string=None,
+            alpha_host_name=None,
+            alpha_address=None,
     ):
         """
         Method to generate increment command for dgraph.
+        :param alpha_address:
+        :param alpha_host_name:
         :param alpha_offset: <offset value set for alpha> | default : 0
         :param is_latest_version:
         :param docker_string:
