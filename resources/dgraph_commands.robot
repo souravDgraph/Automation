@@ -69,16 +69,14 @@ Start Dgraph with learner node
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
     Process Should Be Running    zero
-    Wait For Process    timeout=20 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_${ALPHA_COUNT}_err.txt
     Process Should Be Running    alpha
-    Wait For Process    timeout=20 s    on_timeout=continue
+    Wait For Process    timeout=15 s    on_timeout=continue
     ${alpha_command_learner}    Generate Dgraph Alpha Cli Command    learner="learner=true; group=1"
-    log    ${alpha_command_learner}
     ${result_a}=    Process.start Process    ${alpha_command_learner}    alias=alpha_learner    stdout=alpha_learner_${ALPHA_LEARNER_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_learner_${ALPHA_LEARNER_COUNT}_err.txt
     Process Should Be Running    alpha_learner
-    Wait For Process    timeout=20 s    on_timeout=continue
+    Wait For Process    timeout=10 s    on_timeout=continue
     ${check}=   set dgraph version
     Set Suite Variable      ${LATEST_VERSION_CHECK}    ${check}
     ${ZERO_COUNT}   Evaluate        ${ZERO_COUNT} + 1
@@ -299,15 +297,16 @@ Verify Live loader trigger properly or not
     [Documentation]  Keyword to verify live loader to trigger properly
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}    ${is_leaner}=${None}
     ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
+    ${loader_err}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}_err   Please retry operation
     ${tcp_error}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Error while dialing dial tcp
-    IF  ${status}==${FALSE} or ${tcp_error}
+    IF  ${status}==${FALSE} or ${tcp_error} or ${loader_err}
         ${retry_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
         Terminate Process   ${loader_alias}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${is_leaner}
         @{live_loader_errors}  Create List     github.com/dgraph-io/dgraph/
         ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder    ${loader_alias}_err     @{live_loader_errors}
-        Wait For Process    ${loader_alias}    timeout=10 s
-        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
+        Run Keyword If   ${check}   FAIL    Found Issues in Live Loader during live load
+        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw      fatal error:
         IF  ${is_leaner}
             ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder   alpha_learner    @{alpha_error_context}
             Run Keyword If   ${check}   FAIL    Found Issues in alpha during live load
@@ -370,10 +369,11 @@ Check if parallel process is triggered
     [Arguments]    ${loader_alias}     ${rdf_filename}    ${schema_filename}  ${loader_name}     ${is_learner}
     [Documentation]     Keyword to retry live loading for couple of times.
     ${result_check}=    Run Keyword And Return Status   Grep and Verify file Content in results folder      ${loader_alias}    Please retry operation
+    ${result_check_err}=    Run Keyword And Return Status   Grep and Verify file Content in results folder      ${loader_alias}_err    Please retry operation
     ${process_check}=    Is Process Running    ${loader_alias}
     log  ${loader_alias}
-    Run Keyword If    ${process_check} and ${result_check}    Terminate Process     ${loader_alias}
-    Run Keyword If  ${result_check}  Run Keywords     Sleep   30s
+    Run Keyword If    ${process_check} and ${result_check} and ${result_check_err}   Terminate Process     ${loader_alias}
+    Run Keyword If  ${result_check} and ${result_check_err}  Run Keywords     Sleep   30s
     ...     AND     Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}   ${loader_name}    ${is_learner}
     ...     AND     Check if parallel process is triggered      ${loader_alias}     ${rdf_filename}    ${schema_filename}   ${loader_name}       ${is_learner}
 
@@ -579,15 +579,18 @@ Monitor zero and alpha process
     ...     AND     Run Keyword And Return If   ${is_learner}    Start Dgraph with learner node
     ...     AND     Run Keyword And Return      Start Dgraph
     ${alpha_process_check}=    Is Process Running    alpha
-    ${alpha_learner_process_check}=    Is Process Running    alpha_learner
+    ...     ELSE    Set Variable    ${FALSE}
     ${zero_process_check}=    Is Process Running    zero
-    IF      ${alpha_learner_process_check}
-        End Alpha Learner Process
-        Post Execution Verify Alpha contents        ${TRUE}
-        @{dir}  Create List     alpha_learner_p     alpha_learner_w
-        Backup Custom Directories Created While Execution  @{dir}   
-    ELSE
-        Post Execution Verify Alpha contents
+    IF  ${is_learner}
+        ${alpha_learner_process_check}      Is Process Running    alpha_learner
+        IF   ${alpha_learner_process_check} 
+            End Alpha Learner Process
+            Post Execution Verify Alpha contents        ${TRUE}
+            @{dir}  Create List     alpha_learner_p     alpha_learner_w
+            Backup Custom Directories Created While Execution  @{dir}   
+        ELSE
+            Post Execution Verify Alpha contents
+        END
     END
     IF      ${alpha_process_check}     
         End Alpha Process
