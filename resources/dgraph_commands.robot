@@ -54,7 +54,7 @@ Start Dgraph
     ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
     Set Suite Variable      ${ZERO_COUNT}    ${ZERO_COUNT}
     Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
-    Set Suite Variable      ${LUDICROUS_MODE}    False
+    Set Suite Variable      ${LUDICROUS_MODE}    ${FALSE}
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
@@ -85,7 +85,7 @@ Start Dgraph with learner node
     Set Suite Variable      ${ALPHA_LEARNER_COUNT}    ${ALPHA_LEARNER_COUNT}
     Set Suite Variable      ${ZERO_COUNT}    ${ZERO_COUNT}
     Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
-    Set Suite Variable      ${LUDICROUS_MODE}    False
+    Set Suite Variable      ${LUDICROUS_MODE}    ${FALSE}
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha_learner    @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
@@ -276,6 +276,8 @@ Verify Live loader trigger properly or not
         ${retry_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
         Terminate Process   ${loader_alias}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${is_leaner}
+        @{live_loader_errors}  Create List     github.com/dgraph-io/dgraph/
+        ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder    ${loader_alias}_err     @{live_loader_errors}
         Wait For Process    ${loader_alias}    timeout=10 s
         @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
         IF  ${is_leaner}
@@ -475,12 +477,12 @@ Verify process to be stopped
     [Documentation]    Keyword to check if the process is still running and wait till process completes.
     log    Process which is runing ${process_alias}
     ${process_check}=    Is Process Running    ${process_alias}
-    Run Keyword If    '${process_check}'=='False'    Return From Keyword
+    Run Keyword If    ${process_check}==${FALSE}    Return From Keyword
     FOR    ${i}    IN RANGE    99999
         log    ${i}
         Wait For Process    ${process_alias}
         ${process_check}=    Is Process Running    ${process_alias}
-        Exit For Loop If    '${process_check}'=='False'
+        Exit For Loop If    ${process_check}==${FALSE}
     END
     Log    ${process_alias} Process is stopped
     Comment    Wait Until Keyword Succeeds    600x    5minute    Process Should Be Stopped    handle=${process_alias}    error_message=${error_message} is still running
@@ -576,8 +578,8 @@ Monitor State Check
     ${state_resposne}=  State Check     /state
     ${leader}=    Get Value From Json   ${state_resposne}   $..members..leader
     ${am_dead}=    Get Value From Json   ${state_resposne}   $..members..amDead
-    Should Be Equal As Strings  ${leader[0]}   True
-    Should Be Equal As Strings  ${am_dead[0]}   False
+    Should Be Equal As Strings  ${leader[0]}   ${TRUE}
+    Should Be Equal As Strings  ${am_dead[0]}   ${FALSE}
 
 Clear Backup Folders
     [Documentation]  Keyword to clear backup folders

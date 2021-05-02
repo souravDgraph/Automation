@@ -612,7 +612,11 @@ class DgraphCLI:
 
         args_appender = ""
         if learner:
-            appender = appender + f' --raft {learner} ' + "-p alpha_learner_p -w alpha_learner_w"
+            appender = (
+                appender
+                + f" --raft {learner} "
+                + "-p alpha_learner_p -w alpha_learner_w"
+            )
             self.offset += 1
         logger.debug(f"offset value: {self.offset}")
         args_appender = args_appender + f" -o {self.offset}"
@@ -707,8 +711,8 @@ class DgraphCLI:
         if alpha_address is None:
             alpha_address = self.alpha_addr
 
-        if is_learner != "None":
-            self.alpha_addr += 1
+        if is_learner:
+            alpha_address = self.alpha_addr + 1
 
         # Building command for live loader
         if loader_type == "live":
