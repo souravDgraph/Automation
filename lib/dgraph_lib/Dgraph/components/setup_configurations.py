@@ -611,15 +611,16 @@ class DgraphCLI:
             is_latest = self.set_dgraph_version()
 
         args_appender = ""
+        offset = self.offset
         if learner:
             appender = (
                 appender
                 + f" --raft {learner} "
                 + "-p alpha_learner_p -w alpha_learner_w"
             )
-            self.offset += 1
-        logger.debug(f"offset value: {self.offset}")
-        args_appender = args_appender + f" -o {self.offset}"
+            offset = self.offset + 1
+        logger.debug(f"offset value: {offset}")
+        args_appender = args_appender + f" -o {offset}"
         for key, value in kwargs.items():
             if key == "ludicrous_mode" and value == "enabled":
                 args_appender = args_appender + self.get_ludicrous_command(is_latest)

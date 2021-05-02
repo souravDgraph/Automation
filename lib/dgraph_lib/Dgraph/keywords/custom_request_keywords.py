@@ -24,7 +24,9 @@ class CustomRequestKeywords:
     Custom Request Keywords Class.
     """
 
-    def connect_request_server(self, url=None, port=None, offset=0, is_docker=None):
+    def connect_request_server(
+        self, url=None, port=None, offset=0, is_docker=None, is_learner=None
+    ):
         """
         Method to connect to url to perform backup.
         :param is_docker: is execution on docker
@@ -44,8 +46,13 @@ class CustomRequestKeywords:
         alpha_port = 8080
         if offset != 0:
             self.dgraph_cli.offset = offset
+            if is_learner:
+                self.dgraph_cli.offset += 1
         else:
-            offset = self.dgraph_cli.offset
+            if is_learner:
+                offset = self.dgraph_cli.offset + 1
+            else:
+                offset = self.dgraph_cli.offset
         if url is not None:
             self.req_handler = RequestHandler(url)
         else:

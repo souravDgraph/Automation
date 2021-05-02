@@ -30,7 +30,6 @@ TC_02 Perform NFS backup and restore data
      Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    0
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   ${TRUE}
-     [Teardown]    NONE
 
 TC_04 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
@@ -47,7 +46,6 @@ TC_05 Perform Increment backup and restore data
      Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   ${TRUE}
-     [Teardown]    NONE
 
 TC_06 Perform parallel live loads.
      [Documentation]    Perform live load data.
