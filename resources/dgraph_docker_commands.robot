@@ -65,7 +65,7 @@ End Docker Execution
     @{compose_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    docker_compose_up    @{compose_error_context}
     Run Keyword And Return If      ${passed}       Fail       Captured errors in docker compose
-    @{compose_context}  Create List     Gracefully stopping... 
+    @{compose_context}  Create List     Gracefully stopping...      Buffer flushed successfully.
     Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    docker_compose_up    @{compose_context}
 
 Terminate Docker Execution and Create Backup of Dgraph Execution
