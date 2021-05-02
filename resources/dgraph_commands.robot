@@ -279,9 +279,11 @@ Verify Live loader trigger properly or not
         Wait For Process    ${loader_alias}    timeout=10 s
         @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
         IF  ${is_leaner}
-            verify alpha and zero contents in results folder   alpha_learner    @{alpha_error_context}
+            ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder   alpha_learner    @{alpha_error_context}
+            Run Keyword If   ${check}   FAIL    Found Issues in alpha during live load
         ELSE
-            verify alpha and zero contents in results folder   alpha    @{alpha_error_context}
+            ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder   alpha    @{alpha_error_context}
+            Run Keyword If   ${check}   FAIL    Found Issues in alpha during live load
         END
         ${check}    Run Keyword And Return Status   Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${is_leaner}
         Return From Keyword If   ${check}
