@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite
 Suite Setup        Start Dgraph
-Suite Teardown     Terminate and Create Backup of Dgraph Execution    false
+Suite Teardown     Terminate and Create Backup of Dgraph Execution    ${FALSE}
 Test Setup      Monitor Health And State check
 Test Teardown   Monitor zero and alpha process  ${TRUE}
 Resource          ../../../resources/dgraph_commands.robot
