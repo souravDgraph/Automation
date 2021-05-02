@@ -29,13 +29,12 @@ TC_02 Perform NFS backup and restore data
      Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    0
      ...    ELSE    Perform a restore on backup by older dgraph versions
      Clear Backup Folders   ${TRUE}
-     [Teardown]    NONE
+     [Teardown]  Monitor zero and alpha process  ${TRUE}
 
 TC_03 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
      [Tags]    regression  CI  NIGHTLY
-     [Setup]  Monitor zero and alpha process  ${TRUE}
      Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
 
 TC_04 Perform parallel live and bulk load on data
