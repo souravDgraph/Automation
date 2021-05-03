@@ -1,9 +1,9 @@
 *** Settings ***
 Documentation     Dgraph Live Loading Test Suite with ludicrous mode
 Suite Setup        Start Dgraph Ludicrous Mode
-Suite Teardown     Terminate and Create Backup of Dgraph Execution    false
+Suite Teardown     Terminate and Create Backup of Dgraph Execution    ${FALSE}
 Test Setup      Monitor Health And State check
-Test Teardown   Monitor zero and alpha process  true
+Test Teardown   Monitor zero and alpha process  ${TRUE}
 Default Tags    ludicrous
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
@@ -31,18 +31,17 @@ TC_03 Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.
     ...    *Author*: Krishna, Sourav and Sankalan
     [Tags]      regression   WEEKLY
-    Export NFS data using admin endpoint    json    true
+    Export NFS data using admin endpoint    json    ${TRUE}
 
 TC_04 Perform NFS backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Krishna and Sankalan
      [Tags]    regression   C702    C700   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Create NFS Backup      1
-     log        ${is_latest_global_check}
-     Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    0
+     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    0
      ...    ELSE    Perform a restore on backup by older dgraph versions
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      [Teardown]    NONE
 
 TC_05 Perform parallel live and bulk load on data
@@ -55,11 +54,11 @@ TC_06 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      Create NFS Backup    2
-     Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    1
+     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
      ...    ELSE    Perform a restore on backup by older dgraph versions
-     Clear Backup Folders   true
+     Clear Backup Folders   ${TRUE}
      [Teardown]    NONE
 
 TC_07 Perform parallel live loads.
