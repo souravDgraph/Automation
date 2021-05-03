@@ -79,6 +79,7 @@ jobs:
           echo " ---- Running Dgraph Testcases ----"
           echo "Log level: ${{ github.event.inputs.dgraphBranch }}"
           sudo robot -d results -v dgraph_docker_version:${{ env.DOCKER_DGRAPH_VERSION }} --loglevel TRACE:INFO --splitlog test_suites/dgraph/docker/dgraph_docker_2-node_suite.robot
+          sudo chmod -R 777 ${{ github.workspace }}/Automation_workspace/results/
           
       # Linting the Python code whenever there is a push in main branch
       - name: Python Pylint Github Action
