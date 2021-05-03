@@ -69,6 +69,7 @@ Start Dgraph with learner node
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
     Process Should Be Running    zero
+    Wait For Process    timeout=15 s    on_timeout=continue
     ${alpha_command}    Generate Dgraph Alpha Cli Command
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_${ALPHA_COUNT}_err.txt
     Process Should Be Running    alpha
@@ -581,7 +582,6 @@ Monitor zero and alpha process
     ...     AND     Run Keyword And Return If   ${is_learner}    Start Dgraph with learner node
     ...     AND     Run Keyword And Return      Start Dgraph
     ${alpha_process_check}=    Is Process Running    alpha
-    ...     ELSE    Set Variable    ${FALSE}
     ${zero_process_check}=    Is Process Running    zero
     IF  ${is_learner}
         ${alpha_learner_process_check}      Is Process Running    alpha_learner
