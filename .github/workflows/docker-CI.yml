@@ -11,11 +11,11 @@ on:
      branches: [ main ]
 
   workflow_dispatch:
-    inputs:
-      dgraphBranch:
-        required: true
-        description: "Dgraph Docker Version"
-        default: v21.03.0
+#     inputs:
+#       dgraphBranch:
+#         required: true
+#         description: "Dgraph Docker Version"
+#         default: v21.03.0
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
