@@ -373,6 +373,7 @@ Check if parallel process is triggered
     ${result_check}=    Run Keyword And Return Status   Grep and Verify file Content in results folder      ${loader_alias}    Please retry operation
     ${result_check_err}=    Run Keyword And Return Status   Grep and Verify file Content in results folder      ${loader_alias}_err    Please retry operation
     ${process_check}=    Is Process Running    ${loader_alias}
+    Sleep   30s
     log  ${loader_alias}
     Run Keyword If    ${process_check} and ${result_check} and ${result_check_err}   Terminate Process     ${loader_alias}
     Run Keyword If  ${result_check} and ${result_check_err}  Run Keywords     Sleep   30s
