@@ -13,10 +13,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-        dgraphBranch:
-          description: 'Dgraph Docker Branch'     
-          required: true
-          default: 'v21.03.0'
+      dgraphBranch:
+        description: 'Dgraph Docker Branch'     
+        required: true
+        default: 'v21.03.0'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -77,6 +77,7 @@ jobs:
           tree
           ls
           echo " ---- Running Dgraph Testcases ----"
+          echo "Log level: ${{ github.event.inputs.dgraphBranch }}"
           sudo robot -d results -v dgraph_docker_version:${{ env.DOCKER_DGRAPH_VERSION }} --loglevel TRACE:INFO --splitlog test_suites/dgraph/docker/dgraph_docker_2-node_suite.robot
           
       # Linting the Python code whenever there is a push in main branch
