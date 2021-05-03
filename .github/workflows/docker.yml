@@ -52,14 +52,14 @@ jobs:
           sudo python3 env_setup.py -l All -c enabled -o 20
       
       
-      # Download Dgraph Repo
-      - name: Check out Dgraph repo
-        uses: actions/checkout@master
-        with:
-          repository: dgraph-io/dgraph
-          ref: ${{ github.event.inputs.dgraphBranch }}
-          clean: false  
-          path: dgraph_workspace  
+#       # Download Dgraph Repo
+#       - name: Check out Dgraph repo
+#         uses: actions/checkout@master
+#         with:
+#           repository: dgraph-io/dgraph
+#           ref: ${{ github.event.inputs.dgraphBranch }}
+#           clean: false  
+#           path: dgraph_workspace  
         
        
      # Check Config File for Dgraph
