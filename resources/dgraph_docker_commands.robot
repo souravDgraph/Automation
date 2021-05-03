@@ -48,6 +48,12 @@ Start Dgraph 2-node In Docker with bulk data
 Retrigger Docker File
     [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}      ${is_clear_folder}
     [Documentation]     Monitor Zero and Alpha for docker execution
+    Run Keyword If Test Failed     Run Keywords    Terminate All Processes
+    ...     AND     Sleep   20s
+    ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
+    ...     AND     Backup directories created while execution
+    ...     AND     Backup Yaml File
+    ...     AND     Run Keyword And Return      Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
     Run Keyword And Continue On Failure     End Docker Execution    ${container_name}
     IF    ${is_clear_folder}
         Backup Yaml File
@@ -70,6 +76,13 @@ End Docker Execution
 
 Terminate Docker Execution and Create Backup of Dgraph Execution
     [Arguments]     ${container_name}      ${is_clear_folder}
+    Run Keyword If Any Tests Failed     Run Keywords    Terminate All Processes
+    ...     AND     Sleep   20s
+    ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
+    ...     AND     Backup alpha and zero logs
+    ...     AND     Backup Yaml File
+    ...     AND     Backup directories created while execution
+    ...     AND     Return From Keyword
     Run Keyword And Continue On Failure    END DOCKER EXECUTION     ${container_name}
     Backup alpha and zero logs
     Backup Yaml File
@@ -162,13 +175,14 @@ Docker Verify Live loader trigger properly or not
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
+    ${loader_err}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}_err   Please retry operation
     ${tcp_error}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Error while dialing dial tcp
-    IF  ${status}==${FALSE} or ${tcp_error}
+    IF  ${status}==${FALSE} or ${tcp_error} or ${loader_err}
         ${retry_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
         Terminate Process   ${loader_alias}
         Trigger Loader Process for Docker     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${zero_host}    ${alpha_host}
         Wait For Process    ${loader_alias}    timeout=10 s
-        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
+        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw   fatal error:
         @{live_loader_errors}  Create List     github.com/dgraph-io/dgraph/
         ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder    ${loader_alias}_err     @{live_loader_errors}
         Run Keyword If   ${check}   FAIL    Found Issues in live loader during live load

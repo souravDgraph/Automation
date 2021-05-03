@@ -2,8 +2,8 @@
 Documentation     Dgraph Docker Test Suite
 Suite Setup       Start Dgraph 2-node In Docker with bulk data    ${dgraph_docker_version}   ${container_name}    ${None}
 Test Setup      Monitor Health And State check
-Test Teardown    Retrigger Docker File       ${dgraph_docker_version}   ${container_name}    ${None}     ${TRUE}
-Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution    ${container_name}   ${TRUE}
+Test Teardown    Retrigger Docker File       ${dgraph_docker_version}   ${container_name}    ${None}     ${FALSE}
+Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution    ${container_name}   ${FALSE}
 Default Tags    docker
 Resource          ../../../resources/dgraph_docker_commands.robot
 
@@ -12,7 +12,7 @@ ${rdf_file}        1million.rdf.gz
 ${schema_file}     1million.schema
 ${alpha-node}      1
 ${zero-node}      1
-${dgraph_docker_version}      v21.03.0
+${dgraph_docker_version}     v21.03-slash
 # alpha container to interact and perform all the dgraph operations on
 ${container_name}   alpha1
 
