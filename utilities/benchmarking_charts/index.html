@@ -3,6 +3,7 @@
 
 <head>
     <title>Benchmarking Dgraph</title>
+    <meta http-equiv="refresh" content="300">
 
     <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
@@ -19,11 +20,18 @@
                         if (data.includes("h")) {
                             hr = parseFloat(data.split("h")[0])
                             timeInMin = hr * 60
+
+                            min = parseFloat(data.split("h")[1].split('m')[0])
+                            timeInMin += min
+                            sec = parseFloat(data.split("h")[1].split('m')[1])
+                            timeInMin += sec / 60
                         }
-                        min = parseFloat(data.split("h")[1].split('m')[0])
-                        timeInMin += min
-                        sec = parseFloat(data.split("h")[1].split('m')[1])
-                        timeInMin += sec / 60
+                        else {
+                            min = parseFloat(data.split('m')[0])
+                            timeInMin += min
+                            sec = parseFloat(data.split('m')[1])
+                            timeInMin += sec / 60
+                        }
                     }
                     else {
                         sec = data
@@ -71,12 +79,14 @@
                         if (yAxisTitle.includes("inutes")) {
                             dataPoints.push({
                                 x: parseInt(points[0]),
-                                y: convertTimeToMin(points, 2)
+                                y: convertTimeToMin(points, 2),
+                                z: points[1]
                             });
                         } else {
                             dataPoints.push({
                                 x: parseInt(points[0]),
-                                y: convertTimeToSec(points, 2)
+                                y: convertTimeToSec(points, 2),
+                                z: points[1]
                             });
                         }
                     }
@@ -94,12 +104,14 @@
                         if (yAxisTitle.includes("inutes")) {
                             dataPoints.push({
                                 x: parseInt(points[0]),
-                                y: convertTimeToMin(points, 3)
+                                y: convertTimeToMin(points, 3),
+                                z: points[1]
                             });
                         } else {
                             dataPoints.push({
                                 x: parseInt(points[0]),
-                                y: convertTimeToSec(points, 3)
+                                y: convertTimeToSec(points, 3),
+                                z: points[1]
                             });
                         }
                     }
@@ -115,7 +127,10 @@
                         text: chartName,
                     },
                     axisX: {
-                        title: "Date"
+                        title: "Date",
+                        gridColor: "orange",
+                        gridDashType: "dot",
+                        gridThickness: 2
                     },
                     axisY: {
                         title: yAxisTitle
@@ -128,6 +143,7 @@
                         fontSize: 16
                     },
                     data: [{
+                        toolTipContent: "Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
                         type: "line",
                         showInLegend: true,
                         xValueType: "dateTime",
@@ -136,6 +152,7 @@
                         name: "Live Loader",
                         dataPoints: getLiveLoaderDataFromCSV(csv, yAxisTitle)
                     }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
                         type: "line",
                         showInLegend: true,
                         xValueType: "dateTime",
@@ -147,14 +164,78 @@
 
                 chart.render();
             }
-            $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(seconds)") });
-            $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
-            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(seconds)") });
-            $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
 
+            function getCombinedChartFromCSV(csvMaster, csv21, chartName, yAxisTitle) {
+                var chart = new CanvasJS.Chart(chartName, {
+                    zoomEnabled: true,
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: chartName,
+                    },
+                    axisX: {
+                        title: "Date",
+                        gridColor: "orange",
+                        gridDashType: "dot",
+                        gridThickness: 2
+                    },
+                    axisY: {
+                        title: yAxisTitle
+                    },
+                    toolTip: {
+                        shared: false
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        fontSize: 16
+                    },
+                    data: [{
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader Master",
+                        dataPoints: getLiveLoaderDataFromCSV(csvMaster, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader Master",
+                        dataPoints: getBulkLoaderDataFromCSV(csvMaster, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader 21.03",
+                        dataPoints: getLiveLoaderDataFromCSV(csv21, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader 21.03",
+                        dataPoints: getBulkLoaderDataFromCSV(csv21, yAxisTitle)
+                    }]
+                });
+
+                chart.render();
+            }
+            $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(minutes)") });
+            $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
+            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(minutes)") });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
+            $.get("dataPointsMaster_21mil.csv", function (data1) { $.get("dataPoints21_03_21mil.csv", function (data2) { getCombinedChartFromCSV(data1, data2, "Combined_21mil", "Time(minutes)") }) });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data1) { $.get("dataPoints21_03_stackoverflow.csv", function (data2) { getCombinedChartFromCSV(data1, data2, "Combined_stackoverflow", "Time(minutes)") }) });
         }
     </script>
-
 </head>
 
 <body>
@@ -164,8 +245,10 @@
     <p> These benchmarks are executed on dgus machines.</p>
     <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
     <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Combined_21mil" style="width: 90%; height: 300px;display: inline-block;padding-left:10px;"></div>
     <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
     <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Combined_stackoverflow" style="width: 90%; height: 300px;display: inline-block;padding-left:10px;"></div>
 </body>
 
 </html>
