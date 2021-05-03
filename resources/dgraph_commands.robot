@@ -556,7 +556,7 @@ Verify alpha and zero contents in results folder
         Should Contain Any    ${file_context}    @{context}
         END
     ELSE
-        ${count}=   Set Variable If     '${file_name}' == 'zero'   ${ZERO_COUNT}   ${alpha_count}
+        ${count}=   Set Variable If     '${file_name}' == 'zero'   ${ZERO_COUNT}   ${ALPHA_COUNT}
         FOR     ${i}  IN RANGE   ${count}
             ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
             Should Contain Any    ${file_context}    @{context}
