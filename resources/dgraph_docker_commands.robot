@@ -56,9 +56,10 @@ Retrigger Docker File
     ...     AND     Run Keyword And Return      Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
     End Docker Execution
     Run Keyword And Continue On Failure     Verify Alpha and Zero after termination
+    Backup Yaml File
+    Backup directories created while execution
     IF    ${is_clear_folder}
-        Backup Yaml File
-        Backup directories created while execution
+        clean up dgraph folders
     END
     Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
 
