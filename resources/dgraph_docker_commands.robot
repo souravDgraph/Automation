@@ -48,13 +48,14 @@ Start Dgraph 2-node In Docker with bulk data
 Retrigger Docker File
     [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}      ${is_clear_folder}
     [Documentation]     Monitor Zero and Alpha for docker execution
-    Run Keyword If Test Failed     Run Keywords    Terminate All Processes
+    Run Keyword If Test Failed     Run Keywords    End Docker Execution
     ...     AND     Sleep   20s
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     ...     AND     Backup directories created while execution
     ...     AND     Backup Yaml File
     ...     AND     Run Keyword And Return      Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
-    Run Keyword And Continue On Failure     End Docker Execution    ${container_name}
+    End Docker Execution
+    Run Keyword And Continue On Failure     Verify Alpha and Zero after termination
     IF    ${is_clear_folder}
         Backup Yaml File
         Backup directories created while execution
@@ -63,11 +64,13 @@ Retrigger Docker File
 
 End Docker Execution
     [Documentation]  Keyword to end docker execution
-    [Arguments]     ${container_name}
     ${dir_path}=    normalize path    ${CURDIR}/..
     Terminate All Processes
     ${result_docker}=    Start Process    docker-compose    down       alias=docker_compose_down  stdout=docker_compose_down.txt    stderr=docker_compose_down_err.txt    cwd=results    shell=True
     Wait For Process    timeout=20 s    on_timeout=continue
+
+Verify Alpha and Zero after termination
+    [Documentation]     Keyword to verify alpha and zero logs after total termination
     @{compose_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    docker_compose_up    @{compose_error_context}
     Run Keyword And Return If      ${passed}       Fail       Captured errors in docker compose
@@ -75,7 +78,7 @@ End Docker Execution
     Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    docker_compose_up    @{compose_context}
 
 Terminate Docker Execution and Create Backup of Dgraph Execution
-    [Arguments]     ${container_name}      ${is_clear_folder}
+    [Arguments]    ${is_clear_folder}
     Run Keyword If Any Tests Failed     Run Keywords    Terminate All Processes
     ...     AND     Sleep   20s
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
@@ -83,7 +86,8 @@ Terminate Docker Execution and Create Backup of Dgraph Execution
     ...     AND     Backup Yaml File
     ...     AND     Backup directories created while execution
     ...     AND     Return From Keyword
-    Run Keyword And Continue On Failure    END DOCKER EXECUTION     ${container_name}
+    END DOCKER EXECUTION
+    Run Keyword And Continue On Failure   Verify Alpha and Zero after termination
     Backup alpha and zero logs
     Backup Yaml File
     Backup directories created while execution
@@ -201,7 +205,8 @@ Docker Verify Bulk Process
     ${dir_path}=    normalize path    ${CURDIR}/..
     Should Contain    ${loader_Text_File_Content}    Total:
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
-    End Docker Execution  ${container_name}
+    End Docker Execution
+    Verify Alpha and Zero after termination
     @{dirs}     Create List     alpha1  zero1
     Backup Custom Directories Created While Execution  @{dirs}  
     Backup Yaml File

@@ -3,7 +3,7 @@ Documentation     Dgraph Docker Test Suite
 Suite Setup       Start Dgraph 2-node In Docker with bulk data    ${dgraph_docker_version}   ${container_name}    ${None}
 Test Setup      Monitor Health And State check
 Test Teardown    Retrigger Docker File       ${dgraph_docker_version}   ${container_name}    ${None}     ${FALSE}
-Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution    ${container_name}   ${FALSE}
+Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution   ${FALSE}
 Default Tags    docker
 Resource          ../../../resources/dgraph_docker_commands.robot
 
