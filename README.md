@@ -2,9 +2,9 @@
 
 **This is a Automation Repo for Dgraph including Slash.**
 
-Nightly | CI  |  Weekely
---------|-----|----------
-[![nightly](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Nightly_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Nightly_Automation&buildId=lastFinished&guest=1)          |      [![CI Build Status](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:QADgraphAutomation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=QADgraphAutomation&buildId=lastFinished&guest=1)        |       [![weeklyLargeData](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Weekely_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Weekely_Automation&buildId=lastFinished&guest=1)
+Nightly | CI  |  Weekely  | Docker
+--------|-----|-----------|-------
+[![nightly](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Nightly_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Nightly_Automation&buildId=lastFinished&guest=1)          |      [![CI Build Status](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:QADgraphAutomation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=QADgraphAutomation&buildId=lastFinished&guest=1)        |       [![weeklyLargeData](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Weekely_Automation)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Weekely_Automation&buildId=lastFinished&guest=1)   |       [![docker_execution](https://teamcity.dgraph.io/guestAuth/app/rest/builds/buildType:(id:Dgraph_QA_Docker_Execution)/statusIcon.svg)](https://teamcity.dgraph.io/viewLog.html?buildTypeId=Dgraph_QA_Docker_Execution&buildId=lastFinished&guest=1)
 
 ## Table of Contents
 
@@ -40,7 +40,7 @@ Nightly | CI  |  Weekely
   * Slash
   * Common
   * CustomTestRailListener
-* To setup-docker compose file goto utilities dir->  `python3 create_docker_yml.py -v master -c disabled`
+* To run dgraph using docker file goto test_suites/dgraph/docker dir->
   * Setup supports
     * 2node - ( 1 zero and 1 alpha )
     * 4node - ( 1 zero and 3 alpha )

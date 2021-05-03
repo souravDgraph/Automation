@@ -6,7 +6,6 @@ Library           Dgraph
 Library           String
 
 *** Variables ***
-${URL}            http://localhost:8080
 ${rdf_file}       1million.rdf.gz
 ${schema_file}    1million.schema
 ${appenders}      /admin
@@ -21,9 +20,9 @@ TC_01 Perform cross version backup and restore.
     Build Dgraph Version    ${prev_version}
     Start Dgraph
     Create NFS Backup    2
-    End All Process    true
+    Terminate and Create Backup of Dgraph Execution     ${TRUE}
     Build Dgraph Version    ${current_version}
     Start Dgraph
-    Run Keyword If     ${is_latest_global_check}     Perform a restore on backup latest versions    1
+    Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
      ...    ELSE    Perform a restore on backup by older dgraph versions
-    End All Process    false
+    Terminate and Create Backup of Dgraph Execution     false

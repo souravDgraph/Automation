@@ -142,8 +142,11 @@ backup/*
 export/**
 !export/.gitkeep
 
+# utilities folder
+utilities/*.txt
+
 #other files
 .DS_Store
 .idea/
 
-test_data/datasets/21million.rdf.gz
+.vscode/settings.json
