@@ -176,6 +176,7 @@ End All Process
 Terminate and Create Backup of Dgraph Execution
     [Arguments]  ${is_clear_folder}
     Run Keyword If Any Tests Failed     Run Keywords    Terminate All Processes
+    ...     AND     Sleep   20s
     ...     AND     Backup alpha and zero logs
     ...     AND     Backup directories created while execution
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
@@ -573,6 +574,7 @@ Monitor zero and alpha process
     [Arguments]  ${is_clear_folder}     ${is_learner}=${None}
     [Documentation]    Keyword to monitor zero and alpha process to run
     Run Keyword If Test Failed     Run Keywords    Terminate All Processes
+    ...     AND     Sleep   20s
     ...     AND     Backup directories created while execution
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     ...     AND     Run Keyword And Return If  ${LUDICROUS_MODE}   Start Dgraph Ludicrous Mode
