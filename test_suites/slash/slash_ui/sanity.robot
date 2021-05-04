@@ -305,7 +305,7 @@ Drop data from schema
 
 *** Keywords ***
 Setup
-    Open Browser    ${Browser_Alias}    ${URL}    Chrome
+    Open Browser    ${Browser_Alias}    ${URL}    ${BROWSER_NAME}    options=add_argument("--window-size=1920,1080")
     Login     ${Browser_Alias}    ${USER_NAME}    ${PASSWORD}
 
 Create Backend
