@@ -36,6 +36,8 @@ Start Dgraph 2-node In Docker with bulk data
     Create Backup Folder
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
+    ${result_docker}=    Start Process    docker    rmi      dgraph/dgraph:${dgraph_version}   alias=docker_rmi  stdout=docker_rmi.txt    stderr=docker_rmi_err.txt    cwd=results    shell=True
+    Wait For Process    timeout=5 s    on_timeout=continue
     ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=1
     ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=utilities    shell=True
     ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up_${DOCKER_COMPOSE_UP_COUNT}.txt    stderr=docker_compose_up_err_${DOCKER_COMPOSE_UP_COUNT}.txt    cwd=results    shell=True
@@ -48,20 +50,33 @@ Start Dgraph 2-node In Docker with bulk data
 Retrigger Docker File
     [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}      ${is_clear_folder}
     [Documentation]     Monitor Zero and Alpha for docker execution
-    Run Keyword And Continue On Failure     End Docker Execution    ${container_name}
+    Run Keyword If Test Failed     Run Keywords    End Docker Execution     ${dgraph_version}
+    ...     AND     Sleep   20s
+    ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
+    ...     AND     Backup directories created while execution
+    ...     AND     Backup Yaml File
+    ...     AND     Run Keyword And Return      Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
+    End Docker Execution    ${dgraph_version}
+    Run Keyword And Continue On Failure     Verify Alpha and Zero after termination
+    Backup Yaml File
+    Backup directories created while execution
     IF    ${is_clear_folder}
-        Backup Yaml File
-        Backup directories created while execution
+        clean up dgraph folders
     END
     Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
 
 End Docker Execution
     [Documentation]  Keyword to end docker execution
-    [Arguments]     ${container_name}
+    [Arguments]     ${dgraph_version}
     ${dir_path}=    normalize path    ${CURDIR}/..
     Terminate All Processes
     ${result_docker}=    Start Process    docker-compose    down       alias=docker_compose_down  stdout=docker_compose_down.txt    stderr=docker_compose_down_err.txt    cwd=results    shell=True
+    Wait For Process    timeout=5 s    on_timeout=continue
+    ${result_docker}=    Start Process    docker    rmi      dgraph/dgraph:${dgraph_version}    alias=docker_rmi  stdout=docker_rmi.txt    stderr=docker_rmi_err.txt    cwd=results    shell=True
     Wait For Process    timeout=20 s    on_timeout=continue
+
+Verify Alpha and Zero after termination
+    [Documentation]     Keyword to verify alpha and zero logs after total termination
     @{compose_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    docker_compose_up    @{compose_error_context}
     Run Keyword And Return If      ${passed}       Fail       Captured errors in docker compose
@@ -69,8 +84,16 @@ End Docker Execution
     Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    docker_compose_up    @{compose_context}
 
 Terminate Docker Execution and Create Backup of Dgraph Execution
-    [Arguments]     ${container_name}      ${is_clear_folder}
-    Run Keyword And Continue On Failure    END DOCKER EXECUTION     ${container_name}
+    [Arguments]    ${dgraph_version}    ${is_clear_folder}
+    Run Keyword If Any Tests Failed     Run Keywords    END DOCKER EXECUTION    ${dgraph_version}
+    ...     AND     Sleep   20s
+    ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
+    ...     AND     Backup alpha and zero logs
+    ...     AND     Backup Yaml File
+    ...     AND     Backup directories created while execution
+    ...     AND     Return From Keyword
+    END DOCKER EXECUTION    ${dgraph_version}
+    Run Keyword And Continue On Failure   Verify Alpha and Zero after termination
     Backup alpha and zero logs
     Backup Yaml File
     Backup directories created while execution
@@ -162,13 +185,14 @@ Docker Verify Live loader trigger properly or not
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
+    ${loader_err}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}_err   Please retry operation
     ${tcp_error}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Error while dialing dial tcp
-    IF  ${status}==${FALSE} or ${tcp_error}
+    IF  ${status}==${FALSE} or ${tcp_error} or ${loader_err}
         ${retry_check}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Please retry
         Terminate Process   ${loader_alias}
         Trigger Loader Process for Docker     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${zero_host}    ${alpha_host}
         Wait For Process    ${loader_alias}    timeout=10 s
-        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
+        @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw   fatal error:
         @{live_loader_errors}  Create List     github.com/dgraph-io/dgraph/
         ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder    ${loader_alias}_err     @{live_loader_errors}
         Run Keyword If   ${check}   FAIL    Found Issues in live loader during live load
@@ -187,7 +211,8 @@ Docker Verify Bulk Process
     ${dir_path}=    normalize path    ${CURDIR}/..
     Should Contain    ${loader_Text_File_Content}    Total:
     Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
-    End Docker Execution  ${container_name}
+    End Docker Execution    ${dgraph_version}
+    Verify Alpha and Zero after termination
     @{dirs}     Create List     alpha1  zero1
     Backup Custom Directories Created While Execution  @{dirs}  
     Backup Yaml File
@@ -354,7 +379,7 @@ Docker Perform a restore on backup latest versions
     ${dgraph_command}   Set Variable IF  '${DOCKER_STRING}'!='${EMPTY}'     ${DOCKER_STRING} dgraph     dgraph
     ${cmd}  Catenate   ${dgraph_command}   restore -p ${backup_path} -l ${backup_path} -z localhost:${zero_ports}
     ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${backup_path}
-    ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results     shell=True
+    ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    stderr=restorebackup_err.txt    cwd=results     shell=True
     ...    AND    Process Should Be Running    restore
     ...    AND    Wait For Process    restore
     ...    AND    Process Should Be Stopped    restore
@@ -378,7 +403,7 @@ Docker Perform a restore on backup by older dgraph versions
         ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
         ${tls_check}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
         ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${restore_dir}
-        ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results    shell=True
+        ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt   stderr=restorebackup_err.txt     cwd=results    shell=True
         ...    AND    Process Should Be Running    restore
         ...    AND    Wait For Process    restore
         ...    AND    Process Should Be Stopped    restore
