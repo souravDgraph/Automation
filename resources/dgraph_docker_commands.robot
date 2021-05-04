@@ -85,7 +85,7 @@ Verify Alpha and Zero after termination
 
 Terminate Docker Execution and Create Backup of Dgraph Execution
     [Arguments]    ${dgraph_version}    ${is_clear_folder}
-    Run Keyword If Any Tests Failed     Run Keywords    Terminate All Processes
+    Run Keyword If Any Tests Failed     Run Keywords    END DOCKER EXECUTION    ${dgraph_version}
     ...     AND     Sleep   20s
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     ...     AND     Backup alpha and zero logs
