@@ -29,3 +29,7 @@ class OrganizationLocators:
     remove_org = "xpath = //div[text()='%s']/following::button[text()='Remove']"
     org_email = "xpath = //input[@placeholder='Email ID used for slash account']"
     add_member_alert = "xpath = //h3[text()='Unable to add member']/following-sibling::div"
+    create_org_button = "xpath = //h3[text()='Organizations']//following-sibling::button[text()='Create']"
+    create_new_org_label = "xpath = //h3[text()='Create New Organization']"
+    organization_textbox = "xpath = //input[@placeholder='Your Organization']"
+    create_button = "xpath = //button[text()='Cancel']//following::button[text()='Create']"

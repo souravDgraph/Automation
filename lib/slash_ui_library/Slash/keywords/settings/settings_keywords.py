@@ -6,6 +6,7 @@ Author: vivetha@dgraph.io
 """
 
 import time
+from robot.api.deco import keyword
 from Slash.keywords.settings.constants import CLONE_TEXT, DELETE_TEXT
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.settings.settings import SettingsLocators
@@ -101,29 +102,45 @@ class SettingsKeywords:
                                                     timeout=SettingsKeywords.timeout)
 
     @staticmethod
-    def update_backend_organization(browser_alias, organization):
+    def update_backend_organization(browser_alias, new_org_name, current_org_name=None):
         """
         update the organization name for the backend.
         | browser_alias |  alias of the browser |
+        | old_organization | organization name present already (optional) |
         | organization |  name of the organization |
 
         Example:
-        | Update Backend Organization | Browser_1 | test_org |
+        | Update Backend Organization | Browser_1 | test | Labs |
+        | Update Backend Organization | Browser_1 | Labs | 
 
         Return:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        ui_organization = browser.get_text(SettingsLocators.organization_name,
-                                           timeout=SettingsKeywords.timeout)
-        browser.page_should_not_contain_element(SettingsLocators.update_button)
-        if ui_organization != organization:
-            browser.click_element(SettingsLocators.organization_select,
-                                  timeout=SettingsKeywords.timeout)
-            browser.click_element(SettingsLocators.organization.replace("%s", organization),
-                                  timeout=SettingsKeywords.timeout)
-            browser.click_element(SettingsLocators.update_button,
-                                  timeout=SettingsKeywords.timeout)
+        if(current_org_name):
+            browser.click_element(SettingsLocators.organization_name_button.replace("%s", current_org_name), timeout=SettingsKeywords.timeout)
+        else:
+            browser.click_element(SettingsLocators.organization_name_button.replace("%s", "Select organization"), timeout=SettingsKeywords.timeout)
+        browser.click_element(SettingsLocators.organization_name_list.replace("%s", new_org_name), timeout=SettingsKeywords.timeout)
+        browser.click_element(SettingsLocators.update_button, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.organization_name_button.replace("%s",new_org_name), timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def remove_backend_organization(browser_alias):
+        """
+        remove the backend organization.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Remove Backend Organization | Browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SettingsLocators.remove_org_button, timeout=SettingsKeywords.timeout)
+        browser.click_element(SettingsLocators.remove_org_popup_button, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.organization_name_button.replace("%s", "Select organization"), timeout=SettingsKeywords.timeout)
 
     @staticmethod
     def click_api_key_tab(browser_alias):
@@ -213,3 +230,19 @@ class SettingsKeywords:
         browser.wait_until_page_contains_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
         browser.click_element(SettingsLocators.delete_api_key_confirm, timeout=SettingsKeywords.timeout)
         browser.wait_until_page_does_not_contain_element(SettingsLocators.api.replace("%s", api_key_name), timeout=SettingsKeywords.timeout)
+
+    @staticmethod
+    def click_clone_backend(browser_alias):
+        """
+        click the clone backend button
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Clone Backend | Browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(SettingsLocators.clone_backend, timeout=SettingsKeywords.timeout)
+        browser.wait_until_page_contains_element(SettingsLocators.clone_deployment_label, timeout=SettingsKeywords.timeout)
