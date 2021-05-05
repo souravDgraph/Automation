@@ -257,6 +257,8 @@ Should be able to run a mutation
     Expand Add Query        ${Browser_Alias}        add       User
     Add Value To Field        ${Browser_Alias}        name        santhosh
     Click Execute Query Button       ${Browser_Alias}
+    ${data}=    Get Query Result     ${Browser_Alias}
+    Run Keyword If     ${data}!=${MUTATION_RESULT}    Fail
     Click Remove Query Button        ${Browser_Alias}       mutation
     Verify Query Data      ${QUERY_RESULT1}      User
 
@@ -276,6 +278,8 @@ Should be able to query and return response
     Expand Add Query        ${Browser_Alias}        add       User
     Add Value To Field        ${Browser_Alias}        name        user1
     Click Execute Query Button       ${Browser_Alias}
+    ${data}=    Get Query Result     ${Browser_Alias}
+    Run Keyword If     ${data}!=${MUTATION_RESULT}    Fail
     Click Remove Query Button        ${Browser_Alias}       mutation
     Verify Query Data      ${QUERY_RESULT2}      User
 
@@ -297,6 +301,8 @@ Drop data from schema
     Expand Add Query        ${Browser_Alias}        add       User
     Add Value To Field        ${Browser_Alias}        name        santhosh
     Click Execute Query Button       ${Browser_Alias}
+    ${data}=    Get Query Result     ${Browser_Alias}
+    Run Keyword If     ${data}!=${MUTATION_RESULT}    Fail
     Click Remove Query Button        ${Browser_Alias}       mutation
     Click Schema In Menu     ${Browser_Alias}
     Click Drop Data Button      ${Browser_Alias}

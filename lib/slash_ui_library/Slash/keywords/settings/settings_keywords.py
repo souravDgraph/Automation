@@ -289,6 +289,8 @@ class SettingsKeywords:
         browser.wait_until_page_contains_element(SettingsLocators.label_type, timeout=SettingsKeywords.timeout)
         list_backups = SettingsLocators.get_backups
         backups_list = browser.execute_javascript(list_backups)
-        if(backups_list!=""):
-            return True
-        return False
+        backups_list = backups_list.split("\n\n")
+        for each_backup in backups_list:
+            if("incremental" not in each_backup or "full" not in each_backup) and "Clone" not in each_backup:
+                return False
+        return True

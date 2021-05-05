@@ -124,6 +124,7 @@ class ApiExplorerKeywords():
         height = browser.execute_javascript(ApiExplorerLocators.get_scroll_height)
         browser.execute_javascript(ApiExplorerLocators.set_scroll_top.replace("%s", str(height)))
         js_exe = ApiExplorerLocators.get_query_data
+        time.sleep(5)
         response = browser.execute_javascript(js_exe)
         logger.info(response)
         response = re.sub('\xa0', '', response) 

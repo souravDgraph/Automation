@@ -47,7 +47,7 @@ class SettingsLocators:
     api_keys_tab = "xpath = //button[text()='API Keys']"
     backend_dropdown_list = "xpath = //button//div[text()='%s']"
     delete_confirm_message = "xpath = //div[text()='Backend deleted successfully.']"
-    backup_label = "xpath = //h3[text()='Backups']"
+    backup_label = "xpath = //h3[text()='Backup History']"
     create_backup_button = "xpath = //button[text()='Create Backup']"
     backup_initiated_okay_button = "xpath = //h3[text()='Backup Initiated']//following-sibling::div//button[text()='Okay']"
 
