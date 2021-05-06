@@ -25,7 +25,7 @@ class CustomRequestKeywords:
     """
 
     def connect_request_server(
-        self, url=None, port=None, offset=0, is_docker=None, is_learner=None
+        self, url=None, port=None, offset=0, is_docker=None, is_learner=False
     ):
         """
         Method to connect to url to perform backup.
