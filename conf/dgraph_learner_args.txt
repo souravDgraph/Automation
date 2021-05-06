@@ -1,4 +1,4 @@
---outputdir ./results/dgraph_results
+--outputdir ./results/dgraph_learner_results
 #--timestampoutput
 --console verbose
 --consolemarkers on

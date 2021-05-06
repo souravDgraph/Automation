@@ -1,4 +1,5 @@
-# Dgraph Robot Framework Automation
+# Dgraph Robot Framework Automation - v21.03.0
+> *Make sure that the local version matches with v21.03.0 before execution while using binary*
 
 **This is a Automation Repo for Dgraph including Slash.**
 
@@ -8,6 +9,7 @@ Nightly | CI  |  Weekely  | Docker
 
 ## Table of Contents
 
+* [Framework Features](#framework-features) 
 * [Framework Setup](#framework-setup)
 * [Execution Commands](#execution-commands)
 * [Framework Structure](#framework-structure)
@@ -42,24 +44,47 @@ Nightly | CI  |  Weekely  | Docker
   * CustomTestRailListener
 * To run dgraph using docker file goto test_suites/dgraph/docker dir->
   * Setup supports
-    * 2node - ( 1 zero and 1 alpha )
-    * 4node - ( 1 zero and 3 alpha )
-  * Currently tested only on master branch.
+    * 2node - ( 1 zero and 1 alpha ) 
+    * 4node - ( 1 zero and 3 alpha ) **under progress
+
+## Framework Features:
+
+* **Binary Support with 1 cluster**:
+  * Alpha with Learner Node Suite:
+    * `test_suites/dgraph/Linux/dgraph_suite_04.robot`
+    * To execute use:
+      * `robot -A conf/dgraph_learner_args.txt`
+  * Alpha in Ludicrous Mode Suite:
+    * `test_suites/dgraph/Linux/dgraph_suite_03.robot`
+    * To execute use:
+      * `robot -A conf/dgraph_ludicrous_args.txt`
+  * Dgraph Sanity Test Suite:
+    * `test_suites/dgraph/Linux/dgraph_suite_01.robot`
+    * To execute use:
+      * `robot -A conf/dgraph_live_args.txt`
+* **Docker Support:**
+  * Currently supports only 2 node (1 cluster)
+    * Can be run only in `sudo` mode.
+    * Test suite is present at:
+      * `test_suites/dgraph/docker/dgraph_docker_2-node_suite.robot`
+    * To Execute 2-node Docker Suite:
+      * `sudo robot -A conf/dgraph_docker_args.txt`
+
+* [x] Results are stored under **results/**
+* [x] Backup and Restore are defaulted to **backup/**
+* [x] Test Data is present under **test_data/datasets/**
+
 
 ## Execution Commands
 
 * To run the suite with virtualenv enabled
   * `cd utilities &&  runner.sh -l Dgraph -c disabled -t <absoulte_path>/Automation/test_suites/dgraph/Linux/dgraph_suite.robot`. This is a prefered way to execute.
 * To run individual suite without virtualenv setup
-  * `robot -d results test_suites/dgraph/Linux/dgraph_suite.robot`
+  * `robot -d results test_suites/dgraph/Linux/dgraph_suite_01.robot`
 * To set variables from terminal pass `-v <variablename>:<value>`
-  * `robot -d results -v rdf_file:21million.rdf.gz -v schema_file:21million.schema test_suites/dgraph/Linux/dgraph_suite.robot`
+  * `robot -d results -v rdf_file:21million.rdf.gz -v schema_file:21million.schema test_suites/dgraph/Linux/dgraph_suite_01.robot`
 * To run from arguments file
   * `robot -A conf/dgraph_live_args.txt`
-
-* [x] results are stored under results
-* [x] backup and restore are defaulted to "backup/" directory
-* [x] test data is present under test_data/datasets
 
 ## Framework Structure
 

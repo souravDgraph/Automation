@@ -1,4 +1,4 @@
---outputdir ./results/docker_exe_res
+--outputdir ./results/dgraph_docker_res
 #--timestampoutput
 --console verbose
 --consolemarkers on

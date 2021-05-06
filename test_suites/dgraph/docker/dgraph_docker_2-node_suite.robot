@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Dgraph Docker Test Suite
-Suite Setup       Start Dgraph 2-node In Docker with bulk data    ${dgraph_docker_version}   ${container_name}    ${None}
+Suite Setup       Start Dgraph 2-node In Docker    ${dgraph_docker_version}   ${container_name}    ${None}      is_ludicrous_mode=${ludic_mode}
 Test Setup      Monitor Health And State check
 Test Teardown    Retrigger Docker File       ${dgraph_docker_version}   ${container_name}    ${None}     ${FALSE}
 Suite Teardown    Terminate Docker Execution and Create Backup of Dgraph Execution   ${dgraph_docker_version}   ${FALSE}
@@ -15,6 +15,7 @@ ${zero-node}      1
 ${dgraph_docker_version}     v21.03.0
 # alpha container to interact and perform all the dgraph operations on
 ${container_name}   alpha1
+${ludic_mode}   ${FALSE}
 
 
 *** Test Cases ***
@@ -44,8 +45,7 @@ TC_04 Docker - Perform NFS backup and restore data
      [Tags]    regression   C702    C700   WEEKLY
      Clear Backup Folders   ${TRUE}
      Docker Create NFS Backup      1    alpha1
-     Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    0      alpha1      zero1
-     ...    ELSE    Docker Perform a restore on backup by older dgraph versions     alpha1      zero1
+     Docker Perform a restore on backup latest versions    0      alpha1      zero1
      [Teardown]    NONE
 
 TC_05 Docker - Perfrom NFS export on dgraph
@@ -69,8 +69,7 @@ TC_07 Docker - Perform Increment backup and restore on bulk data
      [Tags]    regression   C702    C700   WEEKLY
      Clear Backup Folders   ${TRUE}
      Docker Create NFS Backup      3    alpha1
-     Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    2      alpha1      zero1
-     ...    ELSE    Docker Perform a restore on backup by older dgraph versions     alpha1      zero1
+     Docker Perform a restore on backup latest versions    2      alpha1      zero1
      Clear Backup Folders   ${TRUE}
 
 TC_08 Docker - Perform parallel live loads.
@@ -86,6 +85,5 @@ TC_09 Docker - Perform Increment backup and restore data
      [Tags]    regression   WEEKLY
      Clear Backup Folders   ${TRUE}
      Docker Create NFS Backup    2      alpha1
-     Run Keyword If     ${DGRAPH_LATEST_VERSION_CHECK}     Docker Perform a restore on backup latest versions    1      alpha1      zero1
-     ...    ELSE    Docker Perform a restore on backup by older dgraph versions      alpha1      zero1
+     Docker Perform a restore on backup latest versions    1      alpha1      zero1
      Clear Backup Folders   ${TRUE}
