@@ -73,6 +73,10 @@ class DashboardKeywords():
         browser.input_text(DashboardLocators.backend_name,
                            backend_name,
                            timeout=DashboardKeywords.timeout)
+                    
+        if select_product:
+            browser.click_element(DashboardLocators.select_product.replace("%s", select_product),
+                                    timeout=DashboardKeywords.timeout)
         if subdomain:
             browser.input_text(DashboardLocators.subdomain,
                                subdomain,
@@ -83,14 +87,12 @@ class DashboardKeywords():
             browser.click_element(DashboardLocators.organization_name.replace("%s", organization),
                                   timeout=DashboardKeywords.timeout)
         if provider:
+            browser.click_element(DashboardLocators.provider_button, timeout=DashboardKeywords.timeout)
             browser.click_element(DashboardLocators.provider.replace("%s", provider),
                                   timeout=DashboardKeywords.timeout)
         
-        if select_product:
-            browser.click_element(DashboardLocators.select_product.replace("%s", select_product),
-                                    timeout=DashboardKeywords.timeout)
-
         if zone:
+            browser.click_element(DashboardLocators.zone_button, timeout=DashboardKeywords.timeout)
             browser.click_element(DashboardLocators.zone.replace("%s", zone),
                                   timeout=DashboardKeywords.timeout)
 
@@ -451,3 +453,19 @@ class DashboardKeywords():
         browser.wait_until_page_contains_element(DashboardLocators.card_added_alert_message,                
                                                     timeout=DashboardKeywords.timeout)                                            
 
+    @staticmethod
+    def has_active_subscription(browser_alias):
+        """
+        check the account have active subscription
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Has Active Subscription | browser_1 |
+        
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        DashboardKeywords.click_avatar(browser_alias)
+        DashboardKeywords.click_billing_button(browser_alias)
+        browser.wait_until_page_contains_element(DashboardLocators.active_subscription_label, timeout=DashboardKeywords.timeout)

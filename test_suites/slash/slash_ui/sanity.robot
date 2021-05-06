@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     This Suite contains the sanity test cases for Slash UI
-Suite Setup       Run Keywords     Setup     AND     Create Backend     AND     Add And Deploy Schema     ${type_name}     ${field_name}      ${SCHEMA1}
+Suite Setup       Run Keywords     Setup     AND     Create Backend       ${BACKEND_NAME}      Dedicated      PROVIDER      ${BACKEND_ZONE}    AND     Add And Deploy Schema     ${type_name}     ${field_name}      ${SCHEMA1}
 Suite Teardown    Run Keywords     Delete Backend    ${BACKEND_NAME}     AND    Close Browser    ${Browser_Alias}
 Library           Slash
 Variables         ../../../conf/slash/variables.py
@@ -62,8 +62,10 @@ User should not be able to create more than one backend
     ...
     ...    Click the launch new backend button
     ...    Check the starter product is disabled
+    [Setup]     Create Backend        Test_Starter       Starter       None       ${BACKEND_ZONE}
     Click Launch New Backend      ${Browser_Alias}        20
     Check Starter Product Disabled       ${Browser_Alias}
+    [Teardown]      Delete Backend      Test_Starter
 
 User should be able to add new API key
     [Documentation]
@@ -105,7 +107,7 @@ User should be able to delete a backend
     Click General Tab      ${Browser_Alias}
     Delete Deployment     ${Browser_Alias}     ${BACKEND_NAME}
     Check Deployment Is Deleted     ${Browser_Alias}     ${BACKEND_NAME}
-    [Teardown]     Create Backend
+    [Teardown]     Create Backend       ${BACKEND_NAME}      Dedicated      PROVIDER      ${BACKEND_ZONE}
 
 User should be able signout from the logout button in the header
     [Documentation]
@@ -219,8 +221,12 @@ Add Card And Verify Billing page with 0$ bill
     ...    add card 
     ...    monitor backend
     ...    click avatar and billing button
+    Click Avatar      ${Browser_Alias}
+    Click Billing Button      ${Browser_Alias}
+    ${has_active_subscription}=       Run Keyword And Return Status      Has Active Subscription      ${Browser_Alias}
+    Run Keyword If      '${has_active_subscription}'=='True'     Cancel Subscription      ${Browser_Alias}
     Click Launch New Backend      ${Browser_Alias}     20
-    Fill Backend Details      ${Browser_Alias}      Shared       Slash GraphQL
+    Fill Backend Details      ${Browser_Alias}      Test_Shared     Shared      None      ${BACKEND_ZONE}
     Click Launch Button      ${Browser_Alias}
     Add Card     ${Browser_Alias}       ${card_number}      ${expiry_date}      ${cvc}      ${postal}
     Monitor Backend Creation      ${Browser_Alias}     Shared     70
@@ -315,9 +321,14 @@ Setup
     Login     ${Browser_Alias}    ${USER_NAME}    ${PASSWORD}
 
 Create Backend
+    [Arguments]      ${backend_name}     ${instance_type}      ${cloud_provider}      ${zone}
+    Click Avatar      ${Browser_Alias}
+    Click Billing Button      ${Browser_Alias}
+    ${has_active_subscription}=       Run Keyword And Return Status      Has Active Subscription      ${Browser_Alias}
     Click Launch New Backend      ${Browser_Alias}     20
-    Fill Backend Details      ${Browser_Alias}      ${BACKEND_NAME}
+    Fill Backend Details      ${Browser_Alias}      ${backend_name}     ${instance_type}      provider=${cloud_provider}     zone=${zone}
     Click Launch Button      ${Browser_Alias}
+    Run Keyword If      '${has_active_subscription}'=='False' and '${instance_type}'!='Starter'    Add Card      ${Browser_Alias}      ${card_number}      ${expiry_date}      ${cvc}      ${postal}
     Monitor Backend Creation      ${Browser_Alias}      ${BACKEND_NAME}     70
 
 Delete Backend

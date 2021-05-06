@@ -34,7 +34,7 @@ class SchemaLocators:
     default_type_name = "xpath = //div/ancestor::div//h3[text()='%s']"
     editable_type_name = "xpath = //div//following::input[@value='%s']"
     save_button = "xpath = //input//following::button[text()='Save']"
-    add_field_button = "xpath = //h3[text()='%s']//following::button[@class='css-zt53j8']"
+    add_field_button = "xpath = //h3[text()='%s']//following::button[@class='css-7f7zux']"
     editable_field_name = "xpath = //h3[text()='%s']//following::input[@value='old_field_name']"
     field_type_button = "xpath = //h3[text()='%s']//following::div//input[@value='untitledfield']//following-sibling::div//button//div[text()='old_data_type']"
     select_field_type = "xpath = //h3[text()='%s']//following::div//input[@value='field_name']//following-sibling::div//button//following::li//div[text()='new_data_type']"
