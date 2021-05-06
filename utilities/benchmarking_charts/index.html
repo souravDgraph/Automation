@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Benchmarking Dgraph</title>
+    <meta http-equiv="refresh" content="300">
+
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            var dataPoints = [];
+
+            function convertTimeToMin(points, index) {
+                let timeInMin = 0
+                if (!(String(points[0]).includes("##") || String(points[2]) == "undefined")) {
+                    let data = String(points[index])
+                    var hr = min = sec = ""
+                    if (data.includes("m")) {
+                        if (data.includes("h")) {
+                            hr = parseFloat(data.split("h")[0])
+                            timeInMin = hr * 60
+
+                            min = parseFloat(data.split("h")[1].split('m')[0])
+                            timeInMin += min
+                            sec = parseFloat(data.split("h")[1].split('m')[1])
+                            timeInMin += sec / 60
+                        }
+                        else {
+                            min = parseFloat(data.split('m')[0])
+                            timeInMin += min
+                            sec = parseFloat(data.split('m')[1])
+                            timeInMin += sec / 60
+                        }
+                    }
+                    else {
+                        sec = data
+                        timeInMin = parseFloat(sec) / 60
+                    }
+                }
+                return timeInMin;
+            }
+
+            function convertTimeToSec(points, index) {
+                let timeInSec = 0
+                if (!(String(points[0]).includes("##") || String(points[2]) == "undefined")) {
+                    let data = String(points[index])
+                    var hr = min = sec = ""
+                    if (data.includes("h") && data.includes("m")) {
+                        hr = parseFloat(data.split("h")[0])
+                        timeInSec = hr * 3600
+                        min = parseFloat(data.split("h")[1].split('m')[0])
+                        timeInSec += min * 60
+                        sec = parseFloat(data.split("h")[1].split('m')[1])
+                        timeInSec += sec
+                    }
+                    else if (data.includes("m") && !data.includes("h")) {
+                        min = parseFloat(data.split('m')[0])
+                        timeInSec = min * 60
+                        sec = parseFloat(data.split('m')[1])
+                        timeInSec += sec
+                    }
+                    else {
+                        sec = data
+                        timeInSec = parseFloat(sec)
+                    }
+                }
+                return timeInSec;
+            }
+
+            function getLiveLoaderDataFromCSV(csv, yAxisTitle) {
+                var dataPoints = csvLines = points = [];
+                csvLines = csv.split(/[\r?\n|\r|\n]+/);
+
+                for (var i = 0; i < csvLines.length; i++)
+                    if (csvLines[i].length > 0) {
+                        let dataInMinutes = []
+                        points = csvLines[i].split(",");
+                        if (yAxisTitle.includes("inutes")) {
+                            dataPoints.push({
+                                x: parseInt(points[0]),
+                                y: convertTimeToMin(points, 2),
+                                z: points[1]
+                            });
+                        } else {
+                            dataPoints.push({
+                                x: parseInt(points[0]),
+                                y: convertTimeToSec(points, 2),
+                                z: points[1]
+                            });
+                        }
+                    }
+                return dataPoints;
+            }
+
+            function getBulkLoaderDataFromCSV(csv, yAxisTitle) {
+                var dataPoints = csvLines = points = [];
+                csvLines = csv.split(/[\r?\n|\r|\n]+/);
+
+                for (var i = 0; i < csvLines.length; i++)
+                    if (csvLines[i].length > 0) {
+                        let dataInMinutes = []
+                        points = csvLines[i].split(",");
+                        if (yAxisTitle.includes("inutes")) {
+                            dataPoints.push({
+                                x: parseInt(points[0]),
+                                y: convertTimeToMin(points, 3),
+                                z: points[1]
+                            });
+                        } else {
+                            dataPoints.push({
+                                x: parseInt(points[0]),
+                                y: convertTimeToSec(points, 3),
+                                z: points[1]
+                            });
+                        }
+                    }
+                return dataPoints;
+            }
+
+            function getChartFromCSV(csv, chartName, yAxisTitle) {
+                var chart = new CanvasJS.Chart(chartName, {
+                    zoomEnabled: true,
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: chartName,
+                    },
+                    axisX: {
+                        title: "Date",
+                        gridColor: "orange",
+                        gridDashType: "dot",
+                        gridThickness: 2
+                    },
+                    axisY: {
+                        title: yAxisTitle
+                    },
+                    toolTip: {
+                        shared: false
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        fontSize: 16
+                    },
+                    data: [{
+                        toolTipContent: "Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader",
+                        dataPoints: getLiveLoaderDataFromCSV(csv, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader",
+                        dataPoints: getBulkLoaderDataFromCSV(csv, yAxisTitle)
+                    }]
+                });
+
+                chart.render();
+            }
+
+            function getCombinedChartFromCSV(csvMaster, csv21, chartName, yAxisTitle) {
+                var chart = new CanvasJS.Chart(chartName, {
+                    zoomEnabled: true,
+                    animationEnabled: true,
+                    theme: "light2",
+                    title: {
+                        text: chartName,
+                    },
+                    axisX: {
+                        title: "Date",
+                        gridColor: "orange",
+                        gridDashType: "dot",
+                        gridThickness: 2
+                    },
+                    axisY: {
+                        title: yAxisTitle
+                    },
+                    toolTip: {
+                        shared: false
+                    },
+                    legend: {
+                        cursor: "pointer",
+                        fontSize: 16
+                    },
+                    data: [{
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader Master",
+                        dataPoints: getLiveLoaderDataFromCSV(csvMaster, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader Master",
+                        dataPoints: getBulkLoaderDataFromCSV(csvMaster, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        yValueType: "Time",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Live Loader 21.03",
+                        dataPoints: getLiveLoaderDataFromCSV(csv21, yAxisTitle)
+                    }, {
+                        toolTipContent:"Date: {x} <br/> Version: {z} <br/> Time: {y} min <br/> name: {name}",
+                        type: "line",
+                        showInLegend: true,
+                        xValueType: "dateTime",
+                        axisYIndex: 1, //Defaults to Zero
+                        name: "Bulk Loader 21.03",
+                        dataPoints: getBulkLoaderDataFromCSV(csv21, yAxisTitle)
+                    }]
+                });
+
+                chart.render();
+            }
+            $.get("dataPoints21_03_21mil.csv", function (data) { getChartFromCSV(data, "21.03_21mil", "Time(minutes)") });
+            $.get("dataPoints21_03_stackoverflow.csv", function (data) { getChartFromCSV(data, "21.03_stackoverflow", "Time(minutes)") });
+            $.get("dataPointsMaster_21mil.csv", function (data) { getChartFromCSV(data, "Master_21mil", "Time(minutes)") });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data) { getChartFromCSV(data, "Master_stackoverflow", "Time(minutes)") });
+            $.get("dataPointsMaster_21mil.csv", function (data1) { $.get("dataPoints21_03_21mil.csv", function (data2) { getCombinedChartFromCSV(data1, data2, "Combined_21mil", "Time(minutes)") }) });
+            $.get("dataPointsMaster_stackoverflow.csv", function (data1) { $.get("dataPoints21_03_stackoverflow.csv", function (data2) { getCombinedChartFromCSV(data1, data2, "Combined_stackoverflow", "Time(minutes)") }) });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Dgraph Benchmark</h1>
+    <p> 21Million dataset benchmark is executed nightly.</p>
+    <p> Stackoverflow benchmark is executed weekly.</p>
+    <p> These benchmarks are executed on dgus machines.</p>
+    <div id="21.03_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Master_21mil" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Combined_21mil" style="width: 90%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="21.03_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Master_stackoverflow" style="width: 45%; height: 300px;display: inline-block;padding-left:10px;"></div>
+    <div id="Combined_stackoverflow" style="width: 90%; height: 300px;display: inline-block;padding-left:10px;"></div>
+</body>
+
+</html>

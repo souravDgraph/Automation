@@ -63,6 +63,7 @@ class DashboardLocators:
     billing_button = "xpath = //button[text()='Billing']"
     billing_label = "xpath = //h3[text()='Billing']"
     cloud_quick_start_label = "xpath = //h1[text()='Dgraph Cloud Quick Start']"
+    super_admin_label = "xpath = //h3[text()='Super Admin']"
 
     # Menu items
     schema = "xpath = //a[@href='/_/schema']"
@@ -71,6 +72,7 @@ class DashboardLocators:
     api_explorer = "xpath = //a[@href='/_/explorer']"
     overview = "xpath = //a[@href='/_/dashboard']"
     documentation = "xpath = //a[@href='https://dgraph.io/docs/slash-graphql/slash-quick-start/']"
+    super_admin = "xpath = //a[@href='/_/super-admin']"
 
     backends_list = "xpath = //button[@aria-haspopup='listbox']"
     backend_selection = "xpath = //li/div[text()='RC3']"

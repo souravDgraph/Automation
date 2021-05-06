@@ -345,13 +345,30 @@ class DashboardKeywords():
 
         Example:
         | Click Billing Button | browser_1 |
+        
+         Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)     
+        browser.click_element(DashboardLocators.billing_button, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.billing_label, 
+                                                    timeout=DashboardKeywords.timeout)
+
+    @staticmethod
+    def click_super_admin_in_menu(browser_alias):
+        """
+        Click Super Admin in Menu
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Super Admin In Menu | browser_1 |
 
         Return:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.click_element(DashboardLocators.billing_button, timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.billing_label, 
+        browser.click_element(DashboardLocators.super_admin, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.super_admin_label, 
                                                     timeout=DashboardKeywords.timeout)
 
     @staticmethod
@@ -432,4 +449,5 @@ class DashboardKeywords():
         browser.unselect_frame()
         browser.click_element(DashboardLocators.add_button, timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.card_added_alert_message,                
-                                                    timeout=DashboardKeywords.timeout)
+                                                    timeout=DashboardKeywords.timeout)                                            
+
