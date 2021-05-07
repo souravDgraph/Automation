@@ -47,7 +47,7 @@ class CustomRequestKeywords:
         if offset != 0:
             self.dgraph_cli.offset = offset
             if is_learner:
-                self.dgraph_cli.offset += 1
+                self.dgraph_cli.offset = offset + 1
         else:
             if is_learner:
                 offset = self.dgraph_cli.offset + 1
