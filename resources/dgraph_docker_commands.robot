@@ -310,21 +310,18 @@ Docker Create NFS Backup
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
     ${alpha_ports}  Get Port From Container     ${container_name}
+    connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     FOR    ${i}    IN RANGE    ${no_of_backups}
-        connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
         Verify file exists in a directory with parent folder name    ${backup_path}
-        Health Check for Backup Operation   ${container_name}
+        Health Check for Backup Operation
     END
     @{dirs_backup}=    List Directories In Directory    ${backup_path}
     log     ${dirs_backup}
 
 Health Check for Backup Operation
-    [Arguments]     ${container_name}
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    ${alpha_ports}  Get Port From Container     ${container_name}
-    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
 
 Check if backup is completed
@@ -364,8 +361,9 @@ Docker Export NFS data using admin endpoint
     ${alpha_ports}  Get Port From Container     ${container_name}
     Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
-    log    ${res.text}
+    log    ${res}
     Verify file exists in a directory with parent folder name    ${export_path}
+    Wait Until Keyword Succeeds    2x    60 sec     Verify Perticular file contents in results folder   docker_compose_up   ${DOCKER_COMPOSE_UP_COUNT}    task ${res}: completed successfully
 
 
 Docker Perform a restore on backup latest versions
@@ -384,26 +382,16 @@ Docker Perform a restore on backup latest versions
     ${type}     Get Value From Json     ${json_file}    $..type
     ${enc}     Get Value From Json     ${json_file}    $..encrypted
     Lists Should Be Equal   ${inc_list}     ${type}
-    ${tls_check}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
     ${enc_check}=    Get Enc Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
     Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
-    ${dgraph_command}   Set Variable     ${DOCKER_STRING} dgraph
-    ${cmd}  Catenate   ${dgraph_command}   restore -p ${backup_path} -l ${backup_path} -z localhost:${zero_ports}
-    ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${backup_path}
-    ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    stderr=restorebackup_err.txt    cwd=results     shell=True
-    ...    AND    Process Should Be Running    restore
-    ...    AND    Wait For Process    restore
-    ...    AND    Process Should Be Stopped    restore
-    ...    AND    Sleep    5s
-    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}      ${zero_ports}
-    Health Check for Restore Operation  ${container_name} 
+    ${result_restore}=   Restore Using Admin    ${backup_path}
+    Health Check for Restore Operation  ${container_name}
 
 
 Health Check for Restore Operation
     [Arguments]     ${container_name}
     [Documentation]  Keyword to verify if backup operation is completed successfully
     ${alpha_ports}  Get Port From Container     ${container_name}
-    Wait Until Keyword Succeeds    20x    30 sec    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed
@@ -464,6 +452,17 @@ Verify alpha and zero contents in results folder
         ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
         Should Contain Any    ${file_context}    @{context}
     END
+
+
+Verify Perticular file contents in results folder
+    [Arguments]    ${file_name}    ${count}=${0}     @{context}
+    [Documentation]    Keyword for checking content in .txt file generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${count_check}=    Evaluate   ${count} - 1
+    ${file_name}=    Set Variable IF  ${count} != 0  ${file_name}_${count_check}     ${file_name}
+    ${file_context}=    Get File    ${dir_path}/results/${file_name}.txt
+    Should Contain Any    ${file_context}    @{context}
 
 Verify file Content in results folder
     [Arguments]    ${file_name}    @{context}

@@ -18,6 +18,20 @@ TC_01 Perform live load data.
      [Tags]    regression     NIGHTLY
      Execute Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    is_learner=${TRUE}
 
+TC_04 Perform NFS backup and restore data
+     [Documentation]    Perform NFS backup and restore data.
+     ...    *Author*: Sourav
+     [Tags]    regression   WEEKLY
+     Clear Backup Folders   ${TRUE}
+     Create NFS Backup      3
+     Perform a restore on backup latest versions    2
+
+TC_05 Perfrom NFS export on dgraph
+    [Documentation]  Test Case to perform nfs export.
+    ...    *Author*: Sourav
+    [Tags]      regression   WEEKLY
+    Export NFS data using admin endpoint    json    ${TRUE}
+
 TC_02 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
@@ -37,7 +51,6 @@ TC_04 Perform NFS backup and restore data
      Clear Backup Folders   ${TRUE}
      Create NFS Backup      3
      Perform a restore on backup latest versions    2
-     Clear Backup Folders   ${TRUE}
 
 TC_05 Perfrom NFS export on dgraph
     [Documentation]  Test Case to perform nfs export.

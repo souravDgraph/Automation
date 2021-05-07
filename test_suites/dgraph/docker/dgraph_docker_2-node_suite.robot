@@ -12,7 +12,7 @@ ${rdf_file}        1million.rdf.gz
 ${schema_file}     1million.schema
 ${alpha-node}      1
 ${zero-node}      1
-${dgraph_docker_version}     v21.03.0
+${dgraph_docker_version}     v21.03-slash
 # alpha container to interact and perform all the dgraph operations on
 ${container_name}   alpha1
 ${ludic_mode}   ${FALSE}

@@ -498,6 +498,8 @@ class DgraphCLI:
         zero_address=None,
         alpha_address=None,
         out_dir=None,
+        slash_grpc_endpoint=None,
+        force_namepsace={"check": False, "namespace": 0},
     ):
         """
         Method to build bulk/live loader cli command
@@ -544,9 +546,12 @@ class DgraphCLI:
                 f"-f {rdf_file} -a {alpha_host_name}:{alpha_address} "
                 f"-z {zero_host_name}:{zero_address} "
             )
-            branch = self.get_dgraph_version_details("Branch")
-            if branch == "master":
-                cli_command += " --force-namespace 0"
+
+            if force_namepsace["check"]:
+                cli_command += f" --force-namespace {force_namepsace['namespace']}"
+
+            if slash_grpc_endpoint:
+                cli_command += f" --slash_grpc_endpoint {slash_grpc_endpoint}"
 
         # Building command for bulk loader
         elif loader_type == "bulk":

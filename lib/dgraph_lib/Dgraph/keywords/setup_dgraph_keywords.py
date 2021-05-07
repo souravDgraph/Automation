@@ -115,6 +115,8 @@ class SetupDgraphKeywords:
         zero_address=None,
         alpha_address=None,
         out_dir=None,
+        slash_grpc_endpoint=None,
+        force_namepsace={"check": False, "namespace": 0},
     ):
         """
         Method to build CLI command for live | bulk loading
@@ -147,6 +149,8 @@ class SetupDgraphKeywords:
             alpha_address=alpha_address,
             out_dir=out_dir,
             is_learner=is_learner,
+            slash_grpc_endpoint=slash_grpc_endpoint,
+            force_namepsace=force_namepsace,
         )
         return loader_command
 
