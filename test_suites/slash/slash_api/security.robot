@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation       It contains Security Test Cases for Slash API
 Suite Setup         Run Keywords 	 Create Backend 	 Create Organization And Fetch Organization Id
-Suite Teardown      Delete Deployment		${Session_alias}		${URL}		${HEADERS}		${deployment_id}
+Suite Teardown      Delete Deployment		${Session_alias}		${URL}		${HEADER}		${deployment_id}
 Test Setup			
 Test Teardown
 Default Tags	    Security
@@ -25,11 +25,11 @@ Delete API Key With Correct User
 	...		- Create API Key with User Auth
 	...		- Get API Key
 	...		- Delete API Key with User Auth
-	${api_key_details}=	Create Api Key	    ${Session_alias}	  ${URL}      ${HEADERS}     ${deployment_id}	  ${API_name}
+	${api_key_details}=	Create Api Key	    ${Session_alias}	  ${URL}      ${HEADER}     ${deployment_id}	  ${API_name}
 	${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid	
-	Delete Api Key	    ${Session_alias}	  ${URL}      ${HEADERS}	${deployment_id}    ${api_key_uid}     API Key Deleted Successfully.
+	Delete Api Key	    ${Session_alias}	  ${URL}      ${HEADER}	     ${deployment_id}    ${api_key_uid}     API Key Deleted Successfully.
 
 Delete API Key With Different User
 	[Documentation]		
@@ -38,12 +38,12 @@ Delete API Key With Different User
 	...		- Create API Key with User Auth
 	...     - Get API Key
 	...		- Delete API Key with Different User Auth
-	${api_key_details}= 	Create Api key		${Session_alias}	${URL}	    ${HEADERS}	     ${deployment_id}		${API_name}
+	${api_key_details}= 	Create Api key		${Session_alias}	${URL}	    ${HEADER}	     ${deployment_id}		${API_name}
 	${details}=    Collections.Get From Dictionary    ${api_key_details}    data
     ${api_key_details}=    Collections.Get From Dictionary    ${details}    createAPIKey
     ${api_key_uid}=    Collections.Get From Dictionary    ${api_key_details}    uid	
-	Delete Api Key	   ${Session_alias}	${URL}	    ${USER2_HEADER}	  ${deployment_id}	${api_key_uid}	    Unauthorized
-	Delete Api Key	   ${Session_alias}	${URL}      ${HEADERS}	   ${deployment_id}	   ${api_key_uid}     API Key Deleted Successfully.
+	Delete Api Key	   ${Session_alias}	${URL}	    ${USER2_HEADER}	   ${deployment_id}	   ${api_key_uid}	    Unauthorized
+	Delete Api Key	   ${Session_alias}	${URL}      ${HEADER}	   ${deployment_id}	   ${api_key_uid}     API Key Deleted Successfully.
 
 Only Owner Add Member To Organization
 	[Documentation]		
@@ -54,7 +54,7 @@ Only Owner Add Member To Organization
 	...		- Get Organization ID
 	...		- Remove a member
 	...		- Add a member to the organization with another user auth
-	Create Session For Organization      ${HEADERS}     ${API_endpoint}
+	Create Session For Organization      ${HEADER}     ${API_endpoint}
 	${data}=	Add New Member To Existing Organization		${org_uid}	   ${user_email}
 	log		${data}
 	Remove Member From Existing Organization    ${org_uid}     ${user_email}
@@ -71,7 +71,7 @@ Only Owner View Members From Organization
 	...		- View members from Organization
 	...		- Create a session for another user
 	...		- View members with another user auth
-	Create Session For Organization     ${HEADERS}    ${API_endpoint}
+	Create Session For Organization     ${HEADER}    ${API_endpoint}
 	Add New Member To Existing Organization	    ${org_uid} 	   ${user_email}
 	${data}=	Get Members From Organization	  ${org_uid}
 	log	  ${data}
@@ -92,7 +92,7 @@ Only Owner Fetch the Organization
 	${details}=    Collections.Get From Dictionary    ${org_details}    data
     ${organization}=    Collections.Get From Dictionary    ${details}    createOrganization
     ${organization_uid}=    Collections.Get From Dictionary    ${organization}    uid
-	Create Session For Organization      ${HEADERS}     ${API_endpoint}
+	Create Session For Organization      ${HEADER}     ${API_endpoint}
 	Get Members From Organization	  ${organization_uid}	 ${response}
 
 Only Owner Fetch the Deployment
@@ -110,21 +110,27 @@ Only Owner Update the Organization for Deployment
 	...		- Get Deployment Name and Deployment uid
 	...		- Update Deployment with User 1
 	...		- Update Deployment with User 2
-	${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}    free
+	${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}    free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
 	${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     ${deployment_name}=    Collections.Get From Dictionary    ${data}    name
-	Update Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}    ${deployment_name}		 organizationId=${org_uid}		
+	Update Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}    ${deployment_name}		 organizationId=${org_uid}		
 	Update Deployment    ${Session_alias}    ${URL}    ${USER2_HEADER}    ${deployment_id}    ${deployment_name}     organizationId=${org_uid}		expected_response_text=Not Authorized       expected_response=403
-	Delete Deployment	   ${Session_alias}		${URL}		${HEADERS}		${deployment_id}
+	Delete Deployment	   ${Session_alias}		${URL}		${HEADER}		${deployment_id}
 
 *** Keywords ***
 Create Backend
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}     free
+    ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME1}    ${PASSWORD}
+    ${USER2_HEADER}=    Create Dictionary    Authorization=Bearer ${auth_token}    Content-Type=application/json
+    Set Suite Variable    ${USER2_HEADER}
+    ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME}    ${PASSWORD}
+    ${HEADER}=    Create Dictionary    Authorization=Bearer ${auth_token}    Content-Type=application/json
+    Set Suite Variable    ${HEADER}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}     free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
+    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADER}
     ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     Set Suite Variable    ${deployment_id}
     Set Suite Variable    ${deployment_endpoint}
@@ -135,7 +141,7 @@ Create Backend
     Set Suite Variable    ${deployment_auth}
 
 Create Organization And Fetch Organization Id
-	Create Session For Organization      ${HEADERS}     ${API_endpoint}
+	Create Session For Organization      ${HEADER}     ${API_endpoint}
 	${org_details}=		Create Organization	   ${org_name}
 	log 	${org_details}
 	${details}=    Collections.Get From Dictionary    ${org_details}    data

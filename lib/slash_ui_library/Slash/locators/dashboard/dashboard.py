@@ -31,6 +31,8 @@ class DashboardLocators:
     launch_button = "xpath = //button[text()='Launch']"
     backend_live = "xpath = //h3[text()='Your Backend is live!']"
     spinning_backend = "xpath = //h3[text()='Creating your backend']"
+    backend_creation = "xpath = //div[@class='css-1n7p5lb' and text()='%s']"
+    health_status = "xpath = //div[text()='Healthy']"
     create_schema_button = "xpath = //button[text()='Create your Schema']"
     backend_endpoint = "xpath =//div[@title='Creating Backend']//input"
     backend_listbox = "xpath =//button[@aria-haspopup='listbox']"
@@ -45,6 +47,22 @@ class DashboardLocators:
     api_explorer_label = "xpath = //div[text()='Explorer']"
     launch_new_backend_label = "xpath = //h3[text()='Launch a New Backend']"
     deployment_location = "xpath = //div[text()='%s']"
+    add_card_number = "xpath = //input[@name='cardnumber']"
+    iframe_element = "xpath = //div//iframe[contains(@name,'__privateStripeFrame')]"
+    expiry_date = "xpath = //input[@name='exp-date']"
+    cvc = "xpath = //input[@name='cvc']"
+    postal = "xpath = //input[@name='postal']"
+    add_button = "xpath = //h3[text()='Add Credit Card']//following::button[text()='Add']"
+    cancel_subscription_button = "xpath = //button[text()='Cancel Subscription']"
+    cancel_subscription_confirm_button = "xpath = //button[text()='Confirm']"
+    card_added_alert_message = "xpath = //div[text()='Added payment details successfully']"
+    card_cancelled_alert_message = "xpath = //div[text()='Cancelling subscription...']"
+    no_active_subscription_label = "xpath = //h3[text()='No active subscriptions']"
+    active_subscription_label = "xpath = //h3[text()='Active subscription']"
+    upcoming_invoice_label = "xpath = //h3[text()='Upcoming invoice']"
+    billing_button = "xpath = //button[text()='Billing']"
+    billing_label = "xpath = //h3[text()='Billing']"
+    cloud_quick_start_label = "xpath = //h1[text()='Dgraph Cloud Quick Start']"
     super_admin_label = "xpath = //h3[text()='Super Admin']"
 
     # Menu items
@@ -58,3 +76,8 @@ class DashboardLocators:
 
     backends_list = "xpath = //button[@aria-haspopup='listbox']"
     backend_selection = "xpath = //li/div[text()='RC3']"
+
+    # Javascript 
+    get_total_amount = "return document.getElementsByClassName('css-s4rimg').valueOf()[0].innerText"
+    get_billing_description = "return document.getElementsByClassName('css-xh0hol')[5].valueOf().innerText"
+    get_billing_amount = "return document.getElementsByClassName('css-19eb4m4').valueOf()[0].innerText"

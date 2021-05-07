@@ -5,6 +5,7 @@
 Author: vivetha@dgraph.io
 """
 
+import re
 from robot.api.deco import keyword
 from Slash.keywords.browser.browser_keywords import BrowserKeywords
 from Slash.locators.dashboard.dashboard import DashboardLocators
@@ -111,23 +112,23 @@ class DashboardKeywords():
                               timeout=DashboardKeywords.timeout)
 
     @staticmethod
-    def monitor_backend_creation(browser_alias,
-                                 timeout):
+    def monitor_backend_creation(browser_alias, backend_name, timeout):
         """
         monitor the backend creation spinning for the backend.
         | browser_alias |  alias of the browser |
-        | timeout | 10 |
+        | backend_name | name of the backend |
+        | timeout | timeout for the backend creation |
 
         Example:
-        | Monitor Backend Creation | browser_1 | 10 |
+        | Monitor Backend Creation | browser_1 | test | 60 |
 
         Return:
             None
         """
         browser = BrowserKeywords.switch_browser(browser_alias)
-        browser.wait_until_page_contains_element(DashboardLocators.spinning_backend,
+        browser.wait_until_page_contains_element(DashboardLocators.backend_creation.replace("%s", backend_name),
                                                  timeout=DashboardKeywords.timeout)
-        browser.wait_until_page_contains_element(DashboardLocators.cluster_usage,
+        browser.wait_until_page_contains_element(DashboardLocators.health_status,
                                                          timeout=timeout)
                                                          
     @staticmethod
@@ -236,6 +237,24 @@ class DashboardKeywords():
         browser.element_should_be_visible(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
 
     @staticmethod
+    def get_deployment_endpoint(browser_alias, endpoint):
+        """
+        get the entire graphql endpoint for the backend.
+        | browser_alias |  alias of the browser |
+        | endpoint |  endpoint for the backend |
+
+        Example:
+        | Get Deployment Endpoint | browser_1 | stgdgraph.enterprise.stage.thegaas.com/graphql |
+
+        Return:
+            https://spring-waterfall.stgdgraph.enterprise.stage.thegaas.com/graphql
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        graphql_endpoint = browser.get_value(DashboardLocators.graphql_endpoint.replace("%s", endpoint))
+        graphql_endpoint = graphql_endpoint.replace("/graphql", "")
+        return graphql_endpoint
+
+    @staticmethod
     def view_deployment_zone(browser_alias, zone):
         """
         view the deployment zone for the backend.
@@ -266,6 +285,10 @@ class DashboardKeywords():
         browser = BrowserKeywords.switch_browser(browser_alias)
         browser.click_element(DashboardLocators.documentation,
                                 timeout=DashboardKeywords.timeout)
+        browser.switch_window("new")
+        browser.wait_until_page_contains_element(DashboardLocators.cloud_quick_start_label, 
+                                                    timeout=DashboardKeywords.timeout)
+        browser.switch_window("main")
 
     @staticmethod
     def click_avatar(browser_alias):
@@ -315,6 +338,23 @@ class DashboardKeywords():
         browser.element_should_be_disabled(DashboardLocators.starter_product_disabled)
 
     @staticmethod
+    def click_billing_button(browser_alias):
+        """
+        click the billing button.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Click Billing Button | browser_1 |
+        
+         Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)     
+        browser.click_element(DashboardLocators.billing_button, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.billing_label, 
+                                                    timeout=DashboardKeywords.timeout)
+
+    @staticmethod
     def click_super_admin_in_menu(browser_alias):
         """
         Click Super Admin in Menu
@@ -330,4 +370,84 @@ class DashboardKeywords():
         browser.click_element(DashboardLocators.super_admin, timeout=DashboardKeywords.timeout)
         browser.wait_until_page_contains_element(DashboardLocators.super_admin_label, 
                                                     timeout=DashboardKeywords.timeout)
-                                                    
+
+    @staticmethod
+    def verify_billing_information(browser_alias, total_amount, billing_description, billing_amount):
+        """
+        verify the billing information.
+        | browser_alias |  alias of the browser |
+        | total_amount | total amount on the billing page |
+        | billing_description | billing description |
+        | billing_amount | amount spent on the backends | 
+
+        Example:
+        | Click Billing Button | browser_1 | TOTAL AMOUNT $0 COUPON NA | Description Slash GraphQL Backends (0 Backends) | Amount $0.00 $0.00 $0.00 |
+
+        Return:
+            Boolean (True or False)
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.wait_until_page_contains_element(DashboardLocators.active_subscription_label, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.upcoming_invoice_label, timeout=DashboardKeywords.timeout)
+        total_amount_js = DashboardLocators.get_total_amount
+        total_amount_response = browser.execute_javascript(total_amount_js)
+        total_amount_response = re.sub('\s+', ' ', total_amount_response)
+        billing_description_js = DashboardLocators.get_billing_description
+        billing_description_response = browser.execute_javascript(billing_description_js)
+        billing_description_response = re.sub('\s+', ' ', billing_description_response)
+        billing_amount_js = DashboardLocators.get_billing_amount
+        billing_amount_response = browser.execute_javascript(billing_amount_js)
+        billing_amount_response = re.sub('\s+', ' ', billing_amount_response)
+        if(total_amount!=total_amount_response or billing_description!=billing_description_response or billing_amount!=billing_amount_response):
+            return False
+        return True
+
+    @staticmethod
+    def cancel_subscription(browser_alias):
+        """
+        cancel the subscription for the account.
+        | browser_alias |  alias of the browser |
+
+        Example:
+        | Cancel Subscription | browser_1 |
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.click_element(DashboardLocators.cancel_subscription_button, 
+                                timeout=DashboardKeywords.timeout)
+        browser.click_element(DashboardLocators.cancel_subscription_confirm_button,
+                                timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.card_cancelled_alert_message, 
+                                                    timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.no_active_subscription_label,
+                                                        timeout=DashboardKeywords.timeout)                                        
+
+    @staticmethod
+    def add_card(browser_alias, card_number, expiry_date, cvc, postal):
+        """
+        add card to the account.
+        | browser_alias |  alias of the browser |
+        | card_number | card number to be added |
+        | expiry_date | expiry date for the card |
+        | cvc | cvc for the card |
+        | postal | postal for the card |
+
+        Example:
+        | Check Starter Product Disabled | browser_1 | 4242424242424242 | 424 | 242 | 42424
+
+        Return:
+            None
+        """
+        browser = BrowserKeywords.switch_browser(browser_alias)
+        browser.select_frame(DashboardLocators.iframe_element)
+        browser.input_text(DashboardLocators.add_card_number, card_number)
+        browser.input_text(DashboardLocators.expiry_date, expiry_date)
+        browser.input_text(DashboardLocators.cvc, cvc)
+        browser.input_text(DashboardLocators.postal, postal)
+        browser.unselect_frame()
+        browser.click_element(DashboardLocators.add_button, timeout=DashboardKeywords.timeout)
+        browser.wait_until_page_contains_element(DashboardLocators.card_added_alert_message,                
+                                                    timeout=DashboardKeywords.timeout)                                            
+

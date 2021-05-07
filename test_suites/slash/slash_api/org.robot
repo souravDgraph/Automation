@@ -1,8 +1,8 @@
 *** Settings ***
 Documentation     This is a simple test with Robot Framework
-Suite Setup       Run Keywords    Create Session For Organization  ${HEADERS}    https://api.stage.thegaas.com    AND    Create Organization And Fetch Organization Id
+Suite Setup       Run Keywords    Create Session For Organization  ${HEADER}    https://api.stage.thegaas.com    AND    Create Organization And Fetch Organization Id
 ...               AND     Create Backend    
-Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${deployment_id}
+Suite Teardown    Delete Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${deployment_id}
 Test Setup        
 Test Teardown
 Library           SlashAPI
@@ -81,11 +81,17 @@ Organization Member Trying to Fetch Backend After Removed From Organization
 
 *** Keywords ***
 Create Backend
-    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADERS}    ${BACKEND_NAME}    ${BACKEND_ZONE}
+    ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME1}    ${PASSWORD}
+    ${USER2_HEADER}=    Create Dictionary    Authorization=Bearer ${auth_token}    Content-Type=application/json
+    Set Suite Variable    ${USER2_HEADER}
+    ${auth_token}=    Login    ${Session_alias}    ${URL}    ${HEADERS}    ${USER_NAME}    ${PASSWORD}
+    ${HEADER}=    Create Dictionary    Authorization=Bearer ${auth_token}    Content-Type=application/json
+    Set Suite Variable    ${HEADER}
+    ${data}=    Create Deployment    ${Session_alias}    ${URL}    ${HEADER}    ${BACKEND_NAME}    ${BACKEND_ZONE}      free
     Validate Created Deployment    ${data}    ${BACKEND_NAME}    ${BACKEND_ZONE}
     ${endpoint}=    Collections.Get From Dictionary    ${data}    url
     ${deployment_endpoint}=    Catenate    SEPARATOR=    https://    ${endpoint}
-    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADERS}
+    Get Deployment Health    ${Session_alias}    ${deployment_endpoint}    ${HEADER}
     ${deployment_id}=    Collections.Get From Dictionary    ${data}    uid
     Set Suite Variable    ${deployment_id}
     Set Suite Variable    ${deployment_endpoint}

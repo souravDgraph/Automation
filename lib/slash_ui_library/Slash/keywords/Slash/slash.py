@@ -10,6 +10,8 @@ from Slash.keywords.lambdas.lambdas_keywords import LambdaKeywords
 from Slash.keywords.login.login_keywords import LoginKeywords
 from Slash.keywords.settings.settings_keywords import SettingsKeywords
 from Slash.keywords.organization.organization_keywords import OrganizationKeywords
+from Slash.keywords.schema.schema_keywords import SchemaKeywords
+from Slash.keywords.api_explorer.api_explorer_keywords import ApiExplorerKeywords
 from Slash.keywords.super_admin.super_admin_keywords import SuperAdminKeywords
 
 
@@ -32,6 +34,8 @@ class Slash(BrowserKeywords,
             OrganizationKeywords,
             LambdaKeywords,
             SettingsKeywords,
+            SchemaKeywords,
+            ApiExplorerKeywords,
             SuperAdminKeywords):
     """Robot Framework Slash GraphQL Keyword Library.
 
