@@ -135,9 +135,12 @@ Start Dgraph Zero
 Start Dgraph Alpha
     [Arguments]     ${path}=${None}     ${is_ludicrous_mode}=${None}    ${is_learner}=${None}       ${alpha_offset}=${None}
     [Documentation]    Start Dgraph alpha process.
+    # Initilizing alpha variables required for the setup.
     ${alpha_command}     Set Variable	    alpha
     ${alpha_alias}      Set Variable If     '${path}'!='${None}'    alpha_bulk_${ALPHA_BULK_COUNT}    alpha_${ALPHA_COUNT}
+    ${log_count}    Set Variable If     '${path}'!='${None}'    ${ALPHA_BULK_COUNT}    ${ALPHA_COUNT}
     ${alpha_bulk_path}      Set Variable If   '${is_learner}'=='${None}'   ${path}     ${None}
+    # Generating alpha command based on the type of configurations..
     IF   ${is_ludicrous_mode}
         ${alpha_alias}      Set Variable If     '${path}'!='${None}'    alpha_ludicrous_bulk_${ALPHA_LUDICROUS_BULK_COUNT}    alpha_ludicrous_${ALPHA_LUDICROUS_COUNT}
         ${log_count}    Set Variable If     '${path}'!='${None}'    ${ALPHA_LUDICROUS_BULK_COUNT}   ${ALPHA_LUDICROUS_COUNT}
@@ -154,11 +157,12 @@ Start Dgraph Alpha
         END
     ELSE
         ${alpha_command}    Generate Dgraph Alpha Cli Command      bulk_path=${alpha_bulk_path}     offset=${alpha_offset}      cwd=${DIR_PATH}/results/${alpha_alias}
-        ${log_count}    Set Variable  ${ALPHA_COUNT}
     END
+    # Executing the alpha process with the configuration
     ${result_a}=    Process.start Process    ${alpha_command}    alias=${alpha_alias}    stdout=${alpha_alias}.txt    cwd=results/    shell=True       stderr=${alpha_alias}_err.txt
     Process Should Be Running    ${alpha_alias} 
     Wait For Process    timeout=20 s    on_timeout=continue
+    # Updating the alpha suite variable accordingly
     IF  '${path}' != '${None}' and '${is_learner}' == '${None}' and '${is_ludicrous_mode}' == '${None}'
         ${ALPHA_BULK_COUNT}  Evaluate        ${ALPHA_BULK_COUNT} + 1
         Set Suite Variable      ${ALPHA_BULK_COUNT}    ${ALPHA_BULK_COUNT}
@@ -182,9 +186,15 @@ Start Dgraph Alpha
             Set Suite Variable      ${ALPHA_LEARNER_COUNT}    ${ALPHA_LEARNER_COUNT}
         END
     ELSE
-        ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
-        Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
+        IF  '${path}'!='${None}'
+            ${ALPHA_BULK_COUNT}  Evaluate        ${ALPHA_BULK_COUNT} + 1
+            Set Suite Variable      ${ALPHA_BULK_COUNT}    ${ALPHA_BULK_COUNT}
+        ELSE
+            ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
+            Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
+        END
     END
+    # Validating if alpha was up properly
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
     ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify Perticular file contents in results folder    ${alpha_alias}   0   @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
@@ -448,8 +458,8 @@ Create NFS Backup
     ...    Keyword to create a NFS backup i.e to save backup to local folder
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
+    connect request server      is_learner=${GLOBAL_IS_LEARNER}
     FOR    ${i}    IN RANGE    ${no_of_backups}
-        connect request server      is_learner=${GLOBAL_IS_LEARNER}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
         Verify files exists in directory    ${backup_path}
@@ -460,7 +470,6 @@ Create NFS Backup
 
 Health Check for Backup Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Connect Request Server      is_learner=${GLOBAL_IS_LEARNER}
     Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
 
 Check if backup is completed
@@ -496,8 +505,6 @@ Perform a restore on backup latest versions
     ${backup_path}=    Join Path    ${root_dir}/backup
     ${json_file}    Load JSON From File    ${backup_path}/manifest.json
     ${type}     Get Value From Json     ${json_file}    $..type
-    ${enc}     Get Value From Json     ${json_file}    $..encrypted
-    Lists Should Be Equal   ${inc_list}     ${type}
     ${tls_check}=    Get Tls Value
     ${enc_check}=    Get Enc Value
     Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
@@ -511,31 +518,8 @@ Perform a restore on backup latest versions
     ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}
     Health Check for Restore Operation
 
-Perform a restore on backup by older dgraph versions
-    [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
-    Connect request server      is_learner=${GLOBAL_IS_LEARNER}
-    ${root_dir}=    normalize path    ${CURDIR}/..
-    ${path}=    Join Path    ${root_dir}/backup
-    @{dirs_backup}=    List Directories In Directory    ${path}
-    ${cmd}  Catenate   dgraph   restore -p ${backup_path} -l ${backup_path} -z localhost:5080
-    FOR     ${i}  IN    ${dirs_backup}
-        ${restore_dir}=    Set Variable    ${i}[0]
-        ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
-        ${tls_check}=    Get Tls Value
-        ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${restore_dir}
-        ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results    shell=True
-        ...    AND    Process Should Be Running    restore
-        ...    AND    Wait For Process    restore
-        ...    AND    Process Should Be Stopped    restore
-        ...    AND    Sleep    5s
-        ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
-        Health Check for Restore Operation
-    END
-
-
 Health Check for Restore Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Wait Until Keyword Succeeds    20x    30 sec       Connect Request Server   is_learner=${GLOBAL_IS_LEARNER}
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed

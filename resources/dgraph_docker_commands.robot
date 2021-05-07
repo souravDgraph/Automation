@@ -307,11 +307,11 @@ Docker Create NFS Backup
     [Arguments]    ${no_of_backups}     ${container_name}
     [Documentation]    Accepts params: "{is_clear_folder}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
+    connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
     ${alpha_ports}  Get Port From Container     ${container_name}
     FOR    ${i}    IN RANGE    ${no_of_backups}
-        connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
         Verify file exists in a directory with parent folder name    ${backup_path}
@@ -321,10 +321,7 @@ Docker Create NFS Backup
     log     ${dirs_backup}
 
 Health Check for Backup Operation
-    [Arguments]     ${container_name}
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    ${alpha_ports}  Get Port From Container     ${container_name}
-    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
 
 Check if backup is completed
@@ -396,14 +393,11 @@ Docker Perform a restore on backup latest versions
     ...    AND    Process Should Be Stopped    restore
     ...    AND    Sleep    5s
     ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}      ${zero_ports}
-    Health Check for Restore Operation  ${container_name} 
+    Health Check for Restore Operation
 
 
 Health Check for Restore Operation
-    [Arguments]     ${container_name}
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    ${alpha_ports}  Get Port From Container     ${container_name}
-    Wait Until Keyword Succeeds    20x    30 sec    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed

@@ -22,13 +22,13 @@ TC_02 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
      ...    *Author*: Sourav
      [Tags]    regression  CI  NIGHTLY
-     Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}       alpha_offset=20
+     Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}       alpha_offset_bulk=${20}
 
 TC_03 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
      ...    *Author*: Sourav
      [Tags]    regression   WEEKLY
-     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
+     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}   alpha_offset_bulk=${30}
 
 TC_04 Perform parallel live loads.
      [Documentation]    Perform live load data.
