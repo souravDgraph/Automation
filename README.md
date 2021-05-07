@@ -1,5 +1,5 @@
-# Dgraph Robot Framework Automation - v21.03.0
-> *Make sure that the local version matches with v21.03.0 before execution while using binary*
+# Dgraph Robot Framework Automation - v21.03-slash
+> *Make sure that the local version matches with v21.03-slash before execution while using binary*
 
 **This is a Automation Repo for Dgraph including Slash.**
 
