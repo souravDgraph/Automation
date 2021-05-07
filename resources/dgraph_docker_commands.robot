@@ -307,10 +307,10 @@ Docker Create NFS Backup
     [Arguments]    ${no_of_backups}     ${container_name}
     [Documentation]    Accepts params: "{is_clear_folder}"
     ...    Keyword to create a NFS backup i.e to save backup to local folder
-    connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
     ${alpha_ports}  Get Port From Container     ${container_name}
+    connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     FOR    ${i}    IN RANGE    ${no_of_backups}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
