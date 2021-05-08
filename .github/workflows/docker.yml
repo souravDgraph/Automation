@@ -79,8 +79,8 @@ jobs:
           tree
           ls
           echo " ---- Running Dgraph Testcases ----"
-          echo "Dgraph version: ${{ evn.DOCKER_DGRAPH_VERSION }}"
-          sudo robot -d results -v dgraph_docker_version:${{ evn.DOCKER_DGRAPH_VERSION }} --loglevel TRACE:INFO --splitlog test_suites/dgraph/docker/dgraph_docker_2-node_suite.robot
+          echo "Dgraph version: ${{ env.DOCKER_DGRAPH_VERSION }}"
+          sudo robot -d results -v dgraph_docker_version:${{ env.DOCKER_DGRAPH_VERSION }} --loglevel TRACE:INFO --splitlog test_suites/dgraph/docker/dgraph_docker_2-node_suite.robot
           sudo chmod -R 777 ${{ github.workspace }}/Automation_workspace/results/
       
       - name: Run Robot Framework Testcases with Manual Trigger
