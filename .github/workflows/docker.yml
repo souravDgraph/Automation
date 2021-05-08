@@ -12,7 +12,7 @@ on:
         # Friendly description to be shown in the UI instead of 'name'
         description: 'Dgraph Docker Version'
         # Default value if no value is explicitly provided
-        default: 'v21.03.0'
+        default: 'v21.03-slash'
         # Input has to be provided for the workflow to run
         required: true
         
@@ -71,7 +71,7 @@ jobs:
          
       - name: Run Robot Framework Testcases
         env:
-          DOCKER_DGRAPH_VERSION: v21.03.0
+          DOCKER_DGRAPH_VERSION: v21.03-slash
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}/Automation_workspace
