@@ -1,9 +1,8 @@
 *** Settings ***
-Documentation     Dgraph Live Loading Test Suite with ludicrous mode
+Documentation     Dgraph Data Loading Test Suite with ludicrous mode
 Suite Setup        Start Dgraph Ludicrous Mode
 Suite Teardown     Terminate and Create Backup of Dgraph Execution    ${FALSE}
 Test Setup      Monitor Health And State check
-Test Teardown   Monitor zero and alpha process  ${TRUE}
 Default Tags    ludicrous
 Resource          ../../../resources/dgraph_commands.robot
 Library           Dgraph
@@ -23,46 +22,34 @@ TC_01 Perform live load data.
 
 TC_02 Perform bulk load data.
      [Documentation]    Perform bulk load operatin on dataset.
-     ...    *Author*: Sourav
+     ...    *Author*: Sourav, Krishna
      [Tags]    regression   CI  NIGHTLY
-     Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
+     Execute Bulk Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}       alpha_offset_bulk=40
 
-TC_03 Perfrom NFS export on dgraph
-    [Documentation]  Test Case to perform nfs export.
-    ...    *Author*: Krishna, Sourav and Sankalan
-    [Tags]      regression   WEEKLY
-    Export NFS data using admin endpoint    json    ${TRUE}
-
-TC_04 Perform NFS backup and restore data
-     [Documentation]    Perform NFS backup and restore data.
-     ...    *Author*: Krishna and Sankalan
-     [Tags]    regression   C702    C700   WEEKLY
-     Clear Backup Folders   ${TRUE}
-     Create NFS Backup      1
-     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    0
-     ...    ELSE    Perform a restore on backup by older dgraph versions
-     Clear Backup Folders   ${TRUE}
-     [Teardown]    NONE
-
-TC_05 Perform parallel live and bulk load on data
+TC_03 Perform parallel live and bulk load on data
      [Documentation]    Perform live load data.
-     ...    *Author*: Sourav
+     ...    *Author*: Sourav, Krishna
      [Tags]    regression   WEEKLY
-     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}
+     Execute Parallel Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}      alpha_offset_bulk=20
 
-TC_06 Perform Increment backup and restore data
+TC_04 Perform parallel live loads.
+     [Documentation]    Perform live load data.
+     ...    *Author*: Sourav, Krishna
+     [Tags]    regression   WEEKLY
+     Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2
+
+TC_05 Perform Increment backup and restore data
      [Documentation]    Perform NFS backup and restore data.
-     ...    *Author*: Sourav
+     ...    *Author*: Sourav, Krishna and Sankalan
      [Tags]    regression   WEEKLY
      Clear Backup Folders   ${TRUE}
      Create NFS Backup    2
-     Run Keyword If     ${LATEST_VERSION_CHECK}     Perform a restore on backup latest versions    1
-     ...    ELSE    Perform a restore on backup by older dgraph versions
+     Perform a restore on backup latest versions    1
      Clear Backup Folders   ${TRUE}
      [Teardown]    NONE
 
-TC_07 Perform parallel live loads.
-     [Documentation]    Perform live load data.
-     ...    *Author*: Sourav
-     [Tags]    regression   WEEKLY
-     Execute Multiple Parallel Live Loader with rdf and schema parameters    ${rdf_file}    ${schema_file}    2
+TC_06 Perfrom NFS export on dgraph
+    [Documentation]  Test Case to perform nfs export.
+    ...    *Author*: Sourav, Krishna and Sankalan
+    [Tags]      regression   WEEKLY
+    Export NFS data using admin endpoint    json    ${TRUE}

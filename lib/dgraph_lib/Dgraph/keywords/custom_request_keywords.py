@@ -10,7 +10,7 @@ __status__ = "Staging"
 
 import json
 from robot.api import logger
-from robot.utils.asserts import assert_equal
+from robot.utils.asserts import assert_almost_equal, assert_equal
 from Dgraph.components.request_handler import RequestHandler
 from Dgraph.components.setup_configurations import DgraphCLI
 from Dgraph.keywords import constants
@@ -25,7 +25,7 @@ class CustomRequestKeywords:
     """
 
     def connect_request_server(
-        self, url=None, port=None, offset=0, is_docker=None, is_learner=None
+        self, url=None, port=None, offset=0, is_docker=None, is_learner=False
     ):
         """
         Method to connect to url to perform backup.
@@ -47,7 +47,7 @@ class CustomRequestKeywords:
         if offset != 0:
             self.dgraph_cli.offset = offset
             if is_learner:
-                self.dgraph_cli.offset += 1
+                self.dgraph_cli.offset = offset + 1
         else:
             if is_learner:
                 offset = self.dgraph_cli.offset + 1
@@ -65,13 +65,13 @@ class CustomRequestKeywords:
             else:
                 url = f"http://localhost:{alpha_port}"
             self.req_handler = RequestHandler(url)
-
-        logger.info("Requested URL: " + url)
+            logger.info("Requested URL: " + url)
 
         if self.dgraph_cli.get_tls():
             self.cert = self.get_certs()
             logger.info("TLS is configured.")
         if self.dgraph_cli.get_acl():
+            logger.info("Requested URL with ACL: " + url)
             self.headers = self.login("/admin")
 
     def login(self, appender):
@@ -392,12 +392,19 @@ class CustomRequestKeywords:
                 f"Something went wrong with the export request... {json.dumps(response.json())}"
             ) from err
         assert_equal(response.json()["data"]["export"]["response"]["code"], "Success")
-        assert_equal(
-            response.json()["data"]["export"]["response"]["message"],
-            "Export completed.",
-        )
-        logger.info("Export successfully completed")
-        return response
+        message_text = ""
+        assert_
+        if (
+            "Export queued with "
+            in response.json()["data"]["export"]["response"]["message"]
+        ):
+            message_text = (
+                str(response.json()["data"]["export"]["response"]["message"])
+                .split(" ID")[1]
+                .strip()
+            )
+            logger.info("Export successfully queued.." + message_text)
+        return message_text
 
     def export_nfs_data_admin(self, data_format, destination, appender="/admin"):
         """
@@ -428,9 +435,15 @@ class CustomRequestKeywords:
                 f"Something went wrong with the export request... {json.dumps(response.json())}"
             ) from err
         assert_equal(response.json()["data"]["export"]["response"]["code"], "Success")
-        assert_equal(
-            response.json()["data"]["export"]["response"]["message"],
-            "Export completed.",
-        )
-        logger.info("Export successfully completed")
-        return response
+        message_text = ""
+        if (
+            "Export queued with "
+            in response.json()["data"]["export"]["response"]["message"]
+        ):
+            message_text = (
+                str(response.json()["data"]["export"]["response"]["message"])
+                .split(" ID")[1]
+                .strip()
+            )
+            logger.info("Export successfully queued.." + message_text)
+        return message_text

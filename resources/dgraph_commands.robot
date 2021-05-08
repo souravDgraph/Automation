@@ -8,13 +8,18 @@ Library           Collections
 Library           DateTime
 
 *** Variables ***
-${LATEST_VERSION_CHECK}
 ${ZERO_COUNT}   0
 ${ALPHA_COUNT}  0
-${LUDICROUS_MODE}   ${FALSE}
+${ALPHA_BULK_COUNT}  0
+${ALPHA_LEARNER_BULK_COUNT}  0
 ${ALPHA_LEARNER_COUNT}  0
+${ALPHA_LEARNER_LUDIC_COUNT}    0
+${ALPHA_LUDICROUS_COUNT}    0
+${ALPHA_LUDICROUS_BULK_COUNT}  0
+${LUDICROUS_MODE}   ${FALSE}
 ${GLOBAL_BACKUP_LOGS_FOLDER}
 ${GLOBAL_IS_LEARNER}    ${FALSE}
+${DIR_PATH}
 
 *** Keywords ***
 Build Dgraph Version
@@ -39,18 +44,18 @@ Build Dgraph Version
 Start Dgraph
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
+    ${DIR_PATH}=    normalize path    ${CURDIR}/..
+    Set Suite Variable      ${DIR_PATH}    ${DIR_PATH}
     clean up dgraph folders
     Create Backup Logs Folder
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
-    Process Should Be Running    zero
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero_${ZERO_COUNT}    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
+    Process Should Be Running    zero_${ZERO_COUNT}
     Wait For Process    timeout=20 s    on_timeout=continue
-    ${alpha_command}    Generate Dgraph Alpha Cli Command       
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_${ALPHA_COUNT}_err.txt
-    Process Should Be Running    alpha
+    ${alpha_command}    Generate Dgraph Alpha Cli Command       cwd=${DIR_PATH}/results/alpha_${ALPHA_COUNT}
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha_${ALPHA_COUNT}    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_${ALPHA_COUNT}_err.txt
+    Process Should Be Running    alpha_${ALPHA_COUNT}
     Wait For Process    timeout=20 s    on_timeout=continue
-    ${check}=   set dgraph version
-    Set Suite Variable      ${LATEST_VERSION_CHECK}    ${check}
     ${ZERO_COUNT}   Evaluate        ${ZERO_COUNT} + 1
     ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
     Set Suite Variable      ${ZERO_COUNT}    ${ZERO_COUNT}
@@ -58,28 +63,28 @@ Start Dgraph
     Set Suite Variable      ${LUDICROUS_MODE}    ${FALSE}
     Set Suite Variable      ${GLOBAL_IS_LEARNER}    ${FALSE}
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify Perticular file contents in results folder    alpha     ${ALPHA_COUNT}     @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph with learner node
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
+    ${DIR_PATH}=    normalize path    ${CURDIR}/..
+    Set Suite Variable      ${DIR_PATH}    ${DIR_PATH}
     clean up dgraph folders
     Create Backup Logs Folder
     ${zero_command}    Generate Dgraph Zero Cli Command
     ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
     Process Should Be Running    zero
     Wait For Process    timeout=15 s    on_timeout=continue
-    ${alpha_command}    Generate Dgraph Alpha Cli Command
+    ${alpha_command}    Generate Dgraph Alpha Cli Command    cwd=${DIR_PATH}/results/alpha_${ALPHA_COUNT}
     ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_${ALPHA_COUNT}_err.txt
     Process Should Be Running    alpha
     Wait For Process    timeout=15 s    on_timeout=continue
-    ${alpha_command_learner}    Generate Dgraph Alpha Cli Command    learner="learner=true; group=1"
+    ${alpha_command_learner}    Generate Dgraph Alpha Cli Command    learner=${TRUE}    cwd=${DIR_PATH}/results/alpha_learner_${ALPHA_LEARNER_COUNT}
     ${result_a}=    Process.start Process    ${alpha_command_learner}    alias=alpha_learner    stdout=alpha_learner_${ALPHA_LEARNER_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_learner_${ALPHA_LEARNER_COUNT}_err.txt
     Process Should Be Running    alpha_learner
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${check}=   set dgraph version
-    Set Suite Variable      ${LATEST_VERSION_CHECK}    ${check}
     ${ZERO_COUNT}   Evaluate        ${ZERO_COUNT} + 1
     ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
     ${ALPHA_LEARNER_COUNT}  Evaluate        ${ALPHA_LEARNER_COUNT} + 1
@@ -90,31 +95,32 @@ Start Dgraph with learner node
     Set Suite Variable      ${GLOBAL_IS_LEARNER}    ${TRUE}
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
     @{alpha_learner_context}  Create List     No GraphQL schema in Dgraph;    is_learner:true
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha_learner    @{alpha_learner_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify Perticular file contents in results folder    alpha    ${ALPHA_COUNT}     @{alpha_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify Perticular file contents in results folder    alpha_learner    ${ALPHA_LEARNER_COUNT}      @{alpha_learner_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph Ludicrous Mode
     [Documentation]    Start Dgraph alpha and Zero process with cwd pointing to results folder.
     # Dgraph alpha and zero command
+    ${DIR_PATH}=    normalize path    ${CURDIR}/..
+    Set Suite Variable      ${DIR_PATH}    ${DIR_PATH}
     Set Suite Variable      ${LUDICROUS_MODE}    True
+    ${alpha_alias}     Set Variable	    alpha_ludicrous_${ALPHA_LUDICROUS_COUNT}
     Create Backup Logs Folder
     ${zero_command}    Generate Dgraph Zero Cli Command     
-    ${result_z}=    Process.start Process    ${zero_command}    alias=zero    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
-    Process Should Be Running    zero
+    ${result_z}=    Process.start Process    ${zero_command}    alias=zero_${ZERO_COUNT}    cwd=results/    shell=True    stdout=zero_${ZERO_COUNT}.txt      stderr=zero_${ZERO_COUNT}_err.txt
+    Process Should Be Running    zero_${ZERO_COUNT}
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${alpha_command}    Generate Dgraph Alpha Cli Command          ludicrous_mode=enabled
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_${ALPHA_COUNT}_err.txt
-    Process Should Be Running    alpha
+    ${alpha_command}    Generate Dgraph Alpha Cli Command          ludicrous_mode=enabled   cwd=${DIR_PATH}/results/${alpha_alias}
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=${alpha_alias}    stdout=${alpha_alias}.txt    cwd=results/    shell=True       stderr=${alpha_alias}_err.txt
+    Process Should Be Running    ${alpha_alias}
     Wait For Process    timeout=10 s    on_timeout=continue
-    ${check}=   set dgraph version
-    Set Suite Variable      ${LATEST_VERSION_CHECK}    ${check}
     ${ZERO_COUNT}   Evaluate        ${ZERO_COUNT} + 1
-    ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
+    ${ALPHA_LUDICROUS_COUNT}    Evaluate        ${ALPHA_LUDICROUS_COUNT} + 1
     Set Suite Variable      ${ZERO_COUNT}    ${ZERO_COUNT}
-    Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
+    Set Suite Variable      ${ALPHA_LUDICROUS_COUNT}    ${ALPHA_LUDICROUS_COUNT}
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify Perticular file contents in results folder    alpha_ludicrous     ${ALPHA_LUDICROUS_COUNT}     @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
 Start Dgraph Zero
@@ -127,54 +133,83 @@ Start Dgraph Zero
     Set Suite Variable      ${ZERO_COUNT}    ${ZERO_COUNT}
 
 Start Dgraph Alpha
-    [Arguments]     ${path}=${None}     ${is_ludicrous_mode}=${None}    ${is_learner}=${None}
-    [Documentation]    Start Dgraph alpha process.
+    [Arguments]     ${path}=${None}     ${is_ludicrous_mode}=${None}    ${is_learner}=${None}       ${alpha_offset}=${None}
+    [Documentation]    Start Dgraph alpha process based on the type of configuration.
+    # Initilizing alpha variables required for the setup.
     ${alpha_command}     Set Variable	    alpha
+    ${alpha_alias}      Set Variable If     '${path}'!='${None}'    alpha_bulk_${ALPHA_BULK_COUNT}    alpha_${ALPHA_COUNT}
+    ${log_count}    Set Variable If     '${path}'!='${None}'    ${ALPHA_BULK_COUNT}    ${ALPHA_COUNT}
     ${alpha_bulk_path}      Set Variable If   '${is_learner}'=='${None}'   ${path}     ${None}
+    # Generating alpha command based on the type of configurations..
     IF   ${is_ludicrous_mode}
-        ${alpha_command}    Generate Dgraph Alpha Cli Command     bulk_path=${alpha_bulk_path}    ludicrous_mode=enabled
+        ${alpha_alias}      Set Variable If     '${path}'!='${None}'    alpha_ludicrous_bulk_${ALPHA_LUDICROUS_BULK_COUNT}    alpha_ludicrous_${ALPHA_LUDICROUS_COUNT}
+        ${log_count}    Set Variable If     '${path}'!='${None}'    ${ALPHA_LUDICROUS_BULK_COUNT}   ${ALPHA_LUDICROUS_COUNT}
+        ${alpha_command}    Generate Dgraph Alpha Cli Command     bulk_path=${alpha_bulk_path}    ludicrous_mode=enabled    offset=${alpha_offset}   cwd=${DIR_PATH}/results/${alpha_alias}
+    ELSE IF  ${is_learner}
+        ${alpha_alias}      Set Variable If     '${path}' != '${None}'    alpha_bulk_learner_${ALPHA_LEARNER_BULK_COUNT}    alpha_learner_${ALPHA_LEARNER_COUNT}
+        ${log_count}    Set Variable If     '${path}' != '${None}'    ${ALPHA_LEARNER_BULK_COUNT}    ${ALPHA_LEARNER_COUNT}
+        IF  ${is_ludicrous_mode}
+            ${alpha_alias}     Set Variable	    alpha_learner_ludic_${ALPHA_LEARNER_LUDIC_COUNT}
+            ${log_count}    Set Variable   ${ALPHA_LEARNER_LUDIC_COUNT}
+            ${alpha_command}     Generate Dgraph Alpha Cli Command    bulk_path=${path}  ludicrous_mode=enabled  learner=${TRUE}    offset=${alpha_offset}    cwd=${DIR_PATH}/results/${alpha_alias}
+        ELSE
+            ${alpha_command}    Generate Dgraph Alpha Cli Command    bulk_path=${path}      learner=${TRUE}     offset=${alpha_offset}      cwd=${DIR_PATH}/results/${alpha_alias}
+        END
     ELSE
-        ${alpha_command}    Generate Dgraph Alpha Cli Command      bulk_path=${alpha_bulk_path}
+        ${alpha_command}    Generate Dgraph Alpha Cli Command      bulk_path=${alpha_bulk_path}     offset=${alpha_offset}      cwd=${DIR_PATH}/results/${alpha_alias}
     END
-    ${result_a}=    Process.start Process    ${alpha_command}    alias=alpha    stdout=alpha_${ALPHA_COUNT}.txt    cwd=results/    shell=True    stderr=alpha_${ALPHA_COUNT}_err.txt
-    Process Should Be Running    alpha
+    # Executing the alpha process with the configuration
+    ${result_a}=    Process.start Process    ${alpha_command}    alias=${alpha_alias}    stdout=${alpha_alias}.txt    cwd=results/    shell=True       stderr=${alpha_alias}_err.txt
+    Process Should Be Running    ${alpha_alias} 
     Wait For Process    timeout=20 s    on_timeout=continue
-    ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
-    Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
-    IF  ${is_learner}
-        ${alpha_command_learner}    Run Keyword If  ${is_ludicrous_mode}    Generate Dgraph Alpha Cli Command    bulk_path=${path}  ludicrous_mode=enabled  learner="learner=true; group=1"     
-        ...     ELSE    Generate Dgraph Alpha Cli Command    bulk_path=${path}      learner="learner=true; group=1"
-        log    ${alpha_command_learner}
-        ${result_a}=    Process.start Process    ${alpha_command_learner}    alias=alpha_learner    stdout=alpha_learner_${ALPHA_LEARNER_COUNT}.txt    cwd=results/    shell=True       stderr=alpha_learner_${ALPHA_LEARNER_COUNT}_err.txt
-        Process Should Be Running    alpha_learner
-        Wait For Process    timeout=20 s    on_timeout=continue
-        ${ALPHA_LEARNER_COUNT}  Evaluate        ${ALPHA_LEARNER_COUNT} + 1
-        Set Suite Variable      ${ALPHA_LEARNER_COUNT}    ${ALPHA_LEARNER_COUNT}
-        @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;    is_learner:true
-        ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha_learner    @{alpha_context}
-        Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha with learner node
+    # Updating the alpha suite variable accordingly
+    IF  '${path}' != '${None}' and '${is_learner}' == '${None}' and '${is_ludicrous_mode}' == '${None}'
+        ${ALPHA_BULK_COUNT}  Evaluate        ${ALPHA_BULK_COUNT} + 1
+        Set Suite Variable      ${ALPHA_BULK_COUNT}    ${ALPHA_BULK_COUNT}
+    ELSE IF   ${is_ludicrous_mode}
+        IF  '${path}' != '${None}'
+            ${ALPHA_LUDICROUS_BULK_COUNT}  Evaluate        ${ALPHA_LUDICROUS_BULK_COUNT} + 1
+            Set Suite Variable      ${ALPHA_LUDICROUS_BULK_COUNT}    ${ALPHA_LUDICROUS_BULK_COUNT}
+        ELSE
+            ${ALPHA_LUDICROUS_COUNT}  Evaluate        ${ALPHA_LUDICROUS_COUNT} + 1
+            Set Suite Variable      ${ALPHA_LUDICROUS_COUNT}    ${ALPHA_LUDICROUS_COUNT}
+        END
+    ELSE IF  ${is_learner}
+        IF  '${path}'!='${None}'
+            ${ALPHA_LEARNER_BULK_COUNT}  Evaluate        ${ALPHA_LEARNER_BULK_COUNT} + 1
+            Set Suite Variable      ${ALPHA_LEARNER_BULK_COUNT}    ${ALPHA_LEARNER_BULK_COUNT}
+        ELSE IF     ${is_ludicrous_mode}
+            ${ALPHA_LEARNER_LUDIC_COUNT}  Evaluate        ${ALPHA_LEARNER_LUDIC_COUNT} + 1
+            Set Suite Variable      ${ALPHA_LEARNER_LUDIC_COUNT}    ${ALPHA_LEARNER_LUDIC_COUNT}
+        ELSE
+            ${ALPHA_LEARNER_COUNT}  Evaluate        ${ALPHA_LEARNER_COUNT} + 1
+            Set Suite Variable      ${ALPHA_LEARNER_COUNT}    ${ALPHA_LEARNER_COUNT}
+        END
+    ELSE
+        IF  '${path}'!='${None}'
+            ${ALPHA_BULK_COUNT}  Evaluate        ${ALPHA_BULK_COUNT} + 1
+            Set Suite Variable      ${ALPHA_BULK_COUNT}    ${ALPHA_BULK_COUNT}
+        ELSE
+            ${ALPHA_COUNT}  Evaluate        ${ALPHA_COUNT} + 1
+            Set Suite Variable      ${ALPHA_COUNT}    ${ALPHA_COUNT}
+        END
     END
+    # Validating if alpha was up properly
     @{alpha_context}  Create List     Dgraph Version  Dgraph codename   No GraphQL schema in Dgraph;
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_context}
+    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify Perticular file contents in results folder    ${alpha_alias}   0   @{alpha_context}
     Run Keyword And Return If      ${passed}==${FALSE}       Fatal Error    msg=Error while bringing up Alpha
 
-
 End All Process
-    [Documentation]    End all the dgraph alpha and zero process and clear the folder based on variable.
-    ...    Accepts argument "is_clear_folder" as a check to clear the folder
+    [Documentation]    End all the dgraph alpha and zero process.
     Terminate All Processes
-    @{zero_context}    Create List    All done. Goodbye!    Got connection request
-    @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
-    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
-    @{alpha_init_err_context}  Create List     Dgraph Version  Dgraph codename
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha    @{alpha_init_err_context}
-    Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initialization failed.
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    alpha   @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail     Captured few errors in alpha
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero        @{zero_context}
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    alpha       @{alpha_context}
+    
+Verify Alpha and Zero logs generated
+    [Documentation]     Verifies all zero's and alpha's logs generated during execution.
+    Post Execution Verify Zero contents
+    Post Execution Verify Alpha contents
 
 Terminate and Create Backup of Dgraph Execution
+    [Documentation]     Terminates and backsup up all the executions.
     [Arguments]  ${is_clear_folder}
     Run Keyword If Any Tests Failed     Run Keywords    Terminate All Processes
     ...     AND     Sleep   20s
@@ -182,10 +217,11 @@ Terminate and Create Backup of Dgraph Execution
     ...     AND     Backup directories created while execution
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     ...     AND     Return From Keyword
-    Run Keyword And Continue On Failure    End All Process
+    End All Process
+    Run Keyword And Continue On Failure    Verify Alpha and Zero logs generated
+    Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     Backup alpha and zero logs
     Backup directories created while execution
-    Run Keyword If    ${is_clear_folder}    clean up dgraph folders
 
 End Zero Process
     [Documentation]    End dgraph zero process
@@ -194,33 +230,59 @@ End Zero Process
 
 Post Execution Verify Zero contents
     [Documentation]  Keyword to verify alpha and zero logs
-    ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    @{zero_context}    Create List    All done. Goodbye!
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero    @{zero_context}
+    @{zero_context}    Create List    All done. Goodbye!    Got connection request
+    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    zero     ${ZERO_COUNT}    @{zero_context}
 
 Post Execution Verify Alpha contents
-    [Arguments]    ${is_learner}=${None}
     [Documentation]  Keyword to verify alpha and zero logs
-    ...    Accepts argument "is_clear_folder" as a check to clear the folder
-    @{alpha_err_context}  Create List     Dgraph Version  Dgraph codename
-    ${alpha_process_alias}      Set Variable If   '${is_learner}'!='${None}'    alpha_learner   alpha
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    ${alpha_process_alias}    @{alpha_err_context}
-    Run Keyword And Return If      ${passed}==${FALSE}       Fail   ${alpha_process_alias} Initlization failed.
-    @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit
-    ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    ${alpha_process_alias}    @{alpha_error_context}
-    Run Keyword And Return If      ${passed}       Fail     Captured few errors in ${alpha_process_alias}
-    @{alpha_context}    Create List    Buffer flushed successfully.
-    Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    ${alpha_process_alias}    @{alpha_context}
+    @{alpha_alias}      Create List     alpha   alpha_bulk   alpha_bulk_learner  alpha_learner      alpha_ludicrous     alpha_learner_ludic
+    @{alpha_counts}     Create List     ${ALPHA_COUNT}  ${ALPHA_BULK_COUNT}     ${ALPHA_LEARNER_BULK_COUNT}     ${ALPHA_LEARNER_COUNT}      ${ALPHA_LUDICROUS_COUNT}    ${ALPHA_LEARNER_LUDIC_COUNT}
+    ${index}=    Set Variable    0
+    FOR  ${alias}  IN     @{alpha_alias}
+    ${log_count}    Set Variable  ${alpha_counts}[${index}]
+        IF  ${log_count}>0
+            @{alpha_context}    Create List    Buffer flushed successfully.     Raft node done.    Operation completed with id: opRestore
+            @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw
+            @{alpha_init_err_context}  Create List     Dgraph Version  Dgraph codename
+            ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    ${alias}    ${log_count}     @{alpha_init_err_context}
+            Run Keyword And Return If      ${passed}==${FALSE}       Fail       alpha Initialization failed.
+            ${passed}=  Run Keyword And Return Status   Wait Until Keyword Succeeds     5x    5 sec   Verify alpha and zero contents in results folder    ${alias}    ${log_count}     @{alpha_error_context}
+            Run Keyword And Return If      ${passed}       Fail     Captured few errors in alpha
+            Wait Until Keyword Succeeds     60x    10 sec     Verify alpha and zero contents in results folder    ${alias}      ${log_count}      @{alpha_context}
+        END
+        ${index}=    Evaluate    ${index} + 1
+    END
+
+End All Alpha Process
+    [Documentation]    Ends All the  dgraph alpha process
+    @{alpha_alias}      Create List     alpha   alpha_bulk   alpha_bulk_learner  alpha_learner      alpha_ludicrous     alpha_learner_ludic
+    @{alpha_counts}     Create List     ${ALPHA_COUNT}  ${ALPHA_BULK_COUNT}     ${ALPHA_LEARNER_BULK_COUNT}     ${ALPHA_LEARNER_COUNT}      ${ALPHA_LUDICROUS_COUNT}    ${ALPHA_LEARNER_LUDIC_COUNT}
+    ${index}=    Set Variable    0
+    FOR  ${alias}    IN    ${alpha_alias}
+        ${count}    Set Variable  ${alpha_counts}[${index}]
+        FOR  ${log_count}    IN RANGE   ${count}
+            ${passed}   Run Keyword And Return Status   Switch Process    ${alias}_${index}
+            Run Keyword If  ${passed}  Terminate Process    handle=${alias}_${index}
+        END
+    END
 
 End Alpha Process
     [Documentation]    End dgraph alpha process
-    Switch Process    alpha
-    Terminate Process    handle=alpha
+    ${alpha_count}  Evaluate    ${ALPHA_COUNT} - 1
+    Switch Process    alpha_${alpha_count}
+    Terminate Process    handle=alpha_${alpha_count}
+
+End Alpha Ludicrous Process
+    [Documentation]    End dgraph alpha process
+    ${alpha_count}  Evaluate    ${ALPHA_LUDICROUS_COUNT} - 1
+    Switch Process    alpha_ludicrous_${alpha_count}
+    Terminate Process    handle=alpha_ludicrous_${alpha_count}
 
 End Alpha Learner Process
     [Documentation]    End dgraph alpha with learner node process
-    Switch Process    alpha_learner
-    Terminate Process    handle=alpha_learner
+    ${alpha_count}  Evaluate    ${ALPHA_LEARNER_COUNT} - 1
+    Switch Process    alpha_learner_${alpha_count}
+    Terminate Process    handle=alpha_learner_${alpha_count}
 
 Get Dgraph Details
     [Documentation]  Keyword to get dgraph details from dgraph version
@@ -234,11 +296,11 @@ Get Dgraph Details
     [Return]    ${value}
 
 Trigger Loader Process
-    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${is_learner}=None
+    [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${is_learner}=None      ${bulk_out_dir}=${None}
     [Documentation]     Keyword to only trigger live loader process
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${path}=    Set Variable     ${dir_path}
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_learner=${is_learner}     is_latest_version=${LATEST_VERSION_CHECK}
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_learner=${is_learner}    out_dir=${bulk_out_dir}
     ${result_loader}=   Process.start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Execute Live Loader with rdf and schema parameters
@@ -253,47 +315,42 @@ Execute Live Loader with rdf and schema parameters
     Should Contain    ${loader_Text_File_Content}    N-Quads processed per second
 
 Execute Bulk Loader with rdf and schema parameters
-    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}=${None}
-    [Documentation]    Keyword to accept two params "rdf_filename","schema_filename" perform bulk loader.
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}=${None}   ${alpha_offset_bulk}=${0}
+    [Documentation]    Keyword to accept four params "rdf_filename","schema_filename", "is_learner", "alpha_offset" perform bulk loader.
     ...    rdf_filename, schema_filename"bulk"
     ${dir_path}=    normalize path    ${CURDIR}/..
-    Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk
+    Trigger Loader Process      bulk     ${rdf_filename}    ${schema_filename}    bulk      bulk_out_dir=${dir_path}/results/bulk/out
     Verify process to be stopped    bulk
     ${loader_Text_File_Content}=    Grep File    ${dir_path}/results/bulk.txt    Total:
     Log    ${loader_Text_File_Content}
-    Verify Bulk Process     ${loader_Text_File_Content}     ${is_learner}
+    Verify Bulk Process     bulk_out_path=${dir_path}/results/bulk/out   loader_Text_File_Content=${loader_Text_File_Content}     is_learner=${is_learner}       alpha_offset_bulk=${alpha_offset_bulk}
 
 Verify Bulk Process
-    [Arguments]     ${loader_Text_File_Content}     ${is_learner}=${None}
+    [Arguments]    ${bulk_out_path}     ${loader_Text_File_Content}     ${is_retrigger}=${FALSE}    ${is_learner}=${FALSE}   ${alpha_offset_bulk}=${0}
     [Documentation]     Keyword to verify bulk loader output files generated along with
      ...    altering zero and alpha instances.
     ${dir_path}=    normalize path    ${CURDIR}/..
     Should Contain    ${loader_Text_File_Content}    Total:
-    Verify Bulk Loader output generated    ${dir_path}/results/out/0/p
-    IF  ${is_learner}
-        End Alpha Learner Process
-        Post Execution Verify Alpha contents   ${TRUE}
-    END
-    End Alpha Process
-    END ZERO PROCESS
-    Post Execution Verify Alpha contents
-    Post Execution Verify Zero contents
-    Backup directories created while execution
-    Start Dgraph Zero
-    IF  ${is_learner}
-        Start Dgraph Alpha    ${dir_path}/results/out/0/p       ${LUDICROUS_MODE}   is_learner=${TRUE}
-        End Alpha Learner Process
-        Post Execution Verify Alpha contents  ${TRUE}
-        End Alpha Process
+    Verify Bulk Loader output generated    ${bulk_out_path}/0/p
+    IF  ${is_retrigger}
+        IF  ${LUDICROUS_MODE}
+            End Alpha Ludicrous Process
+            ${count}    Set Variable  ${ALPHA_LUDICROUS_COUNT} - 1
+            @{dirs}     Create List       alpha_ludicrous_${count}
+        ELSE IF     ${is_learner}
+            End Alpha Learner Process
+            ${count}    Set Variable  ${ALPHA_LEARNER_COUNT} - 1
+            @{dirs}     Create List       alpha_learner_${count}
+        ELSE
+            End Alpha Process
+            ${count}    Set Variable  ${ALPHA_COUNT} - 1
+            @{dirs}     Create List       alpha_${count}
+        END
         Post Execution Verify Alpha contents
-    ELSE 
-        Start Dgraph Alpha    ${dir_path}/results/out/0/p       ${LUDICROUS_MODE}
-        End Alpha Process
-        Post Execution Verify Alpha contents
+        Backup Custom Directories Created While Execution
+        Start Dgraph Alpha    path=${bulk_out_path}/0/p       is_ludicrous_mode=${LUDICROUS_MODE}   is_learner=${is_learner}
     END
-    END ZERO PROCESS
-    Post Execution Verify Zero contents 
-    Backup directories created while execution
+    Start Dgraph Alpha    path=${bulk_out_path}/0/p       is_ludicrous_mode=${LUDICROUS_MODE}   is_learner=${is_learner}     alpha_offset=${alpha_offset_bulk}
 
 Verify Live loader trigger properly or not
     [Documentation]  Keyword to verify live loader to trigger properly
@@ -306,14 +363,14 @@ Verify Live loader trigger properly or not
         Terminate Process   ${loader_alias}
         Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}     ${is_leaner}
         @{live_loader_errors}  Create List     github.com/dgraph-io/dgraph/
-        ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder    ${loader_alias}_err     @{live_loader_errors}
+        ${check}    Run Keyword And Return Status   Grep and Verify file Content in results folder   ${loader_alias}_err     @{live_loader_errors}
         Run Keyword If   ${check}   FAIL    Found Issues in Live Loader during live load
         @{alpha_error_context}  Create List     Error: unknown flag     panic: runtime error:   runtime.goexit      runtime.throw      fatal error:
         IF  ${is_leaner}
-            ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder   alpha_learner    @{alpha_error_context}
+            ${check}    Run Keyword And Return Status   Verify Perticular file contents in results folder   alpha_learner    ${ALPHA_LEARNER_COUNT}     @{alpha_error_context}
             Run Keyword If   ${check}   FAIL    Found Issues in alpha during live load
         ELSE
-            ${check}    Run Keyword And Return Status   verify alpha and zero contents in results folder   alpha    @{alpha_error_context}
+            ${check}    Run Keyword And Return Status   Verify Perticular file contents in results folder   alpha    ${ALPHA_COUNT}      @{alpha_error_context}
             Run Keyword If   ${check}   FAIL    Found Issues in alpha during live load
         END
         ${check}    Run Keyword And Return Status   Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${is_leaner}
@@ -322,15 +379,14 @@ Verify Live loader trigger properly or not
     END
 
 Execute Parallel Loader with rdf and schema parameters
-    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}=${None}
+    [Arguments]    ${rdf_filename}    ${schema_filename}    ${is_learner}=${None}       ${alpha_offset_bulk}=${30}
     [Documentation]    Keyword to accept three params "rdf_filename","schema_filename" perform parallel live/bulk loader.
     ...    rdf_filename, schema_filename
     ${dir_path}=    normalize path    ${CURDIR}/..
     @{loader_type}=    Create List    live    bulk
     FOR    ${i}    IN    @{loader_type}
-        ${alpha_process_check}=    Is Process Running    alpha
         ${loader_alias}=    Catenate    SEPARATOR=_    parallel    ${i}
-        Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}    is_learner=${is_learner}
+        Trigger Loader Process     ${loader_alias}     ${rdf_filename}    ${schema_filename}    ${i}    is_learner=${is_learner}        bulk_out_dir=${dir_path}/results/parallel_bulk/out
         #Wait For Process    timeout=30 s
         Log    ${loader_alias}.txt is log file name for this process.
     END
@@ -339,15 +395,12 @@ Execute Parallel Loader with rdf and schema parameters
         IF  '${i}'=='live'
             Verify Live loader trigger properly or not  ${loader_alias}     ${rdf_filename}    ${schema_filename}    live   is_learner=${is_learner}
         END
-        ${alpha_process_check}=    Is Process Running    alpha
         Verify process to be stopped    ${loader_alias}
         ${grep_context}=    Set Variable If    "${i}"=="bulk"    Total:    N-Quads processed per second
         ${loader_Text_File_Content}    Grep File    ${dir_path}/results/${loader_alias}.txt    ${grep_context}
         Run Keyword If    '${i}' == 'live'    Should Contain    ${loader_Text_File_Content}    ${grep_context}
-        ...    ELSE     Verify Bulk Process     ${loader_Text_File_Content}     ${is_learner}
+        ...    ELSE     Verify Bulk Process     ${dir_path}/results/parallel_bulk/out    ${loader_Text_File_Content}     is_learner=${is_learner}       alpha_offset_bulk=${alpha_offset_bulk}
     END
-    ${zero_process_check}=    Is Process Running    zero
-    ${alpha_process_check}=    Is Process Running    alpha
 
 Execute Multiple Parallel Live Loader with rdf and schema parameters
     [Arguments]    ${rdf_filename}    ${schema_filename}    ${num_threads}   ${is_learner}=${None}
@@ -387,7 +440,7 @@ Execute Increment Command
     FOR    ${i}    IN RANGE    ${num_threads}
         ${alpha_offset}    Set Variable If     ${i}>=1     ${alpha_offset}      0
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
-        ${inc_command}  Get dgraph increment command    is_latest_version=${LATEST_VERSION_CHECK}   alpha_offset=${alpha_offset}
+        ${inc_command}  Get dgraph increment command       alpha_offset=${alpha_offset}
         ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
         Wait For Process    ${inc_alias}    timeout=20 s
     END
@@ -405,8 +458,8 @@ Create NFS Backup
     ...    Keyword to create a NFS backup i.e to save backup to local folder
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
+    connect request server      is_learner=${GLOBAL_IS_LEARNER}
     FOR    ${i}    IN RANGE    ${no_of_backups}
-        connect request server      is_learner=${GLOBAL_IS_LEARNER}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
         Verify files exists in directory    ${backup_path}
@@ -417,7 +470,6 @@ Create NFS Backup
 
 Health Check for Backup Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Connect Request Server      is_learner=${GLOBAL_IS_LEARNER}
     Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
 
 Check if backup is completed
@@ -437,8 +489,11 @@ Export NFS data using admin endpoint
     Run Keyword If    ${is_clear_folder}    clear all the folder in a directory    ${export_path}
     connect request server       is_learner=${GLOBAL_IS_LEARNER}
     ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
-    log    ${res.text}
+    log    ${res}
     Verify files exists in directory    ${export_path}
+    ${alpha_alias}  Set Variable IF  ${GLOBAL_IS_LEARNER}   alpha_learner   alpha
+    ${alpha_count}  Set Variable IF  ${GLOBAL_IS_LEARNER}   ${ALPHA_LEARNER_COUNT}   ${ALPHA_COUNT}
+    Wait Until Keyword Succeeds    60x    60 sec     Verify Perticular file contents in results folder   ${alpha_alias}   ${alpha_count}     task ${res}: completed successfully
 
 
 Perform a restore on backup latest versions
@@ -458,44 +513,16 @@ Perform a restore on backup latest versions
     ${tls_check}=    Get Tls Value
     ${enc_check}=    Get Enc Value
     Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
-    ${cmd}  Catenate   dgraph   restore -p ${backup_path} -l ${backup_path} -z localhost:5080
-    ${result_restore}=    Run Keyword If    ${tls_check}    Restore Using Admin    ${backup_path}
-    ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results     shell=True
-    ...    AND    Process Should Be Running    restore
-    ...    AND    Wait For Process    restore
-    ...    AND    Process Should Be Stopped    restore
-    ...    AND    Sleep    5s
-    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}
+    Restore Using Admin    ${backup_path}
     Health Check for Restore Operation
-
-Perform a restore on backup by older dgraph versions
-    [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
-    Connect request server      is_learner=${GLOBAL_IS_LEARNER}
-    ${root_dir}=    normalize path    ${CURDIR}/..
-    ${path}=    Join Path    ${root_dir}/backup
-    @{dirs_backup}=    List Directories In Directory    ${path}
-    ${cmd}  Catenate   dgraph   restore -p ${backup_path} -l ${backup_path} -z localhost:5080
-    FOR     ${i}  IN    ${dirs_backup}
-        ${restore_dir}=    Set Variable    ${i}[0]
-        ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
-        ${tls_check}=    Get Tls Value
-        ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${restore_dir}
-        ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt    cwd=results    shell=True
-        ...    AND    Process Should Be Running    restore
-        ...    AND    Wait For Process    restore
-        ...    AND    Process Should Be Stopped    restore
-        ...    AND    Sleep    5s
-        ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}
-        Health Check for Restore Operation
-    END
 
 
 Health Check for Restore Operation
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    Wait Until Keyword Succeeds    20x    30 sec       Connect Request Server   is_learner=${GLOBAL_IS_LEARNER}
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed
+    [Documentation]    Keyword to check if the restore operation is performed sucessfully
     ${response}=    Health Check    /health
     ${passed}    Run Keyword And Return Status   Should Be String    ${response}
     Run Keyword If  ${passed}
@@ -545,23 +572,25 @@ Verify files exists in directory
         directory should exist    ${folder_name.strip()}/${dir}
     END
 
+
+Verify Perticular file contents in results folder
+    [Arguments]    ${file_name}    ${count}=${0}     @{context}
+    [Documentation]    Keyword for checking content in .txt file generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${count_check}=    Evaluate   ${count} - 1
+    ${file_name}=    Set Variable IF  ${count} != 0  ${file_name}_${count_check}     ${file_name}
+    ${file_context}=    Get File    ${dir_path}/results/${file_name}.txt
+    Should Contain Any    ${file_context}    @{context}
+
 Verify alpha and zero contents in results folder
-    [Arguments]    ${file_name}    @{context}
+    [Arguments]    ${file_name}   ${count}      @{context}
     [Documentation]    Keyword for checking content in .txt files generated in results folder
     ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
     ${dir_path}=    normalize path    ${CURDIR}/..
-    IF     '${file_name}' == 'alpha_learner'
-        ${count}=   Set Variable    ${ALPHA_LEARNER_COUNT}
-        FOR     ${i}  IN RANGE   ${count}
+    FOR     ${i}  IN RANGE   ${count}
         ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
         Should Contain Any    ${file_context}    @{context}
-        END
-    ELSE
-        ${count}=   Set Variable If     '${file_name}' == 'zero'   ${ZERO_COUNT}   ${ALPHA_COUNT}
-        FOR     ${i}  IN RANGE   ${count}
-            ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
-            Should Contain Any    ${file_context}    @{context}
-        END
     END
 
 Grep and Verify file Content in results folder
@@ -573,43 +602,39 @@ Grep and Verify file Content in results folder
     Should Contain    ${grep_file}    ${grep_text}
 
 Monitor zero and alpha process
-    [Arguments]  ${is_clear_folder}     ${is_learner}=${None}
+    [Arguments]     ${is_clear_folder}    ${is_alpha_retrigger}=${FALSE}  ${is_alpha_learner_retrigger}=${FALSE}  ${is_zero_retrigger}=${FALSE}
     [Documentation]    Keyword to monitor zero and alpha process to run
     Run Keyword If Test Failed     Run Keywords    Terminate All Processes
     ...     AND     Sleep   20s
     ...     AND     Backup directories created while execution
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     ...     AND     Run Keyword And Return If  ${LUDICROUS_MODE}   Start Dgraph Ludicrous Mode
-    ...     AND     Run Keyword And Return If   ${is_learner}    Start Dgraph with learner node
+    ...     AND     Run Keyword And Return If   ${is_alpha_learner_retrigger}    Start Dgraph with learner node
     ...     AND     Run Keyword And Return      Start Dgraph
-    ${alpha_process_check}=    Is Process Running    alpha
-    ${zero_process_check}=    Is Process Running    zero
-    IF  ${is_learner}
-        ${alpha_learner_process_check}      Is Process Running    alpha_learner
-        IF   ${alpha_learner_process_check} 
-            End Alpha Learner Process
-            Post Execution Verify Alpha contents        ${TRUE}
-            @{dir}  Create List     alpha_learner_p     alpha_learner_w
-            Backup Custom Directories Created While Execution  @{dir}   
-        ELSE
-            Post Execution Verify Alpha contents
-        END
-    END
-    IF      ${alpha_process_check}     
-        End Alpha Process
-        Post Execution Verify Alpha contents
-        @{dir}  Create List     p   t
-        Backup Custom Directories Created While Execution  @{dir}
-    ELSE
-        Post Execution Verify Alpha contents
-    END
-    IF      ${zero_process_check}      
+    IF      ${is_zero_retrigger}
         End Zero Process
         @{dir}  Create List     w   zw
         Post Execution Verify Zero contents  
         Backup Custom Directories Created While Execution  @{dir}   
     ELSE
         Post Execution Verify Zero contents
+    END
+
+    IF  ${is_alpha_learner_retrigger}
+        End Alpha Learner Process
+        Post Execution Verify Alpha contents
+        @{dir}  Create List     alpha_learner_p     alpha_learner_w
+        Backup Custom Directories Created While Execution  @{dir}
+    ELSE
+        Post Execution Verify Alpha contents
+    END
+    IF     ${is_alpha_retrigger}   
+        End Alpha Process
+        Post Execution Verify Alpha contents
+        @{dir}  Create List     p   t
+        Backup Custom Directories Created While Execution  @{dir}
+    ELSE
+        Post Execution Verify Alpha contents
     END
     
     IF  ${LUDICROUS_MODE}
@@ -694,16 +719,28 @@ Backup alpha and zero logs
 
 Backup directories created while execution
     [Documentation]     Keyword to backup execution time directories
-    @{dirs}     Create List     w   zw  p   t  out  alpha   tmp     alpha_learner_p     alpha_learner_w
+    @{alpha_alias}      Create List     alpha   alpha_bulk   alpha_bulk_learner  alpha_learner      alpha_ludicrous     alpha_learner_ludic   alpha_ludicrous_bulk
+    @{alpha_counts}     Create List     ${ALPHA_COUNT}  ${ALPHA_BULK_COUNT}     ${ALPHA_LEARNER_BULK_COUNT}     ${ALPHA_LEARNER_COUNT}      ${ALPHA_LUDICROUS_COUNT}    ${ALPHA_LEARNER_LUDIC_COUNT}    ${ALPHA_LUDICROUS_BULK_COUNT}
+    ${index}=    Set Variable    0
+    FOR  ${i}  IN    @{alpha_alias}
+        ${log_count}    Set Variable  ${alpha_counts}[${index}]
+        FOR  ${l_count}  IN RANGE  ${log_count}
+            ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}_${l_count}
+            Run Keyword If  ${passed}   Move Directory   results/${i}_${l_count}   results/${GLOBAL_BACKUP_LOGS_FOLDER}/${i}_${l_count}
+        END
+        ${index}=    Evaluate    ${index} + 1
+    END
+    @{dirs}     Create List     w   zw  p   t  out   tmp     bulk    parallel_bulk
     FOR  ${i}  IN    @{dirs}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
-        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_LOGS_FOLDER}/${i}_${ALPHA_COUNT}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_LOGS_FOLDER}/${i}
     END
 
 Backup Custom Directories Created While Execution
     [Arguments]       @{dirs_to_backup}
     [Documentation]     Keyword to backup execution time directories
+    ${count}    Evaluate    ${ALPHA_COUNT} - 1
     FOR  ${i}  IN    @{dirs_to_backup}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
-        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_LOGS_FOLDER}/${i}_${ALPHA_COUNT}
+        Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_LOGS_FOLDER}/${i}_${count}
     END

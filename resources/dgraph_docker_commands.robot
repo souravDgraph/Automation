@@ -8,10 +8,10 @@ Library           Collections
 Library           DateTime
 
 *** Variables ***
-${DGRAPH_LATEST_VERSION_CHECK}
 ${DOCKER_STRING}
 ${DOCKER_COMPOSE_UP_COUNT}   0
-${GLOBAL_IS_DOCKER_EXE}     ${FALSE}
+${GLOBAL_IS_DOCKER_EXE}     ${TRUE}
+${LUDICROUS_MODE}   ${FALSE}
 ${GLOBAL_BACKUP_DIR_FOLDER}
 ${GLOBAL_YAML_COUNTER}  1
 
@@ -21,31 +21,52 @@ Start Dgraph n-node In Docker
     [Documentation]  Keyword to start dgraph in docker setup.
     [Arguments]     ${no_of_alphas}     ${no_of_zeros}    ${dgraph_version}     ${container_name}
     Create Backup Folder
-    ${dir_path}=    normalize path    ${CURDIR}/..
-    log    ${dir_path}
-    ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=${no_of_zeros}   alpha_count=${no_of_alphas}
-    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stderr=gen_file_err.txt   cwd=utilities    shell=True
-    ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up.txt    stderr=docker_compose_up_err.txt    cwd=conf    shell=True
-    Wait For Process    timeout=30 s    on_timeout=continue
-    Set Dgraph Version from docker      ${container_name}
-    Set Suite Variable  ${GLOBAL_IS_DOCKER_EXE}     ${TRUE}
-
-Start Dgraph 2-node In Docker with bulk data
-    [Documentation]  Keyword to start dgraph with alpha pointing to bulk loader data in docker setup.
-    [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}
-    Create Backup Folder
+    Set Suite Variable  ${LUDICROUS_MODE}   ${is_ludicrous_mode}
     ${dir_path}=    normalize path    ${CURDIR}/..
     log    ${dir_path}
     ${result_docker}=    Start Process    docker    rmi      dgraph/dgraph:${dgraph_version}   alias=docker_rmi  stdout=docker_rmi.txt    stderr=docker_rmi_err.txt    cwd=results    shell=True
     Wait For Process    timeout=5 s    on_timeout=continue
-    ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=1
+    ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=${no_of_zeros}   alpha_count=${no_of_alphas}    ludicrous_mode=${LUDICROUS_MODE}
     ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=utilities    shell=True
     ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up_${DOCKER_COMPOSE_UP_COUNT}.txt    stderr=docker_compose_up_err_${DOCKER_COMPOSE_UP_COUNT}.txt    cwd=results    shell=True
     Wait For Process    timeout=30 s    on_timeout=continue
-    Set Dgraph Version from docker      ${container_name}
     ${DOCKER_COMPOSE_UP_COUNT}  Evaluate    ${DOCKER_COMPOSE_UP_COUNT}+1
     Set Suite Variable  ${DOCKER_COMPOSE_UP_COUNT}  ${DOCKER_COMPOSE_UP_COUNT}
-    Set Suite Variable  ${GLOBAL_IS_DOCKER_EXE}     ${TRUE}
+    Set Suite Variable      ${DOCKER_STRING}    docker exec ${container_name}
+
+Start Dgraph 2-node In Docker
+    [Documentation]  Keyword to start dgraph with alpha pointing to bulk loader data in docker setup.
+    [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}   ${is_ludicrous_mode}=${FALSE}
+    Create Backup Folder
+    Set Suite Variable  ${LUDICROUS_MODE}   ${is_ludicrous_mode}
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    log    ${dir_path}
+    ${result_docker}=    Start Process    docker    rmi      dgraph/dgraph:${dgraph_version}   alias=docker_rmi  stdout=docker_rmi.txt    stderr=docker_rmi_err.txt    cwd=results    shell=True
+    Wait For Process    timeout=5 s    on_timeout=continue
+    ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=1    ludicrous_mode=${LUDICROUS_MODE}
+    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=utilities    shell=True
+    ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up_${DOCKER_COMPOSE_UP_COUNT}.txt    stderr=docker_compose_up_err_${DOCKER_COMPOSE_UP_COUNT}.txt    cwd=results    shell=True
+    Wait For Process    timeout=30 s    on_timeout=continue
+    ${DOCKER_COMPOSE_UP_COUNT}  Evaluate    ${DOCKER_COMPOSE_UP_COUNT}+1
+    Set Suite Variable  ${DOCKER_COMPOSE_UP_COUNT}  ${DOCKER_COMPOSE_UP_COUNT}
+    Set Suite Variable      ${DOCKER_STRING}    docker exec ${container_name}
+
+Start Dgraph 2-node In Docker with bulk
+    [Documentation]  Keyword to start dgraph with alpha pointing to bulk loader data in docker setup.
+    [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}   ${is_ludicrous_mode}=${FALSE}
+    Create Backup Folder
+    Set Suite Variable  ${LUDICROUS_MODE}   ${is_ludicrous_mode}
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    log    ${dir_path}
+    ${result_docker}=    Start Process    docker    rmi      dgraph/dgraph:${dgraph_version}   alias=docker_rmi  stdout=docker_rmi.txt    stderr=docker_rmi_err.txt    cwd=results    shell=True
+    Wait For Process    timeout=5 s    on_timeout=continue
+    ${docker_command}   get zero and alpha docker cli command     bulk_path=${bulk_data_path}      container_name=${container_name}     dgraph_version=${dgraph_version}     zero_count=1   alpha_count=2   ludicrous_mode=${LUDICROUS_MODE}
+    ${result_docker}=    Start Process    ./${docker_command}       alias=gen_file  stdout=gen_file.txt    stderr=gen_file_err.txt    cwd=utilities    shell=True
+    ${docker_compose_up}=    Start Process    docker-compose    up       alias=docker_compose_up  stdout=docker_compose_up_${DOCKER_COMPOSE_UP_COUNT}.txt    stderr=docker_compose_up_err_${DOCKER_COMPOSE_UP_COUNT}.txt    cwd=results    shell=True
+    Wait For Process    timeout=30 s    on_timeout=continue
+    ${DOCKER_COMPOSE_UP_COUNT}  Evaluate    ${DOCKER_COMPOSE_UP_COUNT}+1
+    Set Suite Variable  ${DOCKER_COMPOSE_UP_COUNT}  ${DOCKER_COMPOSE_UP_COUNT}
+    Set Suite Variable      ${DOCKER_STRING}    docker exec ${container_name}
 
 Retrigger Docker File
     [Arguments]    ${dgraph_version}     ${container_name}      ${bulk_data_path}      ${is_clear_folder}
@@ -55,7 +76,7 @@ Retrigger Docker File
     ...     AND     Run Keyword If    ${is_clear_folder}    clean up dgraph folders
     ...     AND     Backup directories created while execution
     ...     AND     Backup Yaml File
-    ...     AND     Run Keyword And Return      Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
+    ...     AND     Run Keyword And Return      Start Dgraph 2-node In Docker   ${dgraph_version}     ${container_name}      ${bulk_data_path}
     End Docker Execution    ${dgraph_version}
     Run Keyword And Continue On Failure     Verify Alpha and Zero after termination
     Backup Yaml File
@@ -63,7 +84,7 @@ Retrigger Docker File
     IF    ${is_clear_folder}
         clean up dgraph folders
     END
-    Start Dgraph 2-node In Docker with bulk data  ${dgraph_version}     ${container_name}      ${bulk_data_path}
+    Start Dgraph 2-node In Docker  ${dgraph_version}     ${container_name}      ${bulk_data_path}
 
 End Docker Execution
     [Documentation]  Keyword to end docker execution
@@ -136,18 +157,6 @@ Get Dgraph Docker Branch Details
     ${value}=   Replace String  ${value}    ${space}     ${empty}
     [Return]    ${value}
 
-Set Dgraph Version from docker
-    [Arguments]     ${container_name}
-    [Documentation]     Keyword to get the dgraph version from docker
-    ${docker_process}=     Run Process   docker       exec    ${container_name}   dgraph  version     alias=version   stdout=dgraph_version.txt    shell=True    cwd=results
-    ${version}=     Get Dgraph Docker Version Details
-    ${branch}=      Get Dgraph Docker Branch Details
-    ${version}=  Run Keyword If      'release' in '${branch}'      Replace String     ${branch}      release/    ${EMPTY}
-    ...     ELSE    Set Variable    ${version}
-    ${check}=   Set Execution To Docker     ${version}      ${branch}
-    Set Suite Variable      ${DGRAPH_LATEST_VERSION_CHECK}        ${check}
-    Set Suite Variable      ${DOCKER_STRING}    docker exec ${container_name}
-
 Trigger Loader Process for Docker
     [Arguments]     ${loader_alias}     ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
     [Documentation]     Keyword to only trigger live loader process
@@ -155,7 +164,7 @@ Trigger Loader Process for Docker
     log     ${DOCKER_STRING}
     ${path}=    Set Variable     ${dir_path}    
     ${out_dir}=    Set Variable IF     'bulk' in '${loader_alias}'     ${dir_path}/results/out   ${None}    
-    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}     is_latest_version=${DGRAPH_LATEST_VERSION_CHECK}  docker_string=${DOCKER_STRING}    zero_host_name=${zero_host}     alpha_host_name=${alpha_host}     out_dir=${out_dir}
+    ${conf_loder_command}=    Get Dgraph Loader Command    ${path}/test_data/datasets/${rdf_filename}    ${path}/test_data/datasets/${schema_filename}       ${loader_name}      docker_string=${DOCKER_STRING}    zero_host_name=${zero_host}     alpha_host_name=${alpha_host}     out_dir=${out_dir}
     ${result_loader}=   Start Process    ${conf_loder_command}    alias=${loader_alias}    stdout=${loader_alias}.txt    stderr=${loader_alias}_err.txt    shell=True    cwd=results
 
 Docker Execute Live Loader with rdf and schema parameters
@@ -185,6 +194,8 @@ Docker Verify Live loader trigger properly or not
     [Arguments]  ${loader_alias}    ${rdf_filename}    ${schema_filename}     ${loader_name}    ${zero_host}    ${alpha_host}
     ${dir_path}=    normalize path    ${CURDIR}/..
     ${status}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}    N-Quads:
+    ${loader_health}    Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}_err   Could not setup connection
+    Run Keyword and Return If      ${loader_health}    Fail     Unable to perform live loader due as connection was not established.
     ${loader_err}   Run Keyword And Return Status   Wait Until Keyword Succeeds    3x    10 sec    Grep and Verify file Content in results folder    ${loader_alias}_err   Please retry operation
     ${tcp_error}=    Run Keyword And Return Status   Wait Until Keyword Succeeds    2x    60 sec    Grep and Verify file Content in results folder    ${loader_alias}    Error while dialing dial tcp
     IF  ${status}==${FALSE} or ${tcp_error} or ${loader_err}
@@ -216,7 +227,7 @@ Docker Verify Bulk Process
     @{dirs}     Create List     alpha1  zero1
     Backup Custom Directories Created While Execution  @{dirs}  
     Backup Yaml File
-    Start Dgraph 2-node In Docker with bulk data    ${dgraph_version}     ${container_name}       ${dir_path}/results/out/0/p
+    Start Dgraph 2-node In Docker    ${dgraph_version}     ${container_name}       ${dir_path}/results/out/0/p
     ${compose_file_number}   Evaluate    ${DOCKER_COMPOSE_UP_COUNT} - 1 
     Verify file Content in results folder  docker_compose_up_${compose_file_number}  ${dir_path}/results/out/0/p
 
@@ -280,7 +291,7 @@ Docker Execute Increment Command
     FOR    ${i}    IN RANGE    ${num_threads}
         ${alpha_count}  Evaluate        ${i} + 1
         ${inc_alias}=    Catenate    SEPARATOR=_    parallel    increment    ${i}
-        ${inc_command}  Get dgraph increment command    is_latest_version=${DGRAPH_LATEST_VERSION_CHECK}  docker_string=${DOCKER_STRING}     alpha_host_name=alpha${alpha_count}
+        ${inc_command}  Get dgraph increment command    docker_string=${DOCKER_STRING}     alpha_host_name=alpha${alpha_count}
         ${result_i}=    Process.start Process   ${inc_command}    alias=${inc_alias}    cwd=results    shell=True    stdout=${inc_alias}.txt    stderr=${inc_alias}_err.txt
         Wait For Process    ${inc_alias}    timeout=20 s
     END
@@ -299,21 +310,18 @@ Docker Create NFS Backup
     ${root_path}=    normalize path    ${CURDIR}/..
     ${backup_path}=    Join Path    ${root_path}/backup
     ${alpha_ports}  Get Port From Container     ${container_name}
+    connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     FOR    ${i}    IN RANGE    ${no_of_backups}
-        connect request server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
         ${res}=    Backup Using Admin    ${backup_path}
         log    ${res}
         Verify file exists in a directory with parent folder name    ${backup_path}
-        Health Check for Backup Operation   ${container_name}
+        Health Check for Backup Operation
     END
     @{dirs_backup}=    List Directories In Directory    ${backup_path}
     log     ${dirs_backup}
 
 Health Check for Backup Operation
-    [Arguments]     ${container_name}
     [Documentation]  Keyword to verify if backup operation is completed successfully
-    ${alpha_ports}  Get Port From Container     ${container_name}
-    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     Wait Until Keyword Succeeds    600x    30 sec  Check if backup is completed
 
 Check if backup is completed
@@ -353,8 +361,9 @@ Docker Export NFS data using admin endpoint
     ${alpha_ports}  Get Port From Container     ${container_name}
     Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     ${res}=    Export Nfs Data Admin    data_format=${data_type}    destination=${export_path}
-    log    ${res.text}
+    log    ${res}
     Verify file exists in a directory with parent folder name    ${export_path}
+    Wait Until Keyword Succeeds    2x    60 sec     Verify Perticular file contents in results folder   docker_compose_up   ${DOCKER_COMPOSE_UP_COUNT}    task ${res}: completed successfully
 
 
 Docker Perform a restore on backup latest versions
@@ -373,50 +382,16 @@ Docker Perform a restore on backup latest versions
     ${type}     Get Value From Json     ${json_file}    $..type
     ${enc}     Get Value From Json     ${json_file}    $..encrypted
     Lists Should Be Equal   ${inc_list}     ${type}
-    ${tls_check}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
     ${enc_check}=    Get Enc Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
     Run Keyword If     ${enc_check} is ${True}    List Should Contain Value   ${enc}     ${TRUE}
-    ${dgraph_command}   Set Variable IF  '${DOCKER_STRING}'!='${EMPTY}'     ${DOCKER_STRING} dgraph     dgraph
-    ${cmd}  Catenate   ${dgraph_command}   restore -p ${backup_path} -l ${backup_path} -z localhost:${zero_ports}
-    ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${backup_path}
-    ...    ELSE    Run Keywords    Start Process   ${cmd}      alias=restore    stdout=restorebackup.txt    stderr=restorebackup_err.txt    cwd=results     shell=True
-    ...    AND    Process Should Be Running    restore
-    ...    AND    Wait For Process    restore
-    ...    AND    Process Should Be Stopped    restore
-    ...    AND    Sleep    5s
-    ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${backup_path}      ${zero_ports}
-    Health Check for Restore Operation  ${container_name} 
+    ${result_restore}=   Restore Using Admin    ${backup_path}
+    Health Check for Restore Operation  ${container_name}
 
-Docker Perform a restore on backup by older dgraph versions
-    [Documentation]    Performs an restore operation on the default location i.e "backup" dir.
-    [Arguments]     ${container_name}   ${zero_service}
-    ${zero_ports}  Get Port From Container     ${zero_service}
-    ${alpha_ports}  Get Port From Container     ${container_name}
-    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
-    ${root_dir}=    normalize path    ${CURDIR}/..
-    ${path}=    Join Path    ${root_dir}/backup
-    @{dirs_backup}=    List Directories In Directory    ${path}
-    ${dgraph_command}   Set Variable IF  '${DOCKER_STRING}'!='${EMPTY}'     ${DOCKER_STRING} dgraph     dgraph
-    ${cmd}  Catenate   ${dgraph_command}   restore -p ${backup_path} -l ${backup_path} -z localhost:${zero_ports}
-    FOR     ${i}  IN    ${dirs_backup}
-        ${restore_dir}=    Set Variable    ${i}[0]
-        ${restore_dir}=    Join Path    ${root_dir}/backup/${restore_dir}
-        ${tls_check}=    Get Tls Value  is_docker=${GLOBAL_IS_DOCKER_EXE}
-        ${result_restore}=    Run Keyword If    ${tls_check}   Restore Using Admin    ${restore_dir}
-        ...    ELSE    Run Keywords    Start Process    ${cmd}      alias=restore    stdout=restorebackup.txt   stderr=restorebackup_err.txt     cwd=results    shell=True
-        ...    AND    Process Should Be Running    restore
-        ...    AND    Wait For Process    restore
-        ...    AND    Process Should Be Stopped    restore
-        ...    AND    Sleep    5s
-        ...    AND    Verify Restore File Content In Results Folder    restorebackup    ${restore_dir}      ${zero_ports}
-        Health Check for Restore Operation  ${container_name}
-    END
 
 Health Check for Restore Operation
     [Arguments]     ${container_name}
     [Documentation]  Keyword to verify if backup operation is completed successfully
     ${alpha_ports}  Get Port From Container     ${container_name}
-    Wait Until Keyword Succeeds    20x    30 sec    Connect Request Server      is_docker=${GLOBAL_IS_DOCKER_EXE}   port=${alpha_ports}
     Wait Until Keyword Succeeds    600x    30 sec      Check if restore is completed
 
 Check if restore is completed
@@ -477,6 +452,17 @@ Verify alpha and zero contents in results folder
         ${file_context}=    Get File    ${dir_path}/results/${file_name}_${i}.txt
         Should Contain Any    ${file_context}    @{context}
     END
+
+
+Verify Perticular file contents in results folder
+    [Arguments]    ${file_name}    ${count}=${0}     @{context}
+    [Documentation]    Keyword for checking content in .txt file generated in results folder
+    ...    [Arguments] -> "file_name" -file name ex: alpha for alpha.txt | "cotent" -content you want to check in file
+    ${dir_path}=    normalize path    ${CURDIR}/..
+    ${count_check}=    Evaluate   ${count} - 1
+    ${file_name}=    Set Variable IF  ${count} != 0  ${file_name}_${count_check}     ${file_name}
+    ${file_context}=    Get File    ${dir_path}/results/${file_name}.txt
+    Should Contain Any    ${file_context}    @{context}
 
 Verify file Content in results folder
     [Arguments]    ${file_name}    @{context}
@@ -556,7 +542,7 @@ Backup Yaml File
 
 Backup directories created while execution
     [Documentation]     Keyword to backup execution time directories
-    @{dirs}     Create List     alpha1  zero1  out  alpha   tmp
+    @{dirs}     Create List     alpha1  zero1  out  alpha   tmp    t
     FOR  ${i}  IN    @{dirs}
         ${passed}   Run Keyword and Return Status   Directory Should Exist      results/${i}
         Run Keyword If  ${passed}   Move Directory   results/${i}   results/${GLOBAL_BACKUP_DIR_FOLDER}/${i}_${DOCKER_COMPOSE_UP_COUNT}

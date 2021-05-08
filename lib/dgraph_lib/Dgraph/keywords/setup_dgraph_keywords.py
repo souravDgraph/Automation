@@ -10,7 +10,6 @@ __status__ = "Staging"
 
 from Dgraph.components.setup_configurations import DgraphCLI
 
-
 # pylint: disable=C0301
 
 
@@ -35,15 +34,24 @@ class SetupDgraphKeywords:
         cli_command = self.dgraph_cli.build_zero_cli(**kwargs)
         return cli_command
 
-    def generate_dgraph_alpha_cli_command(self, bulk_path=None, learner=None, zero_address=None,
-                                          is_latest_check=None, **kwargs):
+    def generate_dgraph_alpha_cli_command(
+        self,
+        bulk_path=None,
+        learner=False,
+        offset: int = 0,
+        zero_address=None,
+        cwd=None,
+        group=1,
+        **kwargs
+    ):
         """
         Method to build CLI command for zero and alpha.
         To set the configurations head to-> conf/dgraph/conf_dgraph.json
         :param learner:
-        :param is_latest_check:
         :param zero_address:
+        :param offset: alpha offset value
         :param bulk_path:
+        :param cwd: <alpha working dir>
         kwargs:
             :param ludicrous_mode: enabled|disabled
         :return: cli_command <returns zero | alpha command>
@@ -53,17 +61,25 @@ class SetupDgraphKeywords:
         | Get dgraph cli command | alpha | ludicrous_mode=enabled
 
         """
-        cli_command = self.dgraph_cli.build_alpha_cli(bulk_path, learner=learner, zero_address=zero_address,
-                                                      is_latest_check=is_latest_check, **kwargs)
+        cli_command = self.dgraph_cli.build_alpha_cli(
+            bulk_path,
+            learner=learner,
+            offset=offset,
+            zero_address=zero_address,
+            cwd=cwd,
+            group=group,
+            **kwargs
+        )
         return cli_command
 
     def get_zero_and_alpha_docker_cli_command(
-            self,
-            container_name,
-            dgraph_version,
-            zero_count=1,
-            alpha_count=1,
-            bulk_path=None,
+        self,
+        container_name,
+        dgraph_version,
+        zero_count=1,
+        alpha_count=1,
+        ludicrous_mode=False,
+        bulk_path=None,
     ):
         """
         Method to generate zero docker cli command
@@ -82,23 +98,25 @@ class SetupDgraphKeywords:
                 bulk_path=bulk_path,
                 container_name=container_name,
                 dgraph_version=dgraph_version,
+                ludicrous_mode=ludicrous_mode,
             )
         )
         return alpha_zero_docker_cli_command_list
 
     def get_dgraph_loader_command(
-            self,
-            rdf_file,
-            schema_file,
-            loader_type,
-            is_latest_version=None,
-            docker_string=None,
-            is_learner=None,
-            zero_host_name=None,
-            alpha_host_name=None,
-            zero_address=None,
-            alpha_address=None,
-            out_dir=None,
+        self,
+        rdf_file,
+        schema_file,
+        loader_type,
+        docker_string=None,
+        is_learner=None,
+        zero_host_name=None,
+        alpha_host_name=None,
+        zero_address=None,
+        alpha_address=None,
+        out_dir=None,
+        slash_grpc_endpoint=None,
+        force_namepsace={"check": False, "namespace": 0},
     ):
         """
         Method to build CLI command for live | bulk loading
@@ -112,7 +130,6 @@ class SetupDgraphKeywords:
         :param rdf_file: <path to rdf file>
         :param schema_file: <path to schema file>
         :param loader_type: <live | bulk>
-        :param is_latest_version:
         :param docker_string: <if executing on docker>
         :param offset: <offset value set for alpha and zero>
         :return: loader_command <returns live loader command>
@@ -125,30 +142,29 @@ class SetupDgraphKeywords:
             rdf_file=rdf_file,
             schema_file=schema_file,
             loader_type=loader_type,
-            latest_version_check=is_latest_version,
             docker_string=docker_string,
             zero_host_name=zero_host_name,
             alpha_host_name=alpha_host_name,
             zero_address=zero_address,
             alpha_address=alpha_address,
             out_dir=out_dir,
-            is_learner=is_learner
+            is_learner=is_learner,
+            slash_grpc_endpoint=slash_grpc_endpoint,
+            force_namepsace=force_namepsace,
         )
         return loader_command
 
     def get_dgraph_increment_command(
-            self,
-            is_latest_version=None,
-            docker_string=None,
-            alpha_host_name=None,
-            alpha_address=None,
+        self,
+        docker_string=None,
+        alpha_host_name=None,
+        alpha_address=None,
     ):
         """
         Method to generate increment command for dgraph.
         :param alpha_address:
         :param alpha_host_name:
         :param alpha_offset: <offset value set for alpha> | default : 0
-        :param is_latest_version:
         :param docker_string:
 
         Example:
@@ -158,7 +174,6 @@ class SetupDgraphKeywords:
 
         """
         inc_command = self.dgraph_cli.build_increment_cli_command(
-            is_latest_version,
             docker_string,
             alpha_host_name=alpha_host_name,
             alpha_address=alpha_address,
@@ -214,35 +229,14 @@ class SetupDgraphKeywords:
         self.dgraph_cli = DgraphCLI(is_docker=is_docker)
         self.dgraph_cli.get_enc()
 
-    @staticmethod
-    def check_dgraph_version(version):
-        """
-        Method to check the dgraph version
-        :param version:
-        :return:
-        """
-        return DgraphCLI.check_version(version)
-
-    def set_dgraph_version(self, version=None, branch=None):
-        """
-        Method to get dgraph local version
-        :param version:
-        :param branch:
-        :return:
-        """
-        return self.dgraph_cli.set_dgraph_version(version=version, branch=branch)
-
-    def get_dgraph_details(self, dgraph_details_key):
+    def get_dgraph_details(self, docker_string, dgraph_details_key):
         """
         Method to get the dgraph version details.
         :param dgraph_details_key:
         :return:<value>
         """
+        if is_docker:
+            self.dgraph_cli.store_dgraph_details_docker(docker_string)
+        else:
+            self.dgraph_cli.store_dgraph_details()
         return self.dgraph_cli.get_dgraph_version_details(dgraph_details_key)
-
-    def set_execution_to_docker(self, version, branch):
-        """
-        Method to set DgaphCLI to docker mode.
-        """
-        self.dgraph_cli = DgraphCLI(is_docker=True)
-        return self.dgraph_cli.set_dgraph_version(version, branch)
